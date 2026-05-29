@@ -1,100 +1,79 @@
 /**
  * useSolverAPI.js — Custom React Hook for Solver API Calls
  * ==========================================================
- * THIS IS THE KEY CHANGE FROM THE ORIGINAL APP.
+ * Sends user inputs to the API server and returns results.
  *
- * WHAT IT REPLACES:
- * The original app had a giant useMemo() block (~200 lines) that ran
- * the binary search solver directly in the browser. Now, this hook
- * sends the inputs to the API server and returns the results.
+ * Phase 4.5 update: uses useAuth() from Clerk to attach a session token
+ * to every request. The server requires this token to verify the user
+ * has a valid subscription before running the solver.
  *
- * WHAT IT DOES (plain English):
+ * HOW IT WORKS:
  * 1. Watches all user inputs for changes
- * 2. Waits 500ms after the last change (debouncing — so we don't
- *    flood the server while the user is still typing)
- * 3. Sends the inputs to POST /api/solve
- * 4. Returns the results (or loading/error state)
- *
- * The return value has the exact same shape as the old useMemo result,
- * so the rest of the UI doesn't need to change.
+ * 2. Waits 500ms after the last change (debouncing)
+ * 3. Gets a fresh Clerk session token via getToken()
+ * 4. Sends inputs + token to POST /api/solve
+ * 5. Returns results (or loading/error state)
  */
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import { apiCall } from "../utils/api";
+import { useState, useEffect, useRef } from 'react';
+import { useAuth } from '@clerk/clerk-react';
+import { apiCall } from '../utils/api';
 
 /**
  * @param {Object} inputs — All user inputs (same shape as the API expects)
  * @returns {{ data: Object|null, loading: boolean, error: string|null }}
  */
 export function useSolverAPI(inputs) {
+  const { getToken } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const timerRef = useRef(null);
   const abortRef = useRef(null);
 
-  // Serialize inputs for comparison (detect actual changes)
   const inputsJson = JSON.stringify(inputs);
 
   useEffect(() => {
-    // Clear any pending debounce timer
     if (timerRef.current) clearTimeout(timerRef.current);
-
-    // Abort any in-flight request
     if (abortRef.current) abortRef.current.abort();
 
-    // Debounce: wait 500ms after last change before calling API
     timerRef.current = setTimeout(async () => {
-      // Validate we have minimum viable inputs before calling
-      if (!inputs.currentAge || !inputs.retirementAge || !inputs.lifeExpectancy) {
-        return;
-      }
-      if (!inputs.accounts || inputs.accounts.length === 0) {
-        return;
-      }
+      if (!inputs.currentAge || !inputs.retirementAge || !inputs.lifeExpectancy) return;
+      if (!inputs.accounts || inputs.accounts.length === 0) return;
 
       setLoading(true);
       setError(null);
 
-      // Create an AbortController so we can cancel if inputs change again
       const controller = new AbortController();
       abortRef.current = controller;
 
       try {
-        // Determine which endpoint to call based on whether portfolio overrides exist
-        const hasOverrides =
-          inputs.portfolioOverrides &&
-          Object.keys(inputs.portfolioOverrides).length > 0;
+        // Get a fresh Clerk session token for this request
+        const token = await getToken();
 
-        const result = await apiCall("/api/solve", {
+        const result = await apiCall('/api/solve', {
           ...inputs,
-          // Ensure these are always objects, not undefined
-          marketReturns: inputs.marketReturns || {},
+          marketReturns:     inputs.marketReturns     || {},
           spendingOverrides: inputs.spendingOverrides || {},
           portfolioOverrides: inputs.portfolioOverrides || {},
-        });
+        }, token);
 
-        // Only update if this request wasn't aborted
         if (!controller.signal.aborted) {
           setData(result);
           setLoading(false);
         }
       } catch (err) {
-        if (!controller.signal.aborted) {
-          // Don't show abort errors
-          if (err.name !== "AbortError") {
-            setError(err.message || "Failed to reach solver. Is the API server running?");
-            setLoading(false);
-          }
+        if (!controller.signal.aborted && err.name !== 'AbortError') {
+          setError(err.message || 'Failed to reach the solver API.');
+          setLoading(false);
         }
       }
     }, 500);
 
-    // Cleanup on unmount or re-render
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [inputsJson]);
+  }, [inputsJson]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { data, loading, error };
 }
@@ -105,6 +84,7 @@ export function useSolverAPI(inputs) {
  * Only called when the Compare tab is active.
  */
 export function useCompareAPI(inputs, active) {
+  const { getToken } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -114,7 +94,6 @@ export function useCompareAPI(inputs, active) {
 
   useEffect(() => {
     if (!active) return;
-
     if (timerRef.current) clearTimeout(timerRef.current);
 
     timerRef.current = setTimeout(async () => {
@@ -125,16 +104,19 @@ export function useCompareAPI(inputs, active) {
       setError(null);
 
       try {
-        const result = await apiCall("/api/compare", {
+        const token = await getToken();
+
+        const result = await apiCall('/api/compare', {
           ...inputs,
-          marketReturns: inputs.marketReturns || {},
+          marketReturns:     inputs.marketReturns     || {},
           spendingOverrides: inputs.spendingOverrides || {},
           portfolioOverrides: inputs.portfolioOverrides || {},
-        });
+        }, token);
+
         setData(result);
         setLoading(false);
       } catch (err) {
-        setError(err.message || "Comparison failed");
+        setError(err.message || 'Comparison failed.');
         setLoading(false);
       }
     }, 600);
@@ -142,7 +124,7 @@ export function useCompareAPI(inputs, active) {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [inputsJson, active]);
+  }, [inputsJson, active]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return { data, loading, error };
 }
