@@ -60,13 +60,21 @@ export default function SpendingPhasesTab({
   const numReturnOverrides = Object.keys(marketReturns).length;
   const numSpendingOverrides = Object.keys(spendingOverrides).length;
 
-  // Derive isResetPhase from checkpoint years (API doesn't send this field)
-  const checkpointYearSet = new Set(le.checkpointYears || []);
-  const isAfterCheckpoint = (year) => {
-    for (const cp of (le.checkpointYears || [])) {
-      if (year >= cp) return true;
-    }
-    return false;
+  // Find the most recent checkpoint that applies to a given year.
+  // Returns the checkpoint year, or null if no checkpoint applies yet.
+  const getActiveCheckpoint = (year) => {
+    const cps = (le.checkpointYears || []).filter(cp => cp <= year);
+    return cps.length > 0 ? Math.max(...cps) : null;
+  };
+
+  // Get the spending level for a year's active segment.
+  // Returns: 'down' (spending reduced), 'up' (spending restored/increased), or null (no checkpoint)
+  const getSegmentDirection = (year) => {
+    const cp = getActiveCheckpoint(year);
+    if (cp == null) return null;
+    const segmentSpending = le.spendingSegments?.[cp];
+    if (segmentSpending == null) return null;
+    return segmentSpending < le.baseSpending * 0.999 ? 'down' : 'up';
   };
 
   const updatePhase = (idx, key, val) => {
@@ -332,9 +340,9 @@ export default function SpendingPhasesTab({
                   <Fragment key={d.year}>
                     <tr
                       style={{
-                        background: isAfterCheckpoint(d.year) ? "#fef2f2" : d.age === retirementAge ? "#dbeafe" : hasReturnOverride ? (d.returnPct < 0 ? C.redBg : d.returnPct > defaultReturn ? C.greenBg : "#fffbeb") : rowIdx % 2 === 0 ? "#fff" : "#fafbfc",
+                        background: getSegmentDirection(d.year) === 'down' ? "#fef2f2" : getSegmentDirection(d.year) === 'up' ? "#f0fdf4" : d.age === retirementAge ? "#dbeafe" : hasReturnOverride ? (d.returnPct < 0 ? C.redBg : d.returnPct > defaultReturn ? C.greenBg : "#fffbeb") : rowIdx % 2 === 0 ? "#fff" : "#fafbfc",
                         cursor: "pointer",
-                        borderLeft: isAfterCheckpoint(d.year) ? `3px solid ${C.red}` : "3px solid transparent",
+                        borderLeft: getSegmentDirection(d.year) === 'down' ? `3px solid ${C.red}` : getSegmentDirection(d.year) === 'up' ? `3px solid ${C.green}` : "3px solid transparent",
                       }}
                       onClick={() => setExpandedRows((prev) => ({ ...prev, [d.year]: !prev[d.year] }))}
                     >
