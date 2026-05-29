@@ -474,7 +474,58 @@ export default function SpendingPhasesTab({
                                 <div>Spending: <strong style={{ fontFamily: FONT_MONO, color: phColor }}>{fmtFull(d.annualSpending)}</strong> <span style={{ fontSize: 10, color: C.ltGray }}>({d.phaseName} {Math.round(d.multiplier * 100)}%)</span></div>
                                 {d.spendAdj !== 0 && <div style={{ fontSize: 11, color: d.spendAdj > 0 ? "#166534" : "#991b1b" }}>↳ Adjustment: <strong style={{ fontFamily: FONT_MONO }}>{d.spendAdj > 0 ? "+" : ""}${Math.abs(d.spendAdj).toLocaleString()}</strong></div>}
                                 <div>Social Security: <strong style={{ fontFamily: FONT_MONO }}>{fmtCompact(d.ssIncome)}</strong></div>
-                                <div>From Portfolio: <strong style={{ fontFamily: FONT_MONO }}>{fmtCompact(d.portfolioWd)}</strong></div>
+                                <div
+                                  style={{ cursor: d.portfolioWd > 0 ? 'pointer' : 'default', userSelect: 'none', display: 'flex', alignItems: 'center', gap: 4 }}
+                                  onClick={(e) => { e.stopPropagation(); d.portfolioWd > 0 && setExpandedWds(prev => ({ ...prev, [d.year]: !prev[d.year] })); }}
+                                >
+                                  {d.portfolioWd > 0 && (
+                                    <span style={{ fontSize: 7, color: C.accent, transition: 'transform 0.2s', transform: expandedWds[d.year] ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
+                                  )}
+                                  <span>From Portfolio: <strong style={{ fontFamily: FONT_MONO }}>{fmtCompact(d.portfolioWd)}</strong></span>
+                                  {d.portfolioWd > 0 && <span style={{ fontSize: 9, color: C.ltGray }}>(detail)</span>}
+                                </div>
+                                {expandedWds[d.year] && d.portfolioWd > 0 && (
+                                  <div style={{ marginTop: 4, marginLeft: 10, padding: '8px 10px', background: '#fff', borderRadius: 8, border: `1px solid ${C.border}` }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: '0 8px', fontSize: 9, marginBottom: 4 }}>
+                                      <span style={{ color: C.gray, fontWeight: 700 }}>Account</span>
+                                      <span style={{ color: C.gray, fontWeight: 700, textAlign: 'right' }}>Avail</span>
+                                      <span style={{ color: C.gray, fontWeight: 700, textAlign: 'right' }}>Drawn</span>
+                                      <span style={{ color: C.gray, fontWeight: 700, textAlign: 'right' }}>Left</span>
+                                      <span style={{ color: C.gray, fontWeight: 700, textAlign: 'right' }}>%</span>
+                                    </div>
+                                    {accounts.map((acct, ai) => {
+                                      const drawn = d.acctWds[ai] || 0;
+                                      const avail = d.preWdBals ? d.preWdBals[ai] : 0;
+                                      const left  = d.acctEndBals ? d.acctEndBals[ai] : 0;
+                                      const pct   = d.portfolioWd > 0 ? drawn / d.portfolioWd * 100 : 0;
+                                      if (drawn <= 0 && avail < 100) return null;
+                                      const barColor = acct.taxTreatment === 'Pre-tax' ? C.accent
+                                                     : acct.taxTreatment === 'Tax-free' ? C.green
+                                                     : C.goGo;
+                                      return (
+                                        <div key={ai} style={{ marginBottom: 4 }}>
+                                          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: '0 8px', alignItems: 'center', fontSize: 10 }}>
+                                            <span style={{ color: C.navy, fontWeight: 500 }}>
+                                              {acct.name}
+                                              {drawn > 0 && left < 100 && (
+                                                <span style={{ fontSize: 7, color: C.red, fontWeight: 700, marginLeft: 3 }}>DEPLETED</span>
+                                              )}
+                                            </span>
+                                            <span style={{ fontFamily: FONT_MONO, color: C.gray, textAlign: 'right' }}>{fmtCompact(avail)}</span>
+                                            <span style={{ fontFamily: FONT_MONO, color: drawn > 0 ? C.red : C.ltGray, textAlign: 'right' }}>{drawn > 0 ? '-' + fmtCompact(drawn) : '–'}</span>
+                                            <span style={{ fontFamily: FONT_MONO, color: left > 0 ? C.navy : C.ltGray, textAlign: 'right' }}>{fmtCompact(left)}</span>
+                                            <span style={{ fontFamily: FONT_MONO, color: C.ltGray, textAlign: 'right' }}>{drawn > 0 ? pct.toFixed(0) + '%' : '–'}</span>
+                                          </div>
+                                          {drawn > 0 && (
+                                            <div style={{ height: 3, background: '#e2e8f0', borderRadius: 2, overflow: 'hidden', marginTop: 2 }}>
+                                              <div style={{ height: '100%', width: pct + '%', background: barColor, borderRadius: 2 }} />
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
                               </div>
                             </div>
                             {/* Tax impact */}
