@@ -1,20 +1,7 @@
-/**
- * SubscriptionContext.jsx
- * =======================
- * Provides subscription status to the entire app.
- *
- * Any component can call useSubscription() to get:
- *   subscription.status  — 'trialing' | 'active' | 'none'
- *   subscription.tier    — 'standard' | 'pro' | null
- *   loading              — true while fetching
- *   refetch()            — call after subscription changes (e.g. after checkout)
- */
-
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { useAuth } from '@clerk/clerk-react'
 
 const SubscriptionContext = createContext(null)
-
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 export function SubscriptionProvider({ children }) {
@@ -28,13 +15,11 @@ export function SubscriptionProvider({ children }) {
       setLoading(false)
       return
     }
-
     try {
       const token = await getToken()
       const res = await fetch(`${API_URL}/api/subscription`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-
       if (res.ok) {
         const data = await res.json()
         setSubscription(data)
@@ -49,7 +34,6 @@ export function SubscriptionProvider({ children }) {
     }
   }, [isSignedIn, getToken])
 
-  // Fetch when auth state is ready
   useEffect(() => {
     if (!isLoaded) return
     fetchSubscription()
@@ -59,7 +43,12 @@ export function SubscriptionProvider({ children }) {
     subscription,
     loading,
     refetch: fetchSubscription,
-    // Convenience booleans
+    // Allows SuccessPage to update subscription directly from server response,
+    // avoiding the Clerk metadata propagation race condition
+    updateSubscription: (data) => {
+      setSubscription(data)
+      setLoading(false)
+    },
     hasAccess: ['trialing', 'active'].includes(subscription.status),
     isPro: subscription.status === 'active' && subscription.tier === 'pro',
     isTrialing: subscription.status === 'trialing',

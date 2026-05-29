@@ -1,12 +1,3 @@
-/**
- * SuccessPage.jsx
- * ===============
- * User lands here after completing Stripe Checkout.
- * Calls /api/link-subscription on the server to store the
- * Stripe customer ID in the user's Clerk metadata.
- * Then redirects to /app once the subscription is confirmed.
- */
-
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '@clerk/clerk-react'
@@ -18,8 +9,8 @@ export default function SuccessPage() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { getToken } = useAuth()
-  const { refetch } = useSubscription()
-  const [status, setStatus] = useState('linking') // 'linking' | 'done' | 'error'
+  const { updateSubscription, refetch } = useSubscription()
+  const [status, setStatus] = useState('linking')
   const [message, setMessage] = useState('Setting up your subscription...')
 
   useEffect(() => {
@@ -35,13 +26,21 @@ export default function SuccessPage() {
 
         if (!res.ok) throw new Error('Failed to link subscription')
 
-        // Refresh subscription context so ProtectedRoute lets them through
-        await refetch()
-        setStatus('done')
-        setMessage('You\'re all set! Taking you to the app...')
+        const data = await res.json()
 
-        // Redirect to app after a short pause
+        // Update subscription context directly from the server response.
+        // This avoids the Clerk metadata propagation delay that would cause
+        // an immediate refetch() to return status: 'none'.
+        if (data.subscription) {
+          updateSubscription(data.subscription)
+        } else {
+          await refetch()
+        }
+
+        setStatus('done')
+        setMessage("You're all set! Taking you to the app...")
         setTimeout(() => navigate('/app'), 1500)
+
       } catch (err) {
         console.error(err)
         setStatus('error')
@@ -52,22 +51,16 @@ export default function SuccessPage() {
     if (sessionId) {
       linkSubscription()
     } else {
-      // No session ID — maybe they landed here directly, just send to app
       refetch().then(() => navigate('/app'))
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div style={{
-      minHeight: '100vh',
-      background: '#0f172a',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: 'DM Sans, sans-serif',
-      padding: 24,
-      textAlign: 'center',
+      minHeight: '100vh', background: '#0f172a',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      fontFamily: 'DM Sans, sans-serif', padding: 24, textAlign: 'center',
     }}>
       {status === 'linking' && (
         <>
@@ -78,17 +71,15 @@ export default function SuccessPage() {
           <div style={{ fontSize: 14, color: '#64748b' }}>{message}</div>
         </>
       )}
-
       {status === 'done' && (
         <>
           <div style={{ fontSize: 48, marginBottom: 16 }}>✓</div>
           <div style={{ fontSize: 22, fontWeight: 700, color: '#10b981', marginBottom: 8 }}>
             Welcome!
           </div>
-          <div style={{ fontSize: 14, color: '#64748b' }}>{message}</div>
+          <div style={{ fontSize: 14, color: '#94a3b8' }}>{message}</div>
         </>
       )}
-
       {status === 'error' && (
         <>
           <div style={{ fontSize: 36, color: '#ef4444', marginBottom: 16 }}>⚠</div>
@@ -96,15 +87,10 @@ export default function SuccessPage() {
             Something went wrong
           </div>
           <div style={{ fontSize: 14, color: '#94a3b8', marginBottom: 24 }}>{message}</div>
-          <button
-            onClick={() => navigate('/pricing')}
-            style={{
-              background: '#10b981', color: '#fff', border: 'none',
-              padding: '10px 24px', borderRadius: 8,
-              fontSize: 14, fontWeight: 600,
-              fontFamily: 'DM Sans, sans-serif', cursor: 'pointer',
-            }}
-          >
+          <button onClick={() => navigate('/pricing')}
+            style={{ background: '#10b981', color: '#fff', border: 'none',
+              padding: '10px 24px', borderRadius: 8, fontSize: 14,
+              fontWeight: 600, fontFamily: 'DM Sans, sans-serif', cursor: 'pointer' }}>
             Back to Pricing
           </button>
         </>
