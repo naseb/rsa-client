@@ -73,9 +73,10 @@ export default function LandingPage() {
         }
         .lp-hero-title .accent { color: #10b981; }
         .lp-hero-sub {
-          font-size: 18px; color: #94a3b8; line-height: 1.7;
-          max-width: 580px; margin: 0 auto 40px;
+          font-size: 18px; color: #94a3b8; line-height: 1.8;
+          max-width: 620px; margin: 0 auto 40px;
         }
+        .lp-hero-sub em { color: #cbd5e1; font-style: italic; }
         .lp-hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
         .lp-btn-primary {
           background: #10b981; color: #fff; border: none;
@@ -278,12 +279,14 @@ export default function LandingPage() {
 
         {/* HERO */}
         <section className="lp-hero">
-          <div className="lp-eyebrow-pill">Free Retirement Planning Tool</div>
+          <div className="lp-eyebrow-pill">The Smarter Retirement Income Planning Tool</div>
           <h1 className="lp-hero-title">
-            "Stop Guessing How Much You Can Spend In Retirement. Know Exactly What Your Accounts Can Pay You."
+            Not "how little can I live on" —<br />but "how much can I actually <span className="accent">spend</span>?"
           </h1>
           <p className="lp-hero-sub">
-            The Retirement Spending Allowance finds your maximum sustainable spending — built around your real accounts, taxes, and Social Security. More in your active years, tapering naturally as your pace slows. Not a rule of thumb.
+            You spent decades building your accounts. Now comes the question that keeps retirees up at night:{' '}
+            <em>how much can I actually take out without running dry?</em>{' '}
+            Enter your balances once and get a precise, personalized answer — built around your real taxes, Social Security, and how your spending naturally changes as you age.
           </p>
           <div className="lp-hero-btns">
             <button className="lp-btn-primary" onClick={launchApp}>Launch the App →</button>
