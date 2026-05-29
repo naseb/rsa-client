@@ -21,8 +21,9 @@ export default function TaxOptimizationTab({ inputs }) {
   const [data, setData]             = useState(null);
   const [loading, setLoading]       = useState(false);
   const [error, setError]           = useState(null);
-  const [activeSection, setSection] = useState('instructions');
-  const [howOpen, setHowOpen]       = useState(true);
+  const [activeSection, setSection]   = useState('instructions');
+  const [howOpen, setHowOpen]         = useState(true);
+  const [inputsAtRun, setInputsAtRun] = useState(null);
   const hasFetched = useRef(false);
 
   useEffect(() => {
@@ -52,6 +53,7 @@ export default function TaxOptimizationTab({ inputs }) {
         throw new Error(err.error || `Error ${res.status}`);
       }
       setData(await res.json());
+      setInputsAtRun(JSON.stringify(inputs));
       setSection('summary');
     } catch (err) {
       setError(err.message);
@@ -87,34 +89,38 @@ export default function TaxOptimizationTab({ inputs }) {
   const getZeroReason = () => {
     if (!taxAnalysis || taxAnalysis.length === 0) return null;
     const windowRows = taxAnalysis.filter(r => r.isInConversionWindow);
-    const preTaxGoneEarly = windowRows.length > 0 &&
-      windowRows[windowRows.length - 1].preTaxBalance < 5000;
+    const lastWindowRow = windowRows[windowRows.length - 1];
+    const preTaxGoneByEndOfWindow = lastWindowRow && lastWindowRow.preTaxBalance < 5000;
     const alwaysAtPeakBracket = windowRows.every(r => r.currentBracketRate >= 0.24);
     const noPretax = taxAnalysis.every(r => r.preTaxBalance < 5000);
 
     if (noPretax) return {
       title: 'No Pre-tax balance to convert',
-      body: 'Roth conversions and bracket filling only apply to Traditional 401(k)/IRA balances. Your accounts are already in Roth or Taxable — no conversion is needed.',
+      body: 'Roth conversions and bracket filling only apply to Traditional 401(k) and Traditional IRA balances. Your accounts are already in Roth or Taxable accounts — no conversion action is needed.',
       positive: true,
     };
-    if (preTaxGoneEarly && alwaysAtPeakBracket) return {
-      title: 'Your RSA plan is already doing the work',
-      body: `Your spending plan naturally depletes your entire Pre-tax balance by age ${windowRows[windowRows.length - 1].age} — during the conversion window and at the ${windowRows[0].currentBracketLabel} bracket. A Roth conversion would cost the same rate. The RSA's structured withdrawals are already the optimization.`,
+    if (preTaxGoneByEndOfWindow && alwaysAtPeakBracket) return {
+      title: 'Pre-tax balance depletes during retirement at your peak bracket',
+      body: `Your spending plan withdraws your entire Pre-tax balance by age ${lastWindowRow.age} at the ${windowRows[0].currentBracketLabel} bracket. A Roth conversion would cost the same ${windowRows[0].currentBracketLabel} rate — so there is no tax saving from converting. Your withdrawal sequence is already efficient.`,
+      tip: 'If you want to shift more into Roth for estate planning or flexibility reasons, you can still convert — just know it will not reduce your lifetime tax bill at your current income level.',
       positive: true,
     };
-    if (preTaxGoneEarly) return {
-      title: 'Pre-tax balance fully depleted during conversion window',
-      body: `Your Pre-tax accounts reach $0 by age ${windowRows[windowRows.length - 1].age}, before RMDs begin. There is no remaining balance that would generate forced RMD income, so no conversion ladder is needed.`,
+    if (preTaxGoneByEndOfWindow) return {
+      title: 'Pre-tax balance depletes before RMDs begin',
+      body: `Your current spending plan withdraws your entire Pre-tax balance by age ${lastWindowRow.age}, before your RMD start age of ${summary.rmdStartAge}. This means RMDs will not create unexpected taxable income later — which is exactly the goal a Roth conversion ladder is designed to achieve.`,
+      tip: 'Your spending plan is accomplishing the same outcome as a Roth conversion ladder — no forced RMDs. The difference: conversions move money to Roth (tax-free growth) rather than spending it. If leaving a tax-free inheritance matters to you, targeted Roth conversions are still worth considering even with $0 net tax savings.',
       positive: true,
     };
     if (alwaysAtPeakBracket) return {
-      title: 'Already at peak bracket throughout retirement',
-      body: `Your income places you in the ${windowRows[0].currentBracketLabel} bracket throughout retirement. Converting to Roth would cost the same rate as your current withdrawals — no net tax saving is available.`,
+      title: 'Income is at your peak bracket throughout retirement',
+      body: `Your income places you in the ${windowRows[0].currentBracketLabel} bracket throughout retirement. Since Roth conversions would also cost ${windowRows[0].currentBracketLabel}, there is no rate arbitrage available — converting does not reduce your lifetime tax bill.`,
+      tip: 'This can change if your income drops in later years. Check the Tax Diagnosis tab to see if any low-income years appear after your Pre-tax balance depletes.',
       positive: false,
     };
     return {
-      title: 'No optimization opportunities identified',
-      body: 'Based on your current inputs, your withdrawal plan does not benefit materially from Roth conversions, bracket filling, or sequencing changes. Revisit if your account balances or retirement age change.',
+      title: 'No optimization opportunities found with current inputs',
+      body: 'Based on your current account balances, retirement age, and return assumptions, the optimizer did not find Roth conversions or bracket-filling strategies that would reduce your lifetime taxes. This can change if your inputs change.',
+      tip: 'Try adjusting your retirement age, account balances, or return assumptions — different scenarios may reveal opportunities.',
       positive: false,
     };
   };
@@ -198,7 +204,26 @@ export default function TaxOptimizationTab({ inputs }) {
       {/* ── Only show tabs and content if data loaded ── */}
       {data && (
         <>
-          {/* ── TAB BAR ── */}
+          {/* ── STALE WARNING ── */}
+      {inputsAtRun && inputsAtRun !== JSON.stringify(inputs) && (
+        <div style={{
+          background: '#fffbeb', border: '1px solid #fde68a',
+          borderRadius: 10, padding: '10px 16px', marginBottom: 12,
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        }}>
+          <span style={{ fontSize: 13, color: '#92400e' }}>
+            ⚠ Your inputs have changed since this analysis was run — results may be outdated.
+          </span>
+          <button onClick={() => { hasFetched.current = false; fetchOptimization(); }}
+            style={{ padding: '5px 14px', background: '#d97706', color: '#fff',
+              border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 700,
+              cursor: 'pointer', fontFamily: FONT_BODY, marginLeft: 12, whiteSpace: 'nowrap' }}>
+            Re-run Now
+          </button>
+        </div>
+      )}
+
+      {/* ── TAB BAR ── */}
           <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12,
             padding: '12px 16px', marginBottom: 16, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
             {sBtn('summary',   '⊕ Summary')}
@@ -240,21 +265,17 @@ export default function TaxOptimizationTab({ inputs }) {
                     </div>
                   </div>
 
-                  {zeroReason.positive && (
-                    <div style={{ background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)',
-                      borderRadius: 10, padding: '14px 18px', marginTop: 8, maxWidth: 680 }}>
-                      <div style={{ fontSize: 13, color: '#6ee7b7', fontWeight: 600, marginBottom: 4 }}>
-                        What this means for you
-                      </div>
-                      <div style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.7 }}>
-                        Your RSA spending plan is already structured in a tax-efficient way. The three-phase
-                        withdrawal strategy is naturally depleting your Pre-tax accounts during retirement —
-                        the same outcome a Roth conversion ladder would target. You can still review the
-                        Roth Conversions and Bracket Filling tabs to see what was checked, and the
-                        Tax Diagnosis tab to see your full year-by-year tax picture.
-                      </div>
-                    </div>
-                  )}
+                  {zeroReason.tip && (
+                        <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)',
+                          borderRadius: 10, padding: '14px 18px', marginTop: 12, maxWidth: 680 }}>
+                          <div style={{ fontSize: 12, color: '#6ee7b7', fontWeight: 700, marginBottom: 4 }}>
+                            💡 Worth knowing
+                          </div>
+                          <div style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.7 }}>
+                            {zeroReason.tip}
+                          </div>
+                        </div>
+                      )}
 
                   <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 20 }}>
                     {[
