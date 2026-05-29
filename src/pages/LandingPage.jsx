@@ -280,10 +280,10 @@ export default function LandingPage() {
         <section className="lp-hero">
           <div className="lp-eyebrow-pill">Free Retirement Planning Tool</div>
           <h1 className="lp-hero-title">
-            Spend more when it<br />matters <span className="accent">most</span>
+            Not "how little can I live on" —<br />but "how much can I actually <span className="accent">spend</span>?"
           </h1>
           <p className="lp-hero-sub">
-            The Retirement Spending Allowance adapts to how you actually live — more in your active Go-Go years, naturally tapering as your pace slows. Unlike the 4% rule, it works with your real numbers.
+            The Retirement Spending Allowance finds your maximum sustainable spending — built around your real accounts, taxes, and Social Security. More in your active years, tapering naturally as your pace slows. Not a rule of thumb.
           </p>
           <div className="lp-hero-btns">
             <button className="lp-btn-primary" onClick={launchApp}>Launch the App →</button>

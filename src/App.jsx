@@ -11,6 +11,7 @@
  */
 
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSolverAPI, useCompareAPI } from "./hooks/useSolverAPI";
 import { C, FONT_BODY, FONT_MONO, fmtCompact, STORAGE_KEY } from "./utils/theme";
 import { DEFAULTS } from "./utils/defaults";
@@ -21,6 +22,8 @@ import SpendingPhasesTab from "./components/SpendingPhasesTab";
 import CompareTab from "./components/CompareTab";
 
 export default function App() {
+  const navigate = useNavigate();
+
   // --- Tab state ---
   const [activeTab, setActiveTab] = useState("instructions");
   const [saveMsg, setSaveMsg] = useState("");
@@ -225,6 +228,7 @@ export default function App() {
               {saveMsg}
             </span>
           )}
+          <button onClick={() => navigate("/")} style={{ ...headerBtn, background: "rgba(16,185,129,0.15)", borderColor: "rgba(16,185,129,0.3)", color: "#10b981" }}>⌂ Home</button>
           <button onClick={handleExport} style={headerBtn}>💾 Export</button>
           <button onClick={handleImport} style={headerBtn}>📂 Import</button>
           <button onClick={handleReset} style={headerBtn}>↺ Reset</button>
