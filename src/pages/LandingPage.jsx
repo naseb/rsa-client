@@ -280,7 +280,7 @@ export default function LandingPage() {
         <section className="lp-hero">
           <div className="lp-eyebrow-pill">Free Retirement Planning Tool</div>
           <h1 className="lp-hero-title">
-            Not "how little can I live on" —<br />but "how much can I actually <span className="accent">spend</span>?"
+            "Stop Guessing How Much You Can Spend In Retirement. Know Exactly What Your Accounts Can Pay You."
           </h1>
           <p className="lp-hero-sub">
             The Retirement Spending Allowance finds your maximum sustainable spending — built around your real accounts, taxes, and Social Security. More in your active years, tapering naturally as your pace slows. Not a rule of thumb.
