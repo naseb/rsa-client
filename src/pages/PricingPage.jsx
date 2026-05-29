@@ -144,7 +144,7 @@ export default function PricingPage() {
           </span>
         </a>
         {isSignedIn && (
-          <div style={{ fontSize: 13, color: '#64748b' }}>
+          <div style={{ fontSize: 13, color: '#cbd5e1' }}>
             Signed in as {user?.primaryEmailAddress?.emailAddress}
           </div>
         )}

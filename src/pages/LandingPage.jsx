@@ -36,7 +36,7 @@ export default function LandingPage() {
         .lp-logo { display: flex; align-items: center; gap: 10px; }
         .lp-logo-diamond { color: #10b981; font-size: 20px; }
         .lp-logo-text { font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15px; color: #f1f5f9; }
-        .lp-logo-sub { font-size: 11px; color: #64748b; letter-spacing: 0.07em; text-transform: uppercase; }
+        .lp-logo-sub { font-size: 11px; color: #94a3b8; letter-spacing: 0.07em; text-transform: uppercase; }
         .lp-nav-cta {
           background: #10b981; color: #fff; border: none;
           padding: 9px 22px; border-radius: 8px;
@@ -305,7 +305,7 @@ export default function LandingPage() {
                 <div>
                   <div className="lp-ph-eyebrow">Retirement Spending Allowance</div>
                   <div className="lp-ph-title">
-                    ◆ <span style={{ color: '#10b981' }}>Go-Go</span> · <span style={{ color: '#64748b' }}>Slow-Go</span> · <span style={{ color: '#475569' }}>No-Go</span>
+                    ◆ <span style={{ color: '#10b981' }}>Go-Go</span> · <span style={{ color: '#94a3b8' }}>Slow-Go</span> · <span style={{ color: '#475569' }}>No-Go</span>
                   </div>
                   <div className="lp-ph-sub">Portfolio: $1,850,000 · Goal: $500,000 at age 90</div>
                 </div>
@@ -317,7 +317,7 @@ export default function LandingPage() {
               <div className="lp-mini-row">
                 <div className="lp-mc"><div className="lp-mc-lbl">Go-Go Spending</div><div className="lp-mc-val">$114,200</div><div className="lp-mc-sub">$9,517/mo · Ages 65–75</div></div>
                 <div className="lp-mc"><div className="lp-mc-lbl">Slow-Go Spending</div><div className="lp-mc-val" style={{ color: '#94a3b8' }}>$91,360</div><div className="lp-mc-sub">$7,613/mo · Ages 75–85</div></div>
-                <div className="lp-mc"><div className="lp-mc-lbl">No-Go Spending</div><div className="lp-mc-val" style={{ color: '#64748b' }}>$68,520</div><div className="lp-mc-sub">$5,710/mo · Ages 85–90</div></div>
+                <div className="lp-mc"><div className="lp-mc-lbl">No-Go Spending</div><div className="lp-mc-val" style={{ color: '#94a3b8' }}>$68,520</div><div className="lp-mc-sub">$5,710/mo · Ages 85–90</div></div>
               </div>
               <table className="lp-pt">
                 <thead><tr><th>Age</th><th>Phase</th><th>Spending</th><th>Portfolio</th><th>Tax</th></tr></thead>
@@ -390,7 +390,7 @@ export default function LandingPage() {
             </div>
             <div className="lp-vc">
               <div className="lp-vb gray">The standard approach</div>
-              <div className="lp-vn" style={{ color: '#64748b' }}>The 4% Rule</div>
+              <div className="lp-vn" style={{ color: '#94a3b8' }}>The 4% Rule</div>
               <div className="lp-vt">Simple, but one-size-fits-all</div>
               <ul className="lp-vl">
                 {['Flat spending every year regardless of lifestyle','No tax optimization','No RMD or IRMAA awareness','No Social Security integration','No account-type sequencing','No scenario modeling','No bequest / goal target'].map(i => <li className="no" key={i}>{i}</li>)}
