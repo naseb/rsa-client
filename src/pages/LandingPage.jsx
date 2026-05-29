@@ -284,9 +284,9 @@ export default function LandingPage() {
             "Stop Guessing How Much You Can Spend In Retirement. Know Exactly What Your Accounts Can Pay You."
           </h1>
           <p className="lp-hero-sub">
-            You spent decades building your accounts. Now comes the question that keeps retirees up at night:{' '}
-            <em>how much can I actually take out without running dry?</em>{' '}
-            Enter your balances once and get a precise, personalized answer — built around your real taxes, Social Security, and how your spending naturally changes as you age.
+            You spent decades building your retirement accounts. Now comes the question that keeps retirees up at night:{' '}
+            <em>how much can I actually take out without running out of money?</em>{' '}
+            Enter your balances once and get a precise, personalized answer — built around Social Security, Taxes and how your spending naturally changes as you age.
           </p>
           <div className="lp-hero-btns">
             <button className="lp-btn-primary" onClick={launchApp}>Launch the App →</button>
