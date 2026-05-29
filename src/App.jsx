@@ -17,12 +17,15 @@ import { C, FONT_BODY, FONT_MONO, fmtCompact, STORAGE_KEY } from "./utils/theme"
 import { DEFAULTS } from "./utils/defaults";
 
 import InstructionsTab from "./components/InstructionsTab";
+import TaxOptimizationTab from "./components/TaxOptimizationTab";
+import { useSubscription } from "./context/SubscriptionContext";
 import SettingsTab from "./components/SettingsTab";
 import SpendingPhasesTab from "./components/SpendingPhasesTab";
 import CompareTab from "./components/CompareTab";
 
 export default function App() {
   const navigate = useNavigate();
+  const { isPro } = useSubscription();
 
   // --- Tab state ---
   const [activeTab, setActiveTab] = useState("instructions");
@@ -242,6 +245,7 @@ export default function App() {
           { id: "settings", label: "Settings & Accounts" },
           { id: "phases", label: "Spending Phases" },
           { id: "compare", label: "vs 4% Rule" },
+          { id: "taxopt", label: isPro ? "⚡ Tax Optimization" : "🔒 Tax Optimization Pro" },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -291,6 +295,10 @@ export default function App() {
             portfolioOverrides={portfolioOverrides}
             setPortfolioOverrides={setPortfolioOverrides}
           />
+        )}
+
+        {activeTab === "taxopt" && (
+          <TaxOptimizationTab inputs={inputs} />
         )}
 
         {activeTab === "compare" && (
