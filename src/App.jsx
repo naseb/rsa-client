@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth, UserButton } from "@clerk/clerk-react";
 import { useSolverAPI, useCompareAPI } from "./hooks/useSolverAPI";
 import { C, FONT_BODY, FONT_MONO, fmtCompact, STORAGE_KEY } from "./utils/theme";
 import { DEFAULTS } from "./utils/defaults";
@@ -26,6 +27,8 @@ import CompareTab from "./components/CompareTab";
 export default function App() {
   const navigate = useNavigate();
   const { isPro } = useSubscription();
+  const { getToken } = useAuth();
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
   // --- Tab state ---
   const [activeTab, setActiveTab] = useState("instructions");
@@ -119,6 +122,22 @@ export default function App() {
       transitionYears: setTransitionYears, smoothTransition: setSmoothTransition,
     };
     if (setters[key]) setters[key](value);
+  };
+
+  // --- Manage Billing ---
+  const handleManageBilling = async () => {
+    try {
+      const token = await getToken();
+      const res = await fetch(`${API_URL}/api/create-portal-session`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Portal unavailable');
+      const { url } = await res.json();
+      window.location.href = url;
+    } catch (err) {
+      alert('Could not open billing portal. Please try again.');
+    }
   };
 
   // --- Export/Import/Reset ---
@@ -232,9 +251,11 @@ export default function App() {
             </span>
           )}
           <button onClick={() => navigate("/")} style={{ ...headerBtn, background: "rgba(16,185,129,0.15)", borderColor: "rgba(16,185,129,0.3)", color: "#10b981" }}>⌂ Home</button>
+          <button onClick={handleManageBilling} style={{ ...headerBtn, background: "rgba(184,134,11,0.15)", borderColor: "rgba(184,134,11,0.3)", color: "#f59e0b" }}>⚙ Account</button>
           <button onClick={handleExport} style={headerBtn}>💾 Export</button>
           <button onClick={handleImport} style={headerBtn}>📂 Import</button>
           <button onClick={handleReset} style={headerBtn}>↺ Reset</button>
+          <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
         </div>
       </div>
 
