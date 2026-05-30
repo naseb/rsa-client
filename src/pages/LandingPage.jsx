@@ -397,7 +397,7 @@ export default function LandingPage() {
           <div className="lp-fg">
             {[
               { icon: '◆', title: 'Three-Phase Spending', desc: 'Go-Go, Slow-Go, and No-Go phases reflect your real lifestyle arc. Spend more while you\'re active, taper naturally as your pace slows.' },
-              { icon: '⚡', title: 'Tax-Optimized Withdrawals', desc: 'Sequences withdrawals across Pre-tax, Tax-free, and Taxable accounts to minimize your lifetime federal tax burden.' },
+              { icon: '⚡', title: 'Tax-Optimized Withdrawals', desc: 'Sequences withdrawals across Pre-tax, Tax-free, and Taxable accounts to minimize your lifetime federal tax burden.', comingSoon: 'Tax Optimization Pro' },
               { icon: '📊', title: 'RMD & IRMAA Aware', desc: 'Accounts for Required Minimum Distributions and Medicare IRMAA surcharges — the details most retirement tools completely ignore.' },
               { icon: '📉', title: 'Market Crash Modeling', desc: 'Override market returns in any year to see exactly how a downturn affects your plan — and how long your portfolio takes to recover.' },
               { icon: '🔐', title: 'Fully Private', desc: 'Your data never leaves your browser. Export and import your complete plan as a local file at any time.' },
@@ -405,7 +405,17 @@ export default function LandingPage() {
             ].map(f => (
               <div className="lp-fc" key={f.title}>
                 <div className="lp-fi">{f.icon}</div>
-                <div className="lp-ft">{f.title}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                  <div className="lp-ft" style={{ marginBottom: 0 }}>{f.title}</div>
+                  {f.comingSoon && (
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
+                      textTransform: 'uppercase', padding: '2px 8px', borderRadius: 100,
+                      background: 'rgba(184,134,11,0.15)', color: '#b8860b',
+                      border: '1px solid rgba(184,134,11,0.3)', whiteSpace: 'nowrap',
+                    }}>Coming Soon</span>
+                  )}
+                </div>
                 <div className="lp-fd">{f.desc}</div>
               </div>
             ))}

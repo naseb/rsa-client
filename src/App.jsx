@@ -17,14 +17,14 @@ import { DEFAULTS } from "./utils/defaults";
 import { useSubscription } from "./context/SubscriptionContext";
 
 import InstructionsTab      from "./components/InstructionsTab";
-import TaxOptimizationTab   from "./components/TaxOptimizationTab";
+// import TaxOptimizationTab from "./components/TaxOptimizationTab"; // hidden — Phase 5 branch
 import SettingsTab          from "./components/SettingsTab";
 import SpendingPhasesTab    from "./components/SpendingPhasesTab";
 import CompareTab           from "./components/CompareTab";
 
 export default function App() {
   const navigate  = useNavigate();
-  const { isPro } = useSubscription();
+  const { isPro } = useSubscription(); // kept for future Tax Optimization tab
   const { getToken } = useAuth();
   const API_URL   = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -281,7 +281,8 @@ export default function App() {
           { id: "settings",     label: "Settings & Accounts" },
           { id: "phases",       label: "Spending Phases" },
           { id: "compare",      label: "vs 4% Rule" },
-          { id: "taxopt",       label: isPro ? "⚡ Tax Optimization" : "🔒 Tax Optimization Pro" },
+          // Tax Optimization tab hidden until Phase 5 rewrite is complete
+          // { id: "taxopt", label: isPro ? "⚡ Tax Optimization" : "🔒 Tax Optimization Pro" },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -334,9 +335,11 @@ export default function App() {
           />
         )}
 
+        {/* Tax Optimization tab content — hidden until Phase 5 rewrite
         {activeTab === "taxopt" && (
           <TaxOptimizationTab inputs={inputs} />
         )}
+        */}
 
         {activeTab === "compare" && (
           <CompareTab
