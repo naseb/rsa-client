@@ -307,7 +307,7 @@ export default function LandingPage() {
         {/* ── HERO ── */}
         <section className="lp-hero">
           <div className="lp-eyebrow-pill">The Smarter Retirement Income Planning Tool</div>
-          <h1 className="lp-hero-title">
+           <h1 className="lp-hero-title">
             "Stop Guessing How Much You Can Spend In Retirement. Know Exactly What Your Accounts Can Pay You."
           </h1>
           <p className="lp-hero-sub">
@@ -397,7 +397,7 @@ export default function LandingPage() {
           <div className="lp-fg">
             {[
               { icon: '◆', title: 'Three-Phase Spending', desc: 'Go-Go, Slow-Go, and No-Go phases reflect your real lifestyle arc. Spend more while you\'re active, taper naturally as your pace slows.' },
-              { icon: '⚡', title: 'Tax-Optimized Withdrawals', desc: 'Sequences withdrawals across Pre-tax, Tax-free, and Taxable accounts to minimize your lifetime federal tax burden.', comingSoon: 'Tax Optimization Pro' },
+              { icon: '⚡', title: 'Tax Optimization Pro', desc: 'Bracket filling, Roth conversion ladders, and dynamic withdrawal sequencing — personalized to your accounts to minimize lifetime federal taxes.', comingSoon: true },
               { icon: '📊', title: 'RMD & IRMAA Aware', desc: 'Accounts for Required Minimum Distributions and Medicare IRMAA surcharges — the details most retirement tools completely ignore.' },
               { icon: '📉', title: 'Market Crash Modeling', desc: 'Override market returns in any year to see exactly how a downturn affects your plan — and how long your portfolio takes to recover.' },
               { icon: '🔐', title: 'Fully Private', desc: 'Your data never leaves your browser. Export and import your complete plan as a local file at any time.' },
@@ -409,10 +409,10 @@ export default function LandingPage() {
                   <div className="lp-ft" style={{ marginBottom: 0 }}>{f.title}</div>
                   {f.comingSoon && (
                     <span style={{
-                      fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
-                      textTransform: 'uppercase', padding: '2px 8px', borderRadius: 100,
-                      background: 'rgba(184,134,11,0.15)', color: '#b8860b',
-                      border: '1px solid rgba(184,134,11,0.3)', whiteSpace: 'nowrap',
+                      fontSize: 11, fontWeight: 700, letterSpacing: '0.05em',
+                      textTransform: 'uppercase', padding: '3px 10px', borderRadius: 100,
+                      background: '#b8860b', color: '#fff',
+                      whiteSpace: 'nowrap', flexShrink: 0,
                     }}>Coming Soon</span>
                   )}
                 </div>
