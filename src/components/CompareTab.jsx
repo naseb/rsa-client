@@ -167,8 +167,6 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
           </div>
           <svg viewBox="0 0 580 230" style={{ width: "100%", height: 230 }}>
             {(() => {
-              const allBals = [...cmp.fourPctBalances, ...cmp.rsaBalances];
-              const maxBal  = Math.max(...allBals, 1);
               const n       = cmp.fourPctBalances.length;
               const LEFT    = 76;
               const RIGHT   = 560;
@@ -177,8 +175,17 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
               const W       = RIGHT - LEFT;
               const H       = BOTTOM - TOP;
 
+              // Cap Y-axis at 2x the starting portfolio value.
+              // Without this cap, the 4% Rule's long-term compounding (e.g. $3M -> $14M)
+              // stretches the scale so far that the RSA line at $1-2M looks like $0.
+              const startBal   = Math.max(cmp.rsaBalances[0] || 0, cmp.fourPctBalances[0] || 0);
+              const rawMax     = Math.max(...cmp.fourPctBalances, ...cmp.rsaBalances, 1);
+              const maxBal     = rawMax > startBal * 2 ? startBal * 2 : rawMax;
+              const isClipped  = rawMax > maxBal;
+              const clamp      = (b) => Math.min(b, maxBal);
+
               const toX = (i) => LEFT + (i / Math.max(n - 1, 1)) * W;
-              const toY = (b) => BOTTOM - (b / maxBal) * H;
+              const toY = (b) => BOTTOM - (clamp(b) / maxBal) * H;
 
               const rsaPoints     = cmp.rsaBalances.map((b, i)     => `${toX(i)},${toY(b)}`).join(" ");
               const fourPctPoints = cmp.fourPctBalances.map((b, i) => `${toX(i)},${toY(b)}`).join(" ");
@@ -207,6 +214,11 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
                   <text x={LEFT + 28}  y={14}  fontSize="11"  fill={C.navy} fontWeight="600">RSA</text>
                   <line x1={LEFT + 72} y1={10} x2={LEFT + 96} y2={10} stroke={C.green} strokeWidth={2} strokeDasharray="6,3" />
                   <text x={LEFT + 100} y={14}  fontSize="11"  fill={C.navy} fontWeight="600">4% Rule</text>
+                  {isClipped && (
+                    <text x={RIGHT} y={28} fontSize="10" fill={C.green} textAnchor="end" fontStyle="italic">
+                      ↑ 4% Rule grows beyond chart top
+                    </text>
+                  )}
 
                   <text x={LEFT}  y={218} fontSize="10" fill={C.gray}>Year 1</text>
                   <text x={RIGHT} y={218} fontSize="10" fill={C.gray} textAnchor="end">Year {n}</text>
