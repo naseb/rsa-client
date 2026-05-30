@@ -307,7 +307,7 @@ export default function LandingPage() {
         {/* ── HERO ── */}
         <section className="lp-hero">
           <div className="lp-eyebrow-pill">The Smarter Retirement Income Planning Tool</div>
-           <h1 className="lp-hero-title">
+          <h1 className="lp-hero-title">
             "Stop Guessing How Much You Can Spend In Retirement. Know Exactly What Your Accounts Can Pay You."
           </h1>
           <p className="lp-hero-sub">
@@ -397,11 +397,11 @@ export default function LandingPage() {
           <div className="lp-fg">
             {[
               { icon: '◆', title: 'Three-Phase Spending', desc: 'Go-Go, Slow-Go, and No-Go phases reflect your real lifestyle arc. Spend more while you\'re active, taper naturally as your pace slows.' },
-              { icon: '⚡', title: 'Tax Optimization Pro', desc: 'Bracket filling, Roth conversion ladders, and dynamic withdrawal sequencing — personalized to your accounts to minimize lifetime federal taxes.', comingSoon: true },
               { icon: '📊', title: 'RMD & IRMAA Aware', desc: 'Accounts for Required Minimum Distributions and Medicare IRMAA surcharges — the details most retirement tools completely ignore.' },
               { icon: '📉', title: 'Market Crash Modeling', desc: 'Override market returns in any year to see exactly how a downturn affects your plan — and how long your portfolio takes to recover.' },
               { icon: '🔐', title: 'Fully Private', desc: 'Your data never leaves your browser. Export and import your complete plan as a local file at any time.' },
               { icon: '🆚', title: 'vs. 4% Rule Comparison', desc: 'See side-by-side how your personalized RSA compares to the standard 4% rule using your actual numbers.' },
+              { icon: '⚡', title: 'Tax Optimization Pro', desc: 'Bracket filling, Roth conversion ladders, and dynamic withdrawal sequencing — personalized to your accounts to minimize lifetime federal taxes.', comingSoon: true },
             ].map(f => (
               <div className="lp-fc" key={f.title}>
                 <div className="lp-fi">{f.icon}</div>
@@ -411,7 +411,7 @@ export default function LandingPage() {
                     <span style={{
                       fontSize: 11, fontWeight: 700, letterSpacing: '0.05em',
                       textTransform: 'uppercase', padding: '3px 10px', borderRadius: 100,
-                      background: '#b8860b', color: '#fff',
+                      background: '#10b981', color: '#fff',
                       whiteSpace: 'nowrap', flexShrink: 0,
                     }}>Coming Soon</span>
                   )}

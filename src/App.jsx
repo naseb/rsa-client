@@ -281,26 +281,37 @@ export default function App() {
           { id: "settings",     label: "Settings & Accounts" },
           { id: "phases",       label: "Spending Phases" },
           { id: "compare",      label: "vs 4% Rule" },
-          // Tax Optimization tab hidden until Phase 5 rewrite is complete
-          // { id: "taxopt", label: isPro ? "⚡ Tax Optimization" : "🔒 Tax Optimization Pro" },
+          { id: "taxopt", label: "⚡ Tax Optimization Pro", comingSoon: true },
         ].map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => !tab.comingSoon && setActiveTab(tab.id)}
+            title={tab.comingSoon ? "Coming Soon" : undefined}
             style={{
               padding: "13px 20px",
               border: "none",
               borderBottom: activeTab === tab.id ? `3px solid #2d6a4f` : "3px solid transparent",
               background: "transparent",
-              color: activeTab === tab.id ? "#2d6a4f" : C.gray,
+              color: tab.comingSoon ? C.ltGray : activeTab === tab.id ? "#2d6a4f" : C.gray,
               fontWeight: activeTab === tab.id ? 700 : 500,
               fontSize: 15,
-              cursor: "pointer",
+              cursor: tab.comingSoon ? "default" : "pointer",
               fontFamily: FONT_BODY,
               transition: "all 0.2s",
+              opacity: tab.comingSoon ? 0.65 : 1,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
             }}
           >
             {tab.label}
+            {tab.comingSoon && (
+              <span style={{
+                fontSize: 9, fontWeight: 700, letterSpacing: "0.06em",
+                textTransform: "uppercase", padding: "2px 7px", borderRadius: 100,
+                background: "#b8860b", color: "#fff", whiteSpace: "nowrap",
+              }}>Soon</span>
+            )}
           </button>
         ))}
       </div>
