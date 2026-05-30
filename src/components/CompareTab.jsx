@@ -357,44 +357,41 @@ export default function CompareTab({ compareData, loading, error, baseSpending, 
         </div>
       )}
 
-      {/* ── Feature comparison ── */}
-      {cmp?.features && (
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`,
-          borderRadius: 12, padding: "24px 28px", marginBottom: 20 }}>
-          <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, marginBottom: 18 }}>
-            Feature Comparison
+
+
+      {/* ── The Bottom Line ── */}
+      {cmp && goGoSpending > 0 && (
+        <div style={{
+          background: "#f0f8f4", border: "1px solid #a7f3d0",
+          borderRadius: 12, padding: "22px 28px", marginBottom: 8,
+        }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: C.navy, marginBottom: 10 }}>
+            The Bottom Line
           </div>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ background: C.pageBg }}>
-                <th style={thS}>Feature</th>
-                <th style={{ ...thS, textAlign: "center", color: "#2d6a4f" }}>◆ RSA</th>
-                <th style={{ ...thS, textAlign: "center", color: C.gray }}>4% Rule</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cmp.features.map(([name, rsaHas, fourPctHas], idx) => (
-                <tr key={name} style={{
-                  borderBottom: `1px solid ${C.border}`,
-                  background: idx % 2 === 0 ? "#fff" : C.pageBg,
-                }}>
-                  <td style={{ padding: "11px 16px", fontSize: 15, color: C.navy }}>{name}</td>
-                  <td style={{ padding: "11px 16px", textAlign: "center", fontSize: 20 }}>
-                    {rsaHas     ? <span style={{ color: "#2d6a4f", fontWeight: 800 }}>✓</span>
-                                : <span style={{ color: C.xltGray }}>✗</span>}
-                  </td>
-                  <td style={{ padding: "11px 16px", textAlign: "center", fontSize: 20 }}>
-                    {fourPctHas ? <span style={{ color: "#2d6a4f", fontWeight: 800 }}>✓</span>
-                                : <span style={{ color: C.xltGray }}>✗</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div style={{ fontSize: 15, color: C.slate, lineHeight: 1.85 }}>
+            With your inputs, the RSA lets you spend{" "}
+            <strong style={{ color: "#2d6a4f" }}>{fmtFull(Math.abs(advantage))} {advantage >= 0 ? "more" : "less"} per year</strong>{" "}
+            in your active Go-Go years — when you actually want the money — while naturally
+            tapering as your lifestyle slows down.{" "}
+            {fourPctEndBal > 0 && (
+              <>
+                The 4% rule leaves{" "}
+                <strong style={{ color: C.navy }}>{fmtCompact(fourPctEndBal)}</strong> on the
+                table at the end because it never adapts.{" "}
+              </>
+            )}
+            Over {retirementYears} years, the RSA puts{" "}
+            <strong style={{ color: "#2d6a4f" }}>
+              {fmtCompact(Math.abs(lifetimeDiff))} {lifetimeDiff >= 0 ? "more" : "less"} total spending
+            </strong>{" "}
+            in your pocket. And that is before you factor in tax optimization, RMD handling,
+            crash scenario modeling, and per-account withdrawal sequencing — none of which
+            the 4% rule even attempts.
+          </div>
         </div>
       )}
 
-      <div style={{ textAlign: "center", padding: "16px 0", fontSize: 14, color: C.ltGray }}>
+      <div style={{ textAlign: "center", padding: "12px 0", fontSize: 13, color: C.ltGray }}>
         The 4% Rule withdraws 4% of your portfolio at retirement, adjusted for inflation each year.
         RSA optimizes spending across phases for maximum early-retirement enjoyment.
       </div>
@@ -402,8 +399,3 @@ export default function CompareTab({ compareData, loading, error, baseSpending, 
     </div>
   );
 }
-
-const thS = {
-  padding: "11px 16px", textAlign: "left", fontSize: 13,
-  color: C.gray, fontWeight: 700, borderBottom: `2px solid ${C.border}`,
-};

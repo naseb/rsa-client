@@ -281,6 +281,22 @@ export default function SpendingPhasesTab({
                     }).join(" ")}
                     fill="none" stroke={C.accent} strokeWidth={2}
                   />
+                  {/* Return override dots — red = crash, green = boom */}
+                  {le.years.map((y, i) => {
+                    if (marketReturns[y.year] == null) return null;
+                    const x    = (i / (le.years.length - 1)) * 420 + 10;
+                    const yPos = 155 - (y.totalEnd / maxBalance) * 140;
+                    const isCrash = y.returnPct < defaultReturn;
+                    return (
+                      <g key={y.year}>
+                        <circle
+                          cx={x} cy={yPos} r={5}
+                          fill={isCrash ? C.red : C.green}
+                          stroke="#fff" strokeWidth={1.5}
+                        />
+                      </g>
+                    );
+                  })}
                 </>
               )}
               <text x={10} y={154} fontSize="8" fill={C.gray}>{currentAge}</text>
