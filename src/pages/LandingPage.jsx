@@ -504,7 +504,7 @@ export default function LandingPage() {
           <div className="lp-cta-inner">
             <h2 className="lp-cta-title">Ready to find your number?</h2>
             <p className="lp-cta-sub">
-              Start your 7-day free trial. No credit card required.
+              Start your 7-day free trial.
               Takes about 5 minutes to enter your accounts and see your answer.
             </p>
             <button className="lp-btn-primary"
