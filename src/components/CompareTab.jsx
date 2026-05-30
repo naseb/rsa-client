@@ -1,7 +1,9 @@
 /**
  * CompareTab.jsx — vs 4% Rule Comparison
  * ========================================
- * Fix: features is an array of [name, rsaBool, fourPctBool] tuples.
+ * Fixes:
+ *  1. features is an array of [name, rsaBool, fourPctBool] tuples
+ *  2. Portfolio chart now has Y-axis labels so users can read actual values
  * Updated: money theme colors, larger fonts for 50+ readability.
  */
 
@@ -135,10 +137,6 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
               </tr>
             </thead>
             <tbody>
-              {/*
-                features is an array of tuples: [featureName, rsaHas, fourPctHas]
-                where rsaHas and fourPctHas are booleans.
-              */}
               {cmp.features.map(([featureName, rsaHas, fourPctHas], idx) => (
                 <tr key={featureName} style={{
                   borderBottom: `1px solid ${C.border}`,
@@ -147,12 +145,12 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
                   <td style={{ padding: "11px 16px", fontSize: 15, color: C.navy, fontWeight: 500 }}>
                     {featureName}
                   </td>
-                  <td style={{ padding: "11px 16px", textAlign: "center", fontSize: 18 }}>
+                  <td style={{ padding: "11px 16px", textAlign: "center", fontSize: 20 }}>
                     {rsaHas
                       ? <span style={{ color: "#2d6a4f", fontWeight: 800 }}>✓</span>
                       : <span style={{ color: C.xltGray }}>✗</span>}
                   </td>
-                  <td style={{ padding: "11px 16px", textAlign: "center", fontSize: 18 }}>
+                  <td style={{ padding: "11px 16px", textAlign: "center", fontSize: 20 }}>
                     {fourPctHas
                       ? <span style={{ color: "#2d6a4f", fontWeight: 800 }}>✓</span>
                       : <span style={{ color: C.xltGray }}>✗</span>}
@@ -164,38 +162,65 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
         </div>
       )}
 
-      {/* ── Portfolio balance chart ── */}
+      {/* ── Portfolio balance chart with Y-axis labels ── */}
       {cmp?.fourPctBalances && cmp?.rsaBalances && (
         <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: "24px 28px", marginBottom: 20 }}>
-          <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, marginBottom: 14 }}>Portfolio Balance Over Time</div>
-          <svg viewBox="0 0 500 200" style={{ width: "100%", height: 200 }}>
+          <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, marginBottom: 4 }}>Portfolio Balance Over Time</div>
+          <div style={{ fontSize: 13, color: C.gray, marginBottom: 16 }}>
+            Dollar values shown on the left axis. RSA portfolio drops during crash years and adjusts spending to recover.
+          </div>
+          <svg viewBox="0 0 560 220" style={{ width: "100%", height: 220 }}>
             {(() => {
               const allBals = [...cmp.fourPctBalances, ...cmp.rsaBalances];
               const maxBal  = Math.max(...allBals, 1);
               const n       = cmp.fourPctBalances.length;
+              const LEFT    = 72;  // left margin for Y-axis labels
+              const RIGHT   = 540;
+              const TOP     = 10;
+              const BOTTOM  = 195;
+              const W       = RIGHT - LEFT;
+              const H       = BOTTOM - TOP;
 
-              const rsaPoints = cmp.rsaBalances.map((b, i) => {
-                const x = (i / Math.max(n - 1, 1)) * 460 + 20;
-                const y = 185 - (b / maxBal) * 170;
-                return `${x},${y}`;
-              }).join(" ");
+              const toX = (i) => LEFT + (i / Math.max(n - 1, 1)) * W;
+              const toY = (b) => BOTTOM - (b / maxBal) * H;
 
-              const fourPctPoints = cmp.fourPctBalances.map((b, i) => {
-                const x = (i / Math.max(n - 1, 1)) * 460 + 20;
-                const y = 185 - (b / maxBal) * 170;
-                return `${x},${y}`;
-              }).join(" ");
+              const rsaPoints      = cmp.rsaBalances.map((b, i)      => `${toX(i)},${toY(b)}`).join(" ");
+              const fourPctPoints  = cmp.fourPctBalances.map((b, i)  => `${toX(i)},${toY(b)}`).join(" ");
+
+              // Y-axis gridlines and labels — 4 steps
+              const steps = [0, 0.25, 0.5, 0.75, 1.0];
 
               return (
                 <>
+                  {/* Gridlines + Y labels */}
+                  {steps.map((pct) => {
+                    const y   = BOTTOM - pct * H;
+                    const val = pct * maxBal;
+                    return (
+                      <g key={pct}>
+                        <line x1={LEFT} y1={y} x2={RIGHT} y2={y}
+                          stroke={C.border} strokeWidth={1} opacity={0.6} />
+                        <text x={LEFT - 4} y={y + 4} fontSize="10"
+                          fill={C.gray} textAnchor="end" fontFamily="monospace">
+                          {fmtCompact(val)}
+                        </text>
+                      </g>
+                    );
+                  })}
+
+                  {/* Lines */}
                   <polyline points={fourPctPoints} fill="none" stroke={C.green} strokeWidth={2} strokeDasharray="6,3" opacity={0.8} />
                   <polyline points={rsaPoints}     fill="none" stroke={C.goGo}  strokeWidth={2.5} />
-                  <line x1={20}  y1={10} x2={44}  y2={10} stroke={C.goGo}  strokeWidth={2.5} />
-                  <text x={48}  y={14} fontSize="11" fill={C.navy} fontWeight="600">RSA</text>
-                  <line x1={90}  y1={10} x2={114} y2={10} stroke={C.green} strokeWidth={2} strokeDasharray="6,3" />
-                  <text x={118} y={14} fontSize="11" fill={C.navy} fontWeight="600">4% Rule</text>
-                  <text x={20}  y={198} fontSize="10" fill={C.gray}>Year 1</text>
-                  <text x={480} y={198} fontSize="10" fill={C.gray} textAnchor="end">Year {n}</text>
+
+                  {/* Legend */}
+                  <line x1={LEFT}      y1={8} x2={LEFT + 24} y2={8} stroke={C.goGo}  strokeWidth={2.5} />
+                  <text x={LEFT + 28}  y={12} fontSize="11" fill={C.navy} fontWeight="600">RSA</text>
+                  <line x1={LEFT + 70} y1={8} x2={LEFT + 94} y2={8} stroke={C.green} strokeWidth={2} strokeDasharray="6,3" />
+                  <text x={LEFT + 98}  y={12} fontSize="11" fill={C.navy} fontWeight="600">4% Rule</text>
+
+                  {/* X labels */}
+                  <text x={LEFT}  y={210} fontSize="10" fill={C.gray}>Year 1</text>
+                  <text x={RIGHT} y={210} fontSize="10" fill={C.gray} textAnchor="end">Year {n}</text>
                 </>
               );
             })()}
