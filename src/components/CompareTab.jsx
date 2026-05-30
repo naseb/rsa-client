@@ -1,13 +1,7 @@
 /**
  * CompareTab.jsx — vs 4% Rule Comparison
  * ========================================
- * Side-by-side comparison of RSA phased approach
- * vs the traditional 4% withdrawal rule.
- *
- * Fix: cmp.features is an array — was incorrectly using
- * Object.entries() which returned index numbers instead of names.
- * Now uses .map() directly on the array.
- *
+ * Fix: features is an array of [name, rsaBool, fourPctBool] tuples.
  * Updated: money theme colors, larger fonts for 50+ readability.
  */
 
@@ -26,9 +20,7 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
     );
   }
 
-  if (error) {
-    return <LoadingOverlay loading={false} error={error} />;
-  }
+  if (error) return <LoadingOverlay loading={false} error={error} />;
 
   if (!compareData) {
     return (
@@ -61,7 +53,6 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
-
           {/* RSA side */}
           <div style={{ background: "rgba(245,158,11,0.1)", borderRadius: 12, padding: "18px 22px", border: "1px solid rgba(245,158,11,0.25)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
@@ -109,7 +100,6 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
           </div>
         </div>
 
-        {/* Difference callout */}
         {cmp?.diff != null && (
           <div style={{ marginTop: 18, textAlign: "center" }}>
             <span style={{ fontSize: 16, color: cmp.diff > 0 ? C.goGo : C.green, fontWeight: 700 }}>
@@ -132,7 +122,7 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
         )}
       </div>
 
-      {/* ── Feature comparison table ── */}
+      {/* ── Feature comparison ── */}
       {cmp?.features && (
         <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: "24px 28px", marginBottom: 20 }}>
           <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, marginBottom: 18 }}>Feature Comparison</div>
@@ -146,27 +136,29 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
             </thead>
             <tbody>
               {/*
-                FIX: cmp.features is an array, not a plain object.
-                Using .map() directly instead of Object.entries() which
-                was returning index numbers (0,1,2...) as feature names.
-                Supports both {feature, rsa, fourPct} and {name, rsa, fourPct} shapes.
+                features is an array of tuples: [featureName, rsaHas, fourPctHas]
+                where rsaHas and fourPctHas are booleans.
               */}
-              {(Array.isArray(cmp.features) ? cmp.features : Object.entries(cmp.features).map(([k, v]) => ({ feature: k, ...v }))).map((item, idx) => {
-                const featureName = item.feature || item.name || item.label || `Feature ${idx + 1}`;
-                return (
-                  <tr key={featureName} style={{ borderBottom: `1px solid ${C.border}`, background: idx % 2 === 0 ? "#fff" : C.pageBg }}>
-                    <td style={{ padding: "11px 16px", fontSize: 14, color: C.navy, fontWeight: 500 }}>
-                      {featureName}
-                    </td>
-                    <td style={{ padding: "11px 16px", textAlign: "center", fontSize: 14, fontFamily: FONT_MONO, color: C.navy }}>
-                      {typeof item.rsa === "number" ? fmtFull(item.rsa) : (item.rsa || "—")}
-                    </td>
-                    <td style={{ padding: "11px 16px", textAlign: "center", fontSize: 14, fontFamily: FONT_MONO, color: C.navy }}>
-                      {typeof item.fourPct === "number" ? fmtFull(item.fourPct) : (item.fourPct || "—")}
-                    </td>
-                  </tr>
-                );
-              })}
+              {cmp.features.map(([featureName, rsaHas, fourPctHas], idx) => (
+                <tr key={featureName} style={{
+                  borderBottom: `1px solid ${C.border}`,
+                  background: idx % 2 === 0 ? "#fff" : C.pageBg,
+                }}>
+                  <td style={{ padding: "11px 16px", fontSize: 15, color: C.navy, fontWeight: 500 }}>
+                    {featureName}
+                  </td>
+                  <td style={{ padding: "11px 16px", textAlign: "center", fontSize: 18 }}>
+                    {rsaHas
+                      ? <span style={{ color: "#2d6a4f", fontWeight: 800 }}>✓</span>
+                      : <span style={{ color: C.xltGray }}>✗</span>}
+                  </td>
+                  <td style={{ padding: "11px 16px", textAlign: "center", fontSize: 18 }}>
+                    {fourPctHas
+                      ? <span style={{ color: "#2d6a4f", fontWeight: 800 }}>✓</span>
+                      : <span style={{ color: C.xltGray }}>✗</span>}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -183,13 +175,13 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
               const n       = cmp.fourPctBalances.length;
 
               const rsaPoints = cmp.rsaBalances.map((b, i) => {
-                const x = (i / (n - 1)) * 460 + 20;
+                const x = (i / Math.max(n - 1, 1)) * 460 + 20;
                 const y = 185 - (b / maxBal) * 170;
                 return `${x},${y}`;
               }).join(" ");
 
               const fourPctPoints = cmp.fourPctBalances.map((b, i) => {
-                const x = (i / (n - 1)) * 460 + 20;
+                const x = (i / Math.max(n - 1, 1)) * 460 + 20;
                 const y = 185 - (b / maxBal) * 170;
                 return `${x},${y}`;
               }).join(" ");
@@ -198,10 +190,9 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
                 <>
                   <polyline points={fourPctPoints} fill="none" stroke={C.green} strokeWidth={2} strokeDasharray="6,3" opacity={0.8} />
                   <polyline points={rsaPoints}     fill="none" stroke={C.goGo}  strokeWidth={2.5} />
-                  {/* Legend */}
-                  <line x1={20} y1={10} x2={44} y2={10} stroke={C.goGo} strokeWidth={2.5} />
-                  <text x={48} y={14} fontSize="11" fill={C.navy} fontWeight="600">RSA</text>
-                  <line x1={90} y1={10} x2={114} y2={10} stroke={C.green} strokeWidth={2} strokeDasharray="6,3" />
+                  <line x1={20}  y1={10} x2={44}  y2={10} stroke={C.goGo}  strokeWidth={2.5} />
+                  <text x={48}  y={14} fontSize="11" fill={C.navy} fontWeight="600">RSA</text>
+                  <line x1={90}  y1={10} x2={114} y2={10} stroke={C.green} strokeWidth={2} strokeDasharray="6,3" />
                   <text x={118} y={14} fontSize="11" fill={C.navy} fontWeight="600">4% Rule</text>
                   <text x={20}  y={198} fontSize="10" fill={C.gray}>Year 1</text>
                   <text x={480} y={198} fontSize="10" fill={C.gray} textAnchor="end">Year {n}</text>
