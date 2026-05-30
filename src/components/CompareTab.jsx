@@ -1,14 +1,17 @@
 /**
  * CompareTab.jsx — vs 4% Rule Comparison
  * ========================================
- * Fix: Both RSA and 4% Rule now face the same market return events.
- * Context added explaining why RSA portfolio depletes (intentional).
+ * Rebuilt to match the original HTML app's rich comparison layout:
+ *   - 4 headline metric cards
+ *   - Side-by-side RSA vs 4% Rule detailed panels
+ *   - Portfolio trajectory chart with age labels
+ *   - Feature comparison table
  */
 
 import { C, FONT_BODY, FONT_MONO, fmtCompact, fmtFull } from "../utils/theme";
 import LoadingOverlay from "./LoadingOverlay";
 
-export default function CompareTab({ compareData, loading, error, baseSpending }) {
+export default function CompareTab({ compareData, loading, error, baseSpending, inputs }) {
   if (loading) {
     return (
       <div>
@@ -32,238 +35,362 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
 
   const { rsa, comparison: cmp } = compareData;
 
-  return (
-    <div style={{ maxWidth: 900 }}>
+  // ── Phase spending from RSA year data ──────────────────────────────────────
+  const retiredYears   = rsa?.years?.filter(y => y.isRetired) || [];
+  const retirementAge  = retiredYears[0]?.age || 65;
+  const goGoYr         = retiredYears.find(y => y.phaseName === 'Go-Go');
+  const slowGoYr       = retiredYears.find(y => y.phaseName === 'Slow-Go');
+  const noGoYr         = retiredYears.find(y => y.phaseName === 'No-Go');
+  const goGoSpending   = goGoYr?.annualSpending   || rsa?.baseSpending || 0;
+  const slowGoSpending = slowGoYr?.annualSpending || 0;
+  const noGoSpending   = noGoYr?.annualSpending   || 0;
 
-      {/* ── Summary banner ── */}
+  const goGoYears   = retiredYears.filter(y => y.phaseName === 'Go-Go').length;
+  const slowGoYears = retiredYears.filter(y => y.phaseName === 'Slow-Go').length;
+  const noGoYears   = retiredYears.filter(y => y.phaseName === 'No-Go').length;
+
+  // ── Key metrics ────────────────────────────────────────────────────────────
+  const fourPctTotal     = cmp?.fourPctTotalSpending  || 0;
+  const rsaEndBalance    = cmp?.rsaBalances?.[cmp.rsaBalances.length - 1]         || 0;
+  const fourPctEndBal    = cmp?.fourPctBalances?.[cmp.fourPctBalances.length - 1] || 0;
+  const advantage        = goGoSpending - fourPctTotal;
+  const advantagePct     = fourPctTotal > 0 ? (advantage / fourPctTotal) * 100 : 0;
+  const withdrawalRate   = (cmp?.rsaWithdrawalRate || 0).toFixed(1);
+  const retirementYears  = cmp?.retirementYears || 33;
+  const lifetimeDiff     = cmp?.lifetimeDiff || 0;
+
+  // Shared styles
+  const card = (label, value, sub, color = C.navy) => (
+    <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12,
+      padding: "20px 22px", flex: 1 }}>
+      <div style={{ fontSize: 11, color: C.gray, textTransform: "uppercase",
+        letterSpacing: "0.1em", marginBottom: 8, fontWeight: 600 }}>{label}</div>
+      <div style={{ fontSize: 28, fontWeight: 800, fontFamily: FONT_MONO, color, lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: 13, color: C.ltGray, marginTop: 6 }}>{sub}</div>
+    </div>
+  );
+
+  return (
+    <div style={{ maxWidth: 960 }}>
+
+      {/* ── Dark header ── */}
       <div style={{
-        background: "linear-gradient(135deg, #1c3829 0%, #2d5a47 40%, #1c3829 100%)",
+        background: "linear-gradient(135deg, #1c3829 0%, #2d5a47 50%, #1c3829 100%)",
         borderRadius: 16, padding: "28px 36px", marginBottom: 20,
-        color: "#fff", position: "relative", overflow: "hidden",
         borderBottom: "2px solid #b8860b",
       }}>
-        <div style={{
-          position: "absolute", top: -40, right: -40, width: 250, height: 250,
-          background: "radial-gradient(circle,rgba(184,134,11,0.12) 0%,transparent 70%)",
-          pointerEvents: "none",
-        }} />
-
-        <div style={{ fontSize: 13, color: "#7aaa8a", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 16 }}>
-          RSA Phased Approach vs Traditional 4% Rule
+        <div style={{ fontSize: 12, color: "#7aaa8a", letterSpacing: "0.14em",
+          textTransform: "uppercase", marginBottom: 10 }}>Your App vs The 4% Rule</div>
+        <div style={{ fontSize: 26, fontWeight: 800, color: "#f7f3ea", marginBottom: 8 }}>
+          <span style={{ color: "#b8860b" }}>◆</span> Retirement Spending Allowance{" "}
+          <span style={{ color: "#7aaa8a", fontWeight: 400 }}>vs</span>{" "}
+          <span style={{ color: "#10b981" }}>4% Rule</span>
         </div>
+        <div style={{ fontSize: 15, color: "#94a3b8", lineHeight: 1.6 }}>
+          Side-by-side comparison using your actual inputs. The 4% rule assumes flat spending
+          every year — your app adapts to how you actually live.
+        </div>
+      </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
-          <div style={{ background: "rgba(245,158,11,0.1)", borderRadius: 12, padding: "18px 22px", border: "1px solid rgba(245,158,11,0.25)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-              <div style={{ width: 12, height: 12, borderRadius: "50%", background: C.goGo }} />
-              <span style={{ fontSize: 15, fontWeight: 700, color: C.goGo }}>RSA Phased Approach</span>
-            </div>
-            <div style={{ fontSize: 36, fontWeight: 800, fontFamily: FONT_MONO, color: C.goGo, lineHeight: 1 }}>
-              {fmtFull(rsa?.baseSpending || baseSpending)}
-              <span style={{ fontSize: 16, color: "#94a3b8", fontWeight: 400 }}>/yr</span>
-            </div>
-            <div style={{ fontSize: 14, color: "#94a3b8", marginTop: 6 }}>Go-Go phase · Scales down in later phases</div>
-            {cmp?.rsaLifetimeSpending != null && (
-              <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 10 }}>
-                Lifetime total: <strong style={{ fontFamily: FONT_MONO, color: "#fff" }}>{fmtCompact(cmp.rsaLifetimeSpending)}</strong>
+      {/* ── 4 metric cards ── */}
+      <div style={{ display: "flex", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
+        {card(
+          "RSA Go-Go Spending",
+          fmtFull(goGoSpending),
+          fmtCompact(goGoSpending / 12) + "/mo",
+          C.goGo
+        )}
+        {card(
+          "4% Rule Spending",
+          fmtFull(fourPctTotal),
+          fmtCompact(fourPctTotal / 12) + "/mo — flat forever",
+          C.gray
+        )}
+        {card(
+          "RSA Advantage (Yr 1)",
+          (advantage >= 0 ? "+" : "") + fmtFull(advantage),
+          (advantagePct >= 0 ? "+" : "") + advantagePct.toFixed(1) + "% more when active",
+          advantage >= 0 ? C.green : C.red
+        )}
+        {card(
+          "RSA Withdrawal Rate",
+          withdrawalRate + "%",
+          withdrawalRate > 4 ? "Above 4% threshold" : "Within 4% threshold",
+          withdrawalRate > 4 ? C.orange : C.green
+        )}
+      </div>
+
+      {/* ── Side-by-side comparison panels ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+
+        {/* RSA Panel */}
+        <div style={{ background: C.cardBg, border: `2px solid #2d6a4f`,
+          borderRadius: 14, padding: "22px 24px", background: "#f0f8f4" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+            <span style={{ color: C.goGo, fontSize: 18 }}>◆</span>
+            <span style={{ fontSize: 16, fontWeight: 700, color: C.navy }}>Retirement Spending Allowance</span>
+            <span style={{ fontSize: 11, background: "#2d6a4f", color: "#fff",
+              padding: "2px 10px", borderRadius: 100, fontWeight: 700 }}>Dynamic</span>
+          </div>
+
+          {/* Phase spending bars */}
+          <div style={{ display: "flex", gap: 6, marginBottom: 18, fontSize: 12 }}>
+            {goGoSpending > 0 && (
+              <div style={{ flex: goGoYears || 1, background: "#fef3c7", border: "1px solid #fcd34d",
+                borderRadius: 6, padding: "6px 10px", textAlign: "center" }}>
+                <div style={{ fontWeight: 700, color: C.goGo }}>Go-Go</div>
+                <div style={{ color: C.navy, fontFamily: FONT_MONO, fontSize: 11 }}>{fmtCompact(goGoSpending)}</div>
+              </div>
+            )}
+            {slowGoSpending > 0 && (
+              <div style={{ flex: slowGoYears || 1, background: "#f5f3ff", border: "1px solid #c4b5fd",
+                borderRadius: 6, padding: "6px 10px", textAlign: "center" }}>
+                <div style={{ fontWeight: 700, color: C.slowGo }}>Slow</div>
+                <div style={{ color: C.navy, fontFamily: FONT_MONO, fontSize: 11 }}>{fmtCompact(slowGoSpending)}</div>
+              </div>
+            )}
+            {noGoSpending > 0 && (
+              <div style={{ flex: noGoYears || 1, background: "#ecfeff", border: "1px solid #67e8f9",
+                borderRadius: 6, padding: "6px 10px", textAlign: "center" }}>
+                <div style={{ fontWeight: 700, color: C.noGo }}>No-Go</div>
+                <div style={{ color: C.navy, fontFamily: FONT_MONO, fontSize: 11 }}>{fmtCompact(noGoSpending)}</div>
               </div>
             )}
           </div>
 
-          <div style={{ background: "rgba(45,106,79,0.1)", borderRadius: 12, padding: "18px 22px", border: "1px solid rgba(45,106,79,0.25)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-              <div style={{ width: 12, height: 12, borderRadius: "50%", background: C.green }} />
-              <span style={{ fontSize: 15, fontWeight: 700, color: C.green }}>Traditional 4% Rule</span>
+          {/* RSA spending rows */}
+          {[
+            { label: "Go-Go (active years)",    val: goGoSpending,   color: C.goGo },
+            { label: "Slow-Go (winding down)",  val: slowGoSpending, color: C.slowGo },
+            { label: "No-Go (quiet years)",     val: noGoSpending,   color: C.noGo },
+          ].filter(r => r.val > 0).map(r => (
+            <div key={r.label} style={{ display: "flex", justifyContent: "space-between",
+              alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${C.border}` }}>
+              <span style={{ fontSize: 15, color: C.slate }}>{r.label}</span>
+              <span style={{ fontSize: 15, fontWeight: 700, fontFamily: FONT_MONO, color: r.color }}>
+                {fmtFull(r.val)}/yr
+              </span>
             </div>
-            <div style={{ fontSize: 36, fontWeight: 800, fontFamily: FONT_MONO, color: C.green, lineHeight: 1 }}>
-              {fmtFull(cmp?.fourPctWithdrawal || 0)}
-              <span style={{ fontSize: 16, color: "#94a3b8", fontWeight: 400 }}>/yr</span>
-            </div>
-            <div style={{ fontSize: 14, color: "#94a3b8", marginTop: 6 }}>Fixed 4% of portfolio at retirement</div>
-            {cmp?.fourPctLifetimeSpending != null && (
-              <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 10 }}>
-                Lifetime total: <strong style={{ fontFamily: FONT_MONO, color: "#fff" }}>{fmtCompact(cmp.fourPctLifetimeSpending)}</strong>
-              </div>
-            )}
-          </div>
-        </div>
+          ))}
 
-        {cmp?.diff != null && (
-          <div style={{ marginTop: 18, textAlign: "center" }}>
-            <span style={{ fontSize: 16, color: cmp.diff > 0 ? C.goGo : C.green, fontWeight: 700 }}>
-              RSA gives you {fmtFull(Math.abs(cmp.diff))} {cmp.diff > 0 ? "MORE" : "LESS"} per year in Go-Go
-              {cmp.diffPct != null && ` (${cmp.diff > 0 ? "+" : ""}${cmp.diffPct.toFixed(0)}%)`}
+          <div style={{ display: "flex", justifyContent: "space-between",
+            alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${C.border}` }}>
+            <span style={{ fontSize: 15, color: C.slate }}>Portfolio at end</span>
+            <span style={{ fontSize: 15, fontWeight: 700, fontFamily: FONT_MONO, color: C.navy }}>
+              {fmtFull(rsaEndBalance)}
             </span>
           </div>
-        )}
-        {cmp?.lifetimeDiff != null && (
-          <div style={{ marginTop: 8, textAlign: "center" }}>
-            <span style={{ fontSize: 14, color: "#94a3b8" }}>
-              Lifetime difference:{' '}
-              <strong style={{ color: cmp.lifetimeDiff > 0 ? C.goGo : C.green, fontFamily: FONT_MONO }}>
-                {cmp.lifetimeDiff > 0 ? "+" : ""}{fmtCompact(cmp.lifetimeDiff)}
-              </strong>{' '}
-              total spending with RSA
+          <div style={{ display: "flex", justifyContent: "space-between",
+            alignItems: "center", padding: "10px 0" }}>
+            <span style={{ fontSize: 15, color: C.slate }}>Lifetime total spent</span>
+            <span style={{ fontSize: 17, fontWeight: 800, fontFamily: FONT_MONO, color: C.green }}>
+              {fmtCompact(cmp?.rsaLifetimeSpending || 0)}
             </span>
           </div>
-        )}
+        </div>
+
+        {/* 4% Rule Panel */}
+        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`,
+          borderRadius: 14, padding: "22px 24px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+            <span style={{ fontSize: 16, fontWeight: 700, color: C.navy }}>4% Rule</span>
+            <span style={{ fontSize: 11, background: "#f1f5f9", color: C.gray,
+              padding: "2px 10px", borderRadius: 100, fontWeight: 700 }}>Static</span>
+          </div>
+
+          {/* Flat bar */}
+          <div style={{ background: "#f8fafc", border: `1px solid ${C.border}`,
+            borderRadius: 6, padding: "10px 14px", marginBottom: 18, textAlign: "center",
+            fontSize: 13, color: C.gray }}>
+            Flat {fmtFull(fourPctTotal)} every year for {retirementYears} years
+          </div>
+
+          {/* 4% Rule spending rows */}
+          {[
+            { label: `Year 1`,                        val: fourPctTotal },
+            { label: `Year ${Math.round(retirementYears / 2)}`, val: fourPctTotal },
+            { label: `Year ${retirementYears}`,       val: fourPctTotal },
+          ].map((r, i) => (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between",
+              alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${C.border}` }}>
+              <span style={{ fontSize: 15, color: C.slate }}>{r.label}</span>
+              <span style={{ fontSize: 15, fontWeight: 700, fontFamily: FONT_MONO, color: C.gray }}>
+                {fmtFull(r.val)}/yr
+              </span>
+            </div>
+          ))}
+
+          <div style={{ display: "flex", justifyContent: "space-between",
+            alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${C.border}` }}>
+            <span style={{ fontSize: 15, color: C.slate }}>Portfolio at end</span>
+            <span style={{ fontSize: 15, fontWeight: 700, fontFamily: FONT_MONO, color: C.navy }}>
+              {fmtFull(fourPctEndBal)}
+            </span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between",
+            alignItems: "center", padding: "10px 0" }}>
+            <span style={{ fontSize: 15, color: C.slate }}>Lifetime total spent</span>
+            <span style={{ fontSize: 17, fontWeight: 800, fontFamily: FONT_MONO, color: C.gray }}>
+              {fmtCompact(cmp?.fourPctLifetimeSpending || 0)}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* ── Key insight callout ── */}
-      <div style={{
-        background: "#fffbeb", border: "1px solid #fcd34d",
-        borderRadius: 12, padding: "18px 24px", marginBottom: 20,
-      }}>
-        <div style={{ fontSize: 16, fontWeight: 700, color: "#92400e", marginBottom: 8 }}>
-          💡 Why does the RSA portfolio decline while the 4% Rule grows?
-        </div>
-        <div style={{ fontSize: 15, color: "#78350f", lineHeight: 1.75 }}>
-          The 4% Rule only withdraws 4% per year — often less than your portfolio earns —
-          so the balance grows. But this means you are <strong>leaving money unspent</strong> during
-          your most active years. RSA is designed to deploy your savings when you can actually
-          enjoy them, spending more in your Go-Go years and less as your pace slows.
-          The {cmp?.lifetimeDiff > 0 ? fmtCompact(cmp.lifetimeDiff) + " lifetime spending advantage" : "key advantage"}
-          {' '}of RSA is a higher quality of life — not a larger estate.
-        </div>
-      </div>
-
-      {/* ── Feature comparison ── */}
-      {cmp?.features && (
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: "24px 28px", marginBottom: 20 }}>
-          <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, marginBottom: 18 }}>Feature Comparison</div>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr style={{ background: C.pageBg }}>
-                <th style={{ padding: "11px 16px", textAlign: "left",   fontSize: 13, color: C.gray,  fontWeight: 700, borderBottom: `2px solid ${C.border}` }}>Feature</th>
-                <th style={{ padding: "11px 16px", textAlign: "center", fontSize: 13, color: C.goGo,  fontWeight: 700, borderBottom: `2px solid ${C.border}` }}>RSA Phased</th>
-                <th style={{ padding: "11px 16px", textAlign: "center", fontSize: 13, color: C.green, fontWeight: 700, borderBottom: `2px solid ${C.border}` }}>4% Rule</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cmp.features.map(([featureName, rsaHas, fourPctHas], idx) => (
-                <tr key={featureName} style={{ borderBottom: `1px solid ${C.border}`, background: idx % 2 === 0 ? "#fff" : C.pageBg }}>
-                  <td style={{ padding: "11px 16px", fontSize: 15, color: C.navy, fontWeight: 500 }}>{featureName}</td>
-                  <td style={{ padding: "11px 16px", textAlign: "center", fontSize: 20 }}>
-                    {rsaHas    ? <span style={{ color: "#2d6a4f", fontWeight: 800 }}>✓</span> : <span style={{ color: C.xltGray }}>✗</span>}
-                  </td>
-                  <td style={{ padding: "11px 16px", textAlign: "center", fontSize: 20 }}>
-                    {fourPctHas ? <span style={{ color: "#2d6a4f", fontWeight: 800 }}>✓</span> : <span style={{ color: C.xltGray }}>✗</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* ── Lifetime spending callout ── */}
+      {lifetimeDiff !== 0 && (
+        <div style={{ background: lifetimeDiff > 0 ? "#f0f8f4" : "#fef2f2",
+          border: `1px solid ${lifetimeDiff > 0 ? "#a7f3d0" : "#fecaca"}`,
+          borderRadius: 12, padding: "16px 24px", marginBottom: 20, textAlign: "center" }}>
+          <span style={{ fontSize: 16, fontWeight: 700,
+            color: lifetimeDiff > 0 ? "#065f46" : C.red }}>
+            RSA gives you {fmtCompact(Math.abs(lifetimeDiff))} {lifetimeDiff > 0 ? "MORE" : "LESS"} in total lifetime spending
+          </span>
+          <span style={{ fontSize: 14, color: C.gray, marginLeft: 10 }}>
+            ({fmtCompact(cmp?.rsaLifetimeSpending || 0)} vs {fmtCompact(cmp?.fourPctLifetimeSpending || 0)})
+          </span>
         </div>
       )}
 
-      {/* ── Portfolio balance chart ── */}
+      {/* ── Portfolio Trajectory chart ── */}
       {cmp?.fourPctBalances && cmp?.rsaBalances && (
-        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: "24px 28px", marginBottom: 20 }}>
-          <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, marginBottom: 4 }}>Portfolio Balance Over Time</div>
-          <div style={{ fontSize: 14, color: C.gray, marginBottom: 16, lineHeight: 1.6 }}>
-            Both scenarios use the same year-by-year market returns — including any crash or boom years you entered.
-            RSA depletes because it intentionally spends more now.
-            A growing 4% Rule portfolio means money left unspent.
+        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`,
+          borderRadius: 12, padding: "24px 28px", marginBottom: 20 }}>
+          <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, marginBottom: 4 }}>
+            Portfolio Trajectory
           </div>
-          {/* Ending balance summary above chart */}
-          {(() => {
-            const rsaEnd     = cmp.rsaBalances[cmp.rsaBalances.length - 1]     || 0;
-            const fourPctEnd = cmp.fourPctBalances[cmp.fourPctBalances.length - 1] || 0;
-            return (
-              <div style={{ display: "flex", gap: 20, marginBottom: 12, flexWrap: "wrap" }}>
-                <div style={{ fontSize: 14, color: C.navy }}>
-                  <span style={{ color: C.goGo, fontWeight: 700 }}>RSA</span> ending balance:{" "}
-                  <strong style={{ fontFamily: "'JetBrains Mono',monospace" }}>{fmtFull(rsaEnd)}</strong>
-                </div>
-                <div style={{ fontSize: 14, color: C.navy }}>
-                  <span style={{ color: C.green, fontWeight: 700 }}>4% Rule</span> ending balance:{" "}
-                  <strong style={{ fontFamily: "'JetBrains Mono',monospace" }}>{fmtFull(fourPctEnd)}</strong>
-                </div>
-              </div>
-            );
-          })()}
-          <svg viewBox="0 0 580 240" style={{ width: "100%", height: 240 }}>
+          <div style={{ display: "flex", gap: 20, marginBottom: 12, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 13 }}>
+              <span style={{ display: "inline-block", width: 24, height: 3,
+                background: C.green, marginRight: 6, verticalAlign: "middle" }} />
+              RSA (phase-based)
+            </span>
+            <span style={{ fontSize: 13 }}>
+              <span style={{ display: "inline-block", width: 24, height: 2,
+                background: C.goGo, borderTop: `2px dashed ${C.goGo}`,
+                marginRight: 6, verticalAlign: "middle" }} />
+              4% rule (flat)
+            </span>
+          </div>
+          <svg viewBox="0 0 580 250" style={{ width: "100%", height: 250 }}>
             {(() => {
-              const retirementAge = compareData?.rsa?.years?.find(y => y.isRetired)?.age || 65;
-              const n       = cmp.fourPctBalances.length;
-              const LEFT    = 76;
-              const RIGHT   = 560;
-              const TOP     = 14;
-              const BOTTOM  = 200;
-              const W       = RIGHT - LEFT;
-              const H       = BOTTOM - TOP;
+              const n      = cmp.fourPctBalances.length;
+              const LEFT   = 80;
+              const RIGHT  = 560;
+              const TOP    = 14;
+              const BOTTOM = 205;
+              const W      = RIGHT - LEFT;
+              const H      = BOTTOM - TOP;
 
-              // Cap Y-axis at the STARTING portfolio value.
-              // The 4% Rule may grow well above this — it will be clipped with
-              // a note. This keeps the RSA trajectory clearly visible.
-              const startBal  = Math.max(cmp.rsaBalances[0] || 0, cmp.fourPctBalances[0] || 0);
-              const maxBal    = startBal;
-              const clamp     = (b) => Math.min(b, maxBal);
-              const fourPctClipped = cmp.fourPctBalances.some(b => b > maxBal);
+              // Cap Y-axis at starting balance to keep RSA line readable
+              const startBal   = Math.max(cmp.rsaBalances[0] || 0, cmp.fourPctBalances[0] || 0);
+              const rawMax     = Math.max(...cmp.fourPctBalances, ...cmp.rsaBalances, 1);
+              const maxBal     = rawMax > startBal * 1.5 ? startBal * 1.5 : rawMax;
+              const isClipped  = rawMax > maxBal;
+              const clamp      = b => Math.min(b, maxBal);
 
-              const toX = (i) => LEFT + (i / Math.max(n - 1, 1)) * W;
-              const toY = (b) => BOTTOM - (clamp(b) / maxBal) * H;
+              const toX = i => LEFT + (i / Math.max(n - 1, 1)) * W;
+              const toY = b => BOTTOM - (clamp(b) / maxBal) * H;
+
+              const rsaPoints     = cmp.rsaBalances.map((b, i)     => `${toX(i)},${toY(b)}`).join(" ");
+              const fourPctPoints = cmp.fourPctBalances.map((b, i) => `${toX(i)},${toY(b)}`).join(" ");
+
+              // Y gridlines
+              const steps = [0, 0.25, 0.5, 0.75, 1.0];
 
               // Age labels every 5 years
               const ageLabels = [];
               for (let i = 0; i < n; i++) {
                 const age = retirementAge + i;
-                if (age % 5 === 0) {
-                  ageLabels.push({ i, age });
-                }
+                if (age === retirementAge || age % 5 === 0) ageLabels.push({ i, age });
               }
-
-              const steps = [0, 0.25, 0.5, 0.75, 1.0];
-
-              const rsaPoints     = cmp.rsaBalances.map((b, i)     => `${toX(i)},${toY(b)}`).join(" ");
-              const fourPctPoints = cmp.fourPctBalances.map((b, i) => `${toX(i)},${toY(b)}`).join(" ");
 
               return (
                 <>
-                  {/* Gridlines + Y labels */}
-                  {steps.map((pct) => {
-                    const y   = BOTTOM - pct * H;
-                    const val = pct * maxBal;
+                  {steps.map(pct => {
+                    const y = BOTTOM - pct * H;
                     return (
                       <g key={pct}>
-                        <line x1={LEFT} y1={y} x2={RIGHT} y2={y} stroke={C.border} strokeWidth={1} opacity={0.7} />
-                        <text x={LEFT - 4} y={y + 4} fontSize="10" fill={C.gray} textAnchor="end" fontFamily="monospace">
-                          {fmtCompact(val)}
+                        <line x1={LEFT} y1={y} x2={RIGHT} y2={y}
+                          stroke={C.border} strokeWidth={1} opacity={0.8} />
+                        <text x={LEFT - 4} y={y + 4} fontSize="10"
+                          fill={C.gray} textAnchor="end" fontFamily="monospace">
+                          {fmtCompact(pct * maxBal)}
                         </text>
                       </g>
                     );
                   })}
 
-                  {/* Lines */}
-                  <polyline points={fourPctPoints} fill="none" stroke={C.green} strokeWidth={2}   strokeDasharray="6,3" opacity={0.8} />
-                  <polyline points={rsaPoints}     fill="none" stroke={C.goGo}  strokeWidth={2.5} />
+                  <polyline points={fourPctPoints} fill="none" stroke={C.goGo}
+                    strokeWidth={2} strokeDasharray="6,3" opacity={0.9} />
+                  <polyline points={rsaPoints} fill="none" stroke={C.green} strokeWidth={2.5} />
 
-                  {/* Legend */}
-                  <line x1={LEFT}      y1={10} x2={LEFT + 24} y2={10} stroke={C.goGo}  strokeWidth={2.5} />
-                  <text x={LEFT + 28}  y={14}  fontSize="11"  fill={C.navy} fontWeight="600">RSA</text>
-                  <line x1={LEFT + 72} y1={10} x2={LEFT + 96} y2={10} stroke={C.green} strokeWidth={2} strokeDasharray="6,3" />
-                  <text x={LEFT + 100} y={14}  fontSize="11"  fill={C.navy} fontWeight="600">4% Rule</text>
-                  {fourPctClipped && (
-                    <text x={RIGHT} y={24} fontSize="10" fill={C.green} textAnchor="end" fontStyle="italic">
-                      ↑ 4% Rule portfolio grows above this line
+                  {isClipped && (
+                    <text x={RIGHT} y={26} fontSize="10" fill={C.goGo}
+                      textAnchor="end" fontStyle="italic">
+                      ↑ 4% Rule grows beyond this line
                     </text>
                   )}
 
-                  {/* Age labels on X axis */}
-                  <line x1={LEFT} y1={BOTTOM} x2={RIGHT} y2={BOTTOM} stroke={C.border} strokeWidth={1} />
+                  {/* X axis */}
+                  <line x1={LEFT} y1={BOTTOM} x2={RIGHT} y2={BOTTOM}
+                    stroke={C.border} strokeWidth={1} />
                   {ageLabels.map(({ i, age }) => (
                     <g key={age}>
-                      <line x1={toX(i)} y1={BOTTOM} x2={toX(i)} y2={BOTTOM + 4} stroke={C.ltGray} strokeWidth={1} />
-                      <text x={toX(i)} y={BOTTOM + 14} fontSize="10" fill={C.gray} textAnchor="middle">
-                        {age}
-                      </text>
+                      <line x1={toX(i)} y1={BOTTOM} x2={toX(i)} y2={BOTTOM + 4}
+                        stroke={C.ltGray} strokeWidth={1} />
+                      <text x={toX(i)} y={BOTTOM + 15} fontSize="11"
+                        fill={C.gray} textAnchor="middle">{age}</text>
                     </g>
                   ))}
-                  <text x={LEFT + W / 2} y={BOTTOM + 26} fontSize="10" fill={C.ltGray} textAnchor="middle">Age</text>
+                  <text x={LEFT + W / 2} y={BOTTOM + 28} fontSize="11"
+                    fill={C.ltGray} textAnchor="middle">Age</text>
                 </>
               );
             })()}
           </svg>
+          <div style={{ fontSize: 13, color: C.gray, marginTop: 8, lineHeight: 1.6 }}>
+            Both use identical year-by-year market returns including any crash/boom years you entered.
+            RSA depletes because it intentionally spends more now.
+            A growing 4% Rule portfolio means money left unspent during your active years.
+          </div>
+        </div>
+      )}
+
+      {/* ── Feature comparison ── */}
+      {cmp?.features && (
+        <div style={{ background: C.cardBg, border: `1px solid ${C.border}`,
+          borderRadius: 12, padding: "24px 28px", marginBottom: 20 }}>
+          <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, marginBottom: 18 }}>
+            Feature Comparison
+          </div>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ background: C.pageBg }}>
+                <th style={thS}>Feature</th>
+                <th style={{ ...thS, textAlign: "center", color: "#2d6a4f" }}>◆ RSA</th>
+                <th style={{ ...thS, textAlign: "center", color: C.gray }}>4% Rule</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cmp.features.map(([name, rsaHas, fourPctHas], idx) => (
+                <tr key={name} style={{
+                  borderBottom: `1px solid ${C.border}`,
+                  background: idx % 2 === 0 ? "#fff" : C.pageBg,
+                }}>
+                  <td style={{ padding: "11px 16px", fontSize: 15, color: C.navy }}>{name}</td>
+                  <td style={{ padding: "11px 16px", textAlign: "center", fontSize: 20 }}>
+                    {rsaHas     ? <span style={{ color: "#2d6a4f", fontWeight: 800 }}>✓</span>
+                                : <span style={{ color: C.xltGray }}>✗</span>}
+                  </td>
+                  <td style={{ padding: "11px 16px", textAlign: "center", fontSize: 20 }}>
+                    {fourPctHas ? <span style={{ color: "#2d6a4f", fontWeight: 800 }}>✓</span>
+                                : <span style={{ color: C.xltGray }}>✗</span>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
@@ -275,3 +402,8 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
     </div>
   );
 }
+
+const thS = {
+  padding: "11px 16px", textAlign: "left", fontSize: 13,
+  color: C.gray, fontWeight: 700, borderBottom: `2px solid ${C.border}`,
+};

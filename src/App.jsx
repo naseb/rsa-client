@@ -344,6 +344,7 @@ export default function App() {
             loading={compareLoading}
             error={compareError}
             baseSpending={solverData?.baseSpending || 0}
+            inputs={inputs}
           />
         )}
 
