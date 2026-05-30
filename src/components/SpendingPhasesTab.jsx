@@ -83,8 +83,8 @@ export default function SpendingPhasesTab({
   };
 
   const tdStyle = {
-    padding: "6px 8px", textAlign: "right", fontFamily: FONT_MONO,
-    fontSize: 11, borderBottom: `1px solid ${C.border}`, whiteSpace: "nowrap",
+    padding: "8px 10px", textAlign: "right", fontFamily: FONT_MONO,
+    fontSize: 13, borderBottom: `1px solid ${C.border}`, whiteSpace: "nowrap",
   };
 
   return (
@@ -323,8 +323,8 @@ export default function SpendingPhasesTab({
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: C.pageBg }}>
-                {["Year", "Age", "Phase", "Return", "Portfolio", "Growth", "Spending", "+/-", "SS", "From Portfolio", "Tax", "End Balance", "vs Target"].map((h) => (
-                  <th key={h} style={{ padding: "8px 8px", textAlign: h === "Return" || h === "+/-" ? "center" : "right", fontWeight: 700, fontSize: 9, color: C.gray, borderBottom: `2px solid ${C.border}`, position: "sticky", top: 0, background: C.pageBg, zIndex: 1, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>{h}</th>
+                {["Year", "Age", "Phase", "Return", "Portfolio", "Growth", "Spending", "+/-", "SS"].map((h) => (
+                  <th key={h} style={{ padding: "8px 8px", textAlign: h === "Return" || h === "+/-" ? "center" : "right", fontWeight: 700, fontSize: 11, color: C.gray, borderBottom: `2px solid ${C.border}`, position: "sticky", top: 0, background: C.pageBg, zIndex: 1, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -357,7 +357,7 @@ export default function SpendingPhasesTab({
                       </td>
                       <td style={{ ...tdStyle, textAlign: "center" }}>
                         {d.isRetired ? (
-                          <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 8, background: phBg, color: phColor, fontWeight: 700, fontFamily: FONT_BODY }}>{d.phaseName}</span>
+                          <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 8, background: phBg, color: phColor, fontWeight: 700, fontFamily: FONT_BODY }}>{d.phaseName}</span>
                         ) : <span style={{ color: C.ltGray }}>–</span>}
                       </td>
                       {/* Return override input */}
@@ -430,18 +430,13 @@ export default function SpendingPhasesTab({
                         ) : <span style={{ color: C.ltGray }}>–</span>}
                       </td>
                       <td style={{ ...tdStyle, color: d.ssIncome > 0 ? "#0d9488" : C.ltGray }}>{d.ssIncome > 0 ? fmtCompact(d.ssIncome) : "–"}</td>
-                      <td style={{ ...tdStyle, color: d.portfolioWd > 0 ? C.red : C.ltGray }}>{d.portfolioWd > 0 ? `-${fmtCompact(d.portfolioWd)}` : "–"}</td>
-                      <td style={{ ...tdStyle, color: d.totalTax > 0 ? C.orange : C.ltGray, fontSize: 10 }}>{d.totalTax > 0 ? `-${fmtCompact(d.totalTax)}` : "–"}</td>
-                      <td style={{ ...tdStyle, fontWeight: 700, color: C.navy }}>{fmtCompact(d.totalEnd)}</td>
-                      <td style={{ ...tdStyle, fontSize: 10, color: d.isRetired ? (vsTarget >= 0 ? C.green : C.red) : C.ltGray, fontWeight: d.isRetired && vsTarget < 0 ? 700 : 400 }}>
-                        {d.isRetired ? `${vsTarget >= 0 ? "+" : ""}${fmtCompact(vsTarget)}` : "–"}
-                      </td>
+
                     </tr>
 
                     {/* Expanded detail row */}
                     {isExpanded && (
                       <tr style={{ background: C.pageBg }}>
-                        <td colSpan={13} style={{ padding: "12px 20px 14px 40px", borderBottom: `2px solid ${C.border}` }}>
+                        <td colSpan={9} style={{ padding: "12px 20px 14px 40px", borderBottom: `2px solid ${C.border}` }}>
                           <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr 0.8fr", gap: 20, fontSize: 12 }}>
                             {/* Account balances */}
                             <div>
