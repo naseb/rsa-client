@@ -165,8 +165,26 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
             RSA depletes because it intentionally spends more now.
             A growing 4% Rule portfolio means money left unspent.
           </div>
-          <svg viewBox="0 0 580 230" style={{ width: "100%", height: 230 }}>
+          {/* Ending balance summary above chart */}
+          {(() => {
+            const rsaEnd     = cmp.rsaBalances[cmp.rsaBalances.length - 1]     || 0;
+            const fourPctEnd = cmp.fourPctBalances[cmp.fourPctBalances.length - 1] || 0;
+            return (
+              <div style={{ display: "flex", gap: 20, marginBottom: 12, flexWrap: "wrap" }}>
+                <div style={{ fontSize: 14, color: C.navy }}>
+                  <span style={{ color: C.goGo, fontWeight: 700 }}>RSA</span> ending balance:{" "}
+                  <strong style={{ fontFamily: "'JetBrains Mono',monospace" }}>{fmtFull(rsaEnd)}</strong>
+                </div>
+                <div style={{ fontSize: 14, color: C.navy }}>
+                  <span style={{ color: C.green, fontWeight: 700 }}>4% Rule</span> ending balance:{" "}
+                  <strong style={{ fontFamily: "'JetBrains Mono',monospace" }}>{fmtFull(fourPctEnd)}</strong>
+                </div>
+              </div>
+            );
+          })()}
+          <svg viewBox="0 0 580 240" style={{ width: "100%", height: 240 }}>
             {(() => {
+              const retirementAge = compareData?.rsa?.years?.find(y => y.isRetired)?.age || 65;
               const n       = cmp.fourPctBalances.length;
               const LEFT    = 76;
               const RIGHT   = 560;
@@ -175,25 +193,34 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
               const W       = RIGHT - LEFT;
               const H       = BOTTOM - TOP;
 
-              // Cap Y-axis at 2x the starting portfolio value.
-              // Without this cap, the 4% Rule's long-term compounding (e.g. $3M -> $14M)
-              // stretches the scale so far that the RSA line at $1-2M looks like $0.
-              const startBal   = Math.max(cmp.rsaBalances[0] || 0, cmp.fourPctBalances[0] || 0);
-              const rawMax     = Math.max(...cmp.fourPctBalances, ...cmp.rsaBalances, 1);
-              const maxBal     = rawMax > startBal * 2 ? startBal * 2 : rawMax;
-              const isClipped  = rawMax > maxBal;
-              const clamp      = (b) => Math.min(b, maxBal);
+              // Cap Y-axis at the STARTING portfolio value.
+              // The 4% Rule may grow well above this — it will be clipped with
+              // a note. This keeps the RSA trajectory clearly visible.
+              const startBal  = Math.max(cmp.rsaBalances[0] || 0, cmp.fourPctBalances[0] || 0);
+              const maxBal    = startBal;
+              const clamp     = (b) => Math.min(b, maxBal);
+              const fourPctClipped = cmp.fourPctBalances.some(b => b > maxBal);
 
               const toX = (i) => LEFT + (i / Math.max(n - 1, 1)) * W;
               const toY = (b) => BOTTOM - (clamp(b) / maxBal) * H;
 
-              const rsaPoints     = cmp.rsaBalances.map((b, i)     => `${toX(i)},${toY(b)}`).join(" ");
-              const fourPctPoints = cmp.fourPctBalances.map((b, i) => `${toX(i)},${toY(b)}`).join(" ");
+              // Age labels every 5 years
+              const ageLabels = [];
+              for (let i = 0; i < n; i++) {
+                const age = retirementAge + i;
+                if (age % 5 === 0) {
+                  ageLabels.push({ i, age });
+                }
+              }
 
               const steps = [0, 0.25, 0.5, 0.75, 1.0];
 
+              const rsaPoints     = cmp.rsaBalances.map((b, i)     => `${toX(i)},${toY(b)}`).join(" ");
+              const fourPctPoints = cmp.fourPctBalances.map((b, i) => `${toX(i)},${toY(b)}`).join(" ");
+
               return (
                 <>
+                  {/* Gridlines + Y labels */}
                   {steps.map((pct) => {
                     const y   = BOTTOM - pct * H;
                     const val = pct * maxBal;
@@ -207,21 +234,32 @@ export default function CompareTab({ compareData, loading, error, baseSpending }
                     );
                   })}
 
+                  {/* Lines */}
                   <polyline points={fourPctPoints} fill="none" stroke={C.green} strokeWidth={2}   strokeDasharray="6,3" opacity={0.8} />
                   <polyline points={rsaPoints}     fill="none" stroke={C.goGo}  strokeWidth={2.5} />
 
+                  {/* Legend */}
                   <line x1={LEFT}      y1={10} x2={LEFT + 24} y2={10} stroke={C.goGo}  strokeWidth={2.5} />
                   <text x={LEFT + 28}  y={14}  fontSize="11"  fill={C.navy} fontWeight="600">RSA</text>
                   <line x1={LEFT + 72} y1={10} x2={LEFT + 96} y2={10} stroke={C.green} strokeWidth={2} strokeDasharray="6,3" />
                   <text x={LEFT + 100} y={14}  fontSize="11"  fill={C.navy} fontWeight="600">4% Rule</text>
-                  {isClipped && (
-                    <text x={RIGHT} y={28} fontSize="10" fill={C.green} textAnchor="end" fontStyle="italic">
-                      ↑ 4% Rule grows beyond chart top
+                  {fourPctClipped && (
+                    <text x={RIGHT} y={24} fontSize="10" fill={C.green} textAnchor="end" fontStyle="italic">
+                      ↑ 4% Rule portfolio grows above this line
                     </text>
                   )}
 
-                  <text x={LEFT}  y={218} fontSize="10" fill={C.gray}>Year 1</text>
-                  <text x={RIGHT} y={218} fontSize="10" fill={C.gray} textAnchor="end">Year {n}</text>
+                  {/* Age labels on X axis */}
+                  <line x1={LEFT} y1={BOTTOM} x2={RIGHT} y2={BOTTOM} stroke={C.border} strokeWidth={1} />
+                  {ageLabels.map(({ i, age }) => (
+                    <g key={age}>
+                      <line x1={toX(i)} y1={BOTTOM} x2={toX(i)} y2={BOTTOM + 4} stroke={C.ltGray} strokeWidth={1} />
+                      <text x={toX(i)} y={BOTTOM + 14} fontSize="10" fill={C.gray} textAnchor="middle">
+                        {age}
+                      </text>
+                    </g>
+                  ))}
+                  <text x={LEFT + W / 2} y={BOTTOM + 26} fontSize="10" fill={C.ltGray} textAnchor="middle">Age</text>
                 </>
               );
             })()}
