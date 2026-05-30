@@ -67,16 +67,16 @@ export default function TaxOptimizationTab({ inputs }) {
   if (loading) return (
     <div style={{ textAlign: 'center', padding: '80px 0', color: C.gray }}>
       <div style={{ fontSize: 28, color: C.accent, marginBottom: 12 }}>◆</div>
-      <div style={{ fontSize: 14 }}>Running tax optimization engines...</div>
-      <div style={{ fontSize: 12, marginTop: 6, color: C.ltGray }}>Analyzing bracket opportunities and Roth conversion windows</div>
+      <div style={{ fontSize: 17 }}>Running tax optimization engines...</div>
+      <div style={{ fontSize: 15, marginTop: 8, color: C.ltGray }}>Analyzing bracket opportunities and Roth conversion windows</div>
     </div>
   );
 
   if (error) return (
-    <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '16px 20px', color: '#991b1b', fontSize: 13 }}>
+    <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '16px 20px', color: '#991b1b', fontSize: 16 }}>
       <strong>Optimizer Error:</strong> {error}
       <button onClick={() => { hasFetched.current = false; fetchOptimization(); }}
-        style={{ marginLeft: 12, padding: '4px 12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>
+        style={{ marginLeft: 12, padding: '4px 12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 14 }}>
         Retry
       </button>
     </div>
@@ -133,7 +133,7 @@ export default function TaxOptimizationTab({ inputs }) {
       background: activeSection === id ? C.accent : 'transparent',
       color: activeSection === id ? '#fff' : C.gray,
       fontWeight: activeSection === id ? 700 : 500,
-      fontSize: 13, cursor: 'pointer', fontFamily: FONT_BODY, transition: 'all 0.15s',
+      fontSize: 15, cursor: 'pointer', fontFamily: FONT_BODY, transition: 'all 0.15s',
     }}>{label}</button>
   );
 
@@ -146,7 +146,7 @@ export default function TaxOptimizationTab({ inputs }) {
           style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
             padding: '14px 20px', background: 'none', border: 'none', cursor: 'pointer',
             fontFamily: FONT_BODY, textAlign: 'left' }}>
-          <span style={{ fontSize: 14, fontWeight: 700, color: C.navy }}>📖 How Tax Optimization Pro Works</span>
+          <span style={{ fontSize: 16, fontWeight: 700, color: C.navy }}>📖 How Tax Optimization Pro Works</span>
           <span style={{ fontSize: 12, color: C.gray, transition: 'transform 0.2s', display: 'inline-block',
             transform: howOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
         </button>
@@ -181,10 +181,10 @@ export default function TaxOptimizationTab({ inputs }) {
                     <div style={{ width: 28, height: 28, borderRadius: 8, background: `${e.color}20`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 14, color: e.color, fontWeight: 700 }}>{e.icon}</div>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: C.navy }}>{e.title}</span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: C.navy }}>{e.title}</span>
                   </div>
-                  <p style={{ fontSize: 12, color: C.gray, lineHeight: 1.7, marginBottom: 10 }}>{e.body}</p>
-                  <p style={{ fontSize: 11, color: '#64748b', lineHeight: 1.6, background: '#fff',
+                  <p style={{ fontSize: 15, color: C.gray, lineHeight: 1.75, marginBottom: 12 }}>{e.body}</p>
+                  <p style={{ fontSize: 14, color: '#64748b', lineHeight: 1.7, background: '#fff',
                     borderRadius: 6, padding: '8px 10px', border: `1px solid ${C.border}`,
                     fontStyle: 'italic' }}>{e.example}</p>
                 </div>
@@ -192,7 +192,7 @@ export default function TaxOptimizationTab({ inputs }) {
             </div>
 
             <div style={{ marginTop: 14, padding: '10px 14px', background: '#fffbeb',
-              borderRadius: 8, border: '1px solid #fde68a', fontSize: 12, color: '#92400e' }}>
+              borderRadius: 8, border: '1px solid #fde68a', fontSize: 14, color: '#92400e' }}>
               <strong>Important:</strong> These are planning estimates, not guarantees. Tax law changes over time.
               The savings numbers shown are illustrative of the potential benefit. Always validate
               recommendations with a qualified tax advisor before making changes to your withdrawal strategy.
@@ -211,12 +211,12 @@ export default function TaxOptimizationTab({ inputs }) {
           borderRadius: 10, padding: '10px 16px', marginBottom: 12,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
-          <span style={{ fontSize: 13, color: '#92400e' }}>
+          <span style={{ fontSize: 15, color: '#92400e' }}>
             ⚠ Your inputs have changed since this analysis was run — results may be outdated.
           </span>
           <button onClick={() => { hasFetched.current = false; fetchOptimization(); }}
             style={{ padding: '5px 14px', background: '#d97706', color: '#fff',
-              border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 700,
+              border: 'none', borderRadius: 6, fontSize: 14, fontWeight: 700,
               cursor: 'pointer', fontFamily: FONT_BODY, marginLeft: 12, whiteSpace: 'nowrap' }}>
             Re-run Now
           </button>
@@ -244,7 +244,7 @@ export default function TaxOptimizationTab({ inputs }) {
                 background: `radial-gradient(circle,rgba(${isAlreadyOptimized ? '16,185,129' : '16,185,129'},0.12) 0%,transparent 70%)`,
                 pointerEvents: 'none' }} />
 
-              <div style={{ fontSize: 11, color: '#64748b', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 6 }}>
+              <div style={{ fontSize: 13, color: '#64748b', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6 }}>
                 Tax Optimization Pro — Results
               </div>
 
@@ -259,7 +259,7 @@ export default function TaxOptimizationTab({ inputs }) {
                       <div style={{ fontSize: 24, fontWeight: 800, color: zeroReason.positive ? '#10b981' : '#f8fafc', marginBottom: 6 }}>
                         {zeroReason.title}
                       </div>
-                      <div style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.7, maxWidth: 680 }}>
+                      <div style={{ fontSize: 17, color: '#94a3b8', lineHeight: 1.75, maxWidth: 680 }}>
                         {zeroReason.body}
                       </div>
                     </div>
@@ -268,10 +268,10 @@ export default function TaxOptimizationTab({ inputs }) {
                   {zeroReason.tip && (
                         <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)',
                           borderRadius: 10, padding: '14px 18px', marginTop: 12, maxWidth: 680 }}>
-                          <div style={{ fontSize: 12, color: '#6ee7b7', fontWeight: 700, marginBottom: 4 }}>
+                          <div style={{ fontSize: 14, color: '#6ee7b7', fontWeight: 700, marginBottom: 4 }}>
                             💡 Worth knowing
                           </div>
-                          <div style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.7 }}>
+                          <div style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.75 }}>
                             {zeroReason.tip}
                           </div>
                         </div>
@@ -287,7 +287,7 @@ export default function TaxOptimizationTab({ inputs }) {
                     ].map(s => (
                       <div key={s.label} style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 10,
                         padding: '12px 18px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                        <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase',
+                        <div style={{ fontSize: 12, color: '#64748b', textTransform: 'uppercase',
                           letterSpacing: '0.08em', marginBottom: 4 }}>{s.label}</div>
                         <div style={{ fontSize: 16, fontWeight: 700, fontFamily: FONT_MONO, color: '#f8fafc' }}>{s.val}</div>
                       </div>
@@ -327,7 +327,7 @@ export default function TaxOptimizationTab({ inputs }) {
                     ].map(s => (
                       <div key={s.label} style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 10,
                         padding: '12px 18px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                        <div style={{ fontSize: 10, color: '#64748b', textTransform: 'uppercase',
+                        <div style={{ fontSize: 12, color: '#64748b', textTransform: 'uppercase',
                           letterSpacing: '0.08em', marginBottom: 4 }}>{s.label}</div>
                         <div style={{ fontSize: 16, fontWeight: 700, fontFamily: FONT_MONO, color: '#f8fafc' }}>{s.val}</div>
                       </div>
@@ -338,7 +338,7 @@ export default function TaxOptimizationTab({ inputs }) {
 
               <div style={{ marginTop: 14, padding: '10px 14px', background: 'rgba(245,158,11,0.08)',
                 borderRadius: 8, border: '1px solid rgba(245,158,11,0.15)', display: 'inline-block' }}>
-                <span style={{ fontSize: 12, color: '#fbbf24' }}>
+                <span style={{ fontSize: 14, color: '#fbbf24' }}>
                   ⚠ Planning estimates only. Consult a qualified tax advisor before changing your withdrawal strategy.
                 </span>
               </div>
@@ -349,8 +349,8 @@ export default function TaxOptimizationTab({ inputs }) {
           {activeSection === 'roth' && (
             <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
               <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, background: '#f0fdf4' }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: C.navy }}>Roth Conversion Ladder</div>
-                <div style={{ fontSize: 12, color: C.gray, marginTop: 4, lineHeight: 1.6, maxWidth: 700 }}>
+                <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>Roth Conversion Ladder</div>
+                <div style={{ fontSize: 15, color: C.gray, marginTop: 8, lineHeight: 1.75, maxWidth: 700 }}>
                   Your tax picture year by year — using the <strong>exact same numbers as the Spending Phases tab</strong>.
                   <br />
                   <strong>How your bracket is calculated:</strong> Pre-tax withdrawals + 85% of Social Security
@@ -402,8 +402,8 @@ export default function TaxOptimizationTab({ inputs }) {
           {activeSection === 'bracket' && (
             <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
               <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, background: '#eff6ff' }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: C.navy }}>Bracket Filling</div>
-                <div style={{ fontSize: 12, color: C.gray, marginTop: 4, lineHeight: 1.6, maxWidth: 700 }}>
+                <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>Bracket Filling</div>
+                <div style={{ fontSize: 15, color: C.gray, marginTop: 8, lineHeight: 1.75, maxWidth: 700 }}>
                   <strong>What this shows:</strong> Years where your taxable income is below the ceiling of your
                   current bracket — meaning you could pull more from Pre-tax at the same rate.
                   The "Room Available" column shows how much more you could withdraw before hitting
@@ -453,8 +453,8 @@ export default function TaxOptimizationTab({ inputs }) {
           {activeSection === 'sequence' && (
             <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
               <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: C.navy }}>Dynamic Withdrawal Sequencing</div>
-                <div style={{ fontSize: 12, color: C.gray, marginTop: 4, lineHeight: 1.6, maxWidth: 700 }}>
+                <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>Dynamic Withdrawal Sequencing</div>
+                <div style={{ fontSize: 15, color: C.gray, marginTop: 8, lineHeight: 1.75, maxWidth: 700 }}>
                   <strong>What this shows:</strong> Specific years where changing the standard withdrawal order
                   (Taxable → Roth → Pre-tax) could reduce taxes. Common triggers include being near an
                   IRMAA Medicare surcharge threshold, having an unusually low-income year, or approaching
@@ -466,16 +466,16 @@ export default function TaxOptimizationTab({ inputs }) {
                   {sequencingInsights.map(s => (
                     <div key={s.year} style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '14px 18px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                        <span style={{ fontWeight: 700, color: C.navy, fontSize: 13 }}>Age {s.age} ({s.year})</span>
+                        <span style={{ fontWeight: 700, color: C.navy, fontSize: 16 }}>Age {s.age} ({s.year})</span>
                         {s.recommendedSequence && (
-                          <span style={{ fontSize: 11, background: '#fef3c7', color: '#92400e',
+                          <span style={{ fontSize: 13, background: '#fef3c7', color: '#92400e',
                             padding: '2px 10px', borderRadius: 100, fontWeight: 600 }}>
                             {s.recommendedSequence}
                           </span>
                         )}
                       </div>
                       {s.insights.map((ins, i) => (
-                        <div key={i} style={{ fontSize: 13, color: '#78350f', lineHeight: 1.6,
+                        <div key={i} style={{ fontSize: 15, color: '#78350f', lineHeight: 1.75,
                           marginBottom: i < s.insights.length - 1 ? 6 : 0 }}>
                           • {ins}
                         </div>
@@ -500,8 +500,8 @@ export default function TaxOptimizationTab({ inputs }) {
           {activeSection === 'compare' && (
             <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
               <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: C.navy }}>Year-by-Year Tax Comparison</div>
-                <div style={{ fontSize: 12, color: C.gray, marginTop: 4, lineHeight: 1.6 }}>
+                <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>Year-by-Year Tax Comparison</div>
+                <div style={{ fontSize: 15, color: C.gray, marginTop: 8, lineHeight: 1.75 }}>
                   <strong>Current Tax</strong> = what you pay under your existing plan.{' '}
                   <strong>Optimized Tax</strong> = estimated tax after applying recommendations.{' '}
                   <strong>Savings</strong> = the net benefit in that year. Rows highlighted green have identified savings.
@@ -562,8 +562,8 @@ export default function TaxOptimizationTab({ inputs }) {
           {activeSection === 'diagnosis' && (
             <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
               <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
-                <div style={{ fontSize: 15, fontWeight: 700, color: C.navy }}>Tax Diagnosis</div>
-                <div style={{ fontSize: 12, color: C.gray, marginTop: 4, lineHeight: 1.6, maxWidth: 700 }}>
+                <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>Tax Diagnosis</div>
+                <div style={{ fontSize: 15, color: C.gray, marginTop: 8, lineHeight: 1.75, maxWidth: 700 }}>
                   Your tax picture year by year under your current plan — before any optimization.
                   <strong> Bracket Room</strong> = how much more income you could have before crossing into the next bracket.
                   <strong> In Window?</strong> = YES if you are before your RMD start age — the window where conversions are most valuable.
@@ -595,8 +595,8 @@ export default function TaxOptimizationTab({ inputs }) {
                         <td style={{ ...tdS, fontFamily: FONT_MONO }}>{(row.effectiveRate * 100).toFixed(1)}%</td>
                         <td style={{ ...tdS }}>
                           {row.isInConversionWindow
-                            ? <span style={{ fontSize: 10, background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: 4, fontWeight: 700 }}>YES</span>
-                            : <span style={{ fontSize: 10, color: C.ltGray }}>—</span>}
+                            ? <span style={{ fontSize: 12, background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: 4, fontWeight: 700 }}>YES</span>
+                            : <span style={{ fontSize: 12, color: C.ltGray }}>—</span>}
                         </td>
                       </tr>
                     ))}
@@ -610,7 +610,7 @@ export default function TaxOptimizationTab({ inputs }) {
           <div style={{ marginTop: 16, textAlign: 'right' }}>
             <button onClick={() => { hasFetched.current = false; fetchOptimization(); }}
               style={{ padding: '8px 18px', background: C.cardBg, border: `1px solid ${C.border}`,
-                borderRadius: 8, color: C.gray, fontSize: 12, fontWeight: 600,
+                borderRadius: 8, color: C.gray, fontSize: 14, fontWeight: 600,
                 cursor: 'pointer', fontFamily: FONT_BODY }}>
               ↺ Re-run with current inputs
             </button>
@@ -627,15 +627,15 @@ export default function TaxOptimizationTab({ inputs }) {
 function EmptyState({ title, reasons }) {
   return (
     <div style={{ padding: '28px 24px' }}>
-      <div style={{ fontSize: 14, fontWeight: 700, color: C.navy, marginBottom: 10 }}>{title}</div>
-      <div style={{ fontSize: 12, color: C.gray, marginBottom: 10 }}>This can happen for several reasons:</div>
+      <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, marginBottom: 12 }}>{title}</div>
+      <div style={{ fontSize: 15, color: C.gray, marginBottom: 12 }}>This can happen for several reasons:</div>
       <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
         {reasons.map((r, i) => (
-          <li key={i} style={{ fontSize: 12, color: C.gray, lineHeight: 1.6 }}>{r}</li>
+          <li key={i} style={{ fontSize: 15, color: C.gray, lineHeight: 1.75 }}>{r}</li>
         ))}
       </ul>
       <div style={{ marginTop: 14, padding: '10px 14px', background: '#f8fafc',
-        borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 12, color: '#64748b' }}>
+        borderRadius: 8, border: `1px solid ${C.border}`, fontSize: 15, color: '#64748b' }}>
         💡 Try adjusting your retirement age or account balances in Settings — different inputs
         may reveal optimization opportunities.
       </div>
@@ -649,17 +649,17 @@ function UpgradePrompt() {
   return (
     <div style={{ textAlign: 'center', padding: '60px 40px', maxWidth: 520, margin: '0 auto' }}>
       <div style={{ fontSize: 36, color: '#1d4ed8', marginBottom: 16 }}>🔒</div>
-      <h2 style={{ fontSize: 22, fontWeight: 800, color: C.navy, marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>
+      <h2 style={{ fontSize: 24, fontWeight: 800, color: C.navy, marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>
         Tax Optimization Pro
       </h2>
-      <p style={{ fontSize: 14, color: C.gray, lineHeight: 1.7, marginBottom: 24 }}>
+      <p style={{ fontSize: 17, color: C.gray, lineHeight: 1.75, marginBottom: 28 }}>
         Available on the <strong>Pro Annual</strong> plan. Unlock Roth conversion ladders,
         bracket filling, and dynamic withdrawal sequencing — with a personalized
         estimate of your lifetime federal tax savings.
       </p>
       <a href="/pricing" style={{ display: 'inline-block', background: '#1d4ed8', color: '#fff',
         padding: '12px 28px', borderRadius: 10, textDecoration: 'none',
-        fontSize: 14, fontWeight: 700, fontFamily: "'DM Sans', sans-serif" }}>
+        fontSize: 17, fontWeight: 700, fontFamily: "'DM Sans', sans-serif" }}>
         Upgrade to Pro →
       </a>
     </div>
@@ -669,13 +669,13 @@ function UpgradePrompt() {
 
 // ── Shared styles ─────────────────────────────────────────────────────────────
 const tdS = {
-  padding: '7px 12px', fontSize: 12,
+  padding: '9px 14px', fontSize: 14,
   borderBottom: '1px solid #f1f5f9',
-  color: '#475569', whiteSpace: 'nowrap',
+  color: '#374151', whiteSpace: 'nowrap',
 };
 const thS = {
-  padding: '8px 12px', fontSize: 9,
-  color: '#94a3b8', fontWeight: 700,
+  padding: '10px 14px', fontSize: 11,
+  color: '#6b7280', fontWeight: 700,
   textTransform: 'uppercase', letterSpacing: '0.04em',
   textAlign: 'left', borderBottom: '2px solid #e2e8f0',
   whiteSpace: 'nowrap', background: '#f8fafc',
