@@ -297,7 +297,7 @@ export default function LandingPage() {
           <div className="lp-logo">
             <span className="lp-logo-diamond">◆</span>
             <div>
-              <div className="lp-logo-text">Retirement Spending Allowance</div>
+              <div className="lp-logo-text">Retirement Spending Analyzer</div>
               <div className="lp-logo-sub">Smarter retirement income planning</div>
             </div>
           </div>
@@ -341,7 +341,7 @@ export default function LandingPage() {
             <div className="lp-preview-content">
               <div className="lp-preview-header">
                 <div>
-                  <div className="lp-ph-eyebrow">Retirement Spending Allowance</div>
+                  <div className="lp-ph-eyebrow">Retirement Spending Analyzer</div>
                   <div className="lp-ph-title">
                     ◆ <span style={{ color: '#10b981' }}>Go-Go</span>{' '}
                     · <span style={{ color: '#94a3b8' }}>Slow-Go</span>{' '}
@@ -351,7 +351,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <div className="lp-ph-val">$114,200</div>
-                  <div className="lp-ph-lbl">Annual Allowance</div>
+                  <div className="lp-ph-lbl">Annual Spending</div>
                 </div>
               </div>
               <div className="lp-mini-row">
@@ -433,8 +433,8 @@ export default function LandingPage() {
                 },
                 {
                   n: '3',
-                  title: 'Get your allowance',
-                  desc: 'The solver finds your maximum sustainable Go-Go spending while meeting your end-of-life portfolio goal.',
+                  title: 'Get your number',
+                  desc: 'The analyzer finds your maximum sustainable Go-Go spending while meeting your end-of-life portfolio goal.',
                 },
               ].map(s => (
                 <div className="lp-step" key={s.n}>
@@ -456,7 +456,7 @@ export default function LandingPage() {
           <div className="lp-vs-grid">
             <div className="lp-vc feat">
               <div className="lp-vb green">◆ RSA</div>
-              <div className="lp-vn">Retirement Spending Allowance</div>
+              <div className="lp-vn">Retirement Spending Analyzer</div>
               <div className="lp-vt">Adapts to your life, your taxes, your plan</div>
               <ul className="lp-vl">
                 {[
@@ -512,7 +512,7 @@ export default function LandingPage() {
         <footer className="lp-footer">
           <div className="lp-fl">
             <span style={{ color: '#b8860b' }}>◆</span>
-            Retirement Spending Allowance
+            Retirement Spending Analyzer
           </div>
           <div className="lp-fn">
             Not financial advice. Consult a qualified advisor for personalized guidance.

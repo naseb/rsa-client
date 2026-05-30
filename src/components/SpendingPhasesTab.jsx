@@ -92,13 +92,13 @@ export default function SpendingPhasesTab({
       <LoadingOverlay loading={loading} error={null} />
 
       {/* ===== RESULTS BANNER ===== */}
-      <div style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0f172a 100%)", borderRadius: 16, padding: "28px 36px", marginBottom: 20, color: "#fff", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -40, right: -40, width: 250, height: 250, background: "radial-gradient(circle,rgba(245,158,11,0.1) 0%,transparent 70%)", pointerEvents: "none" }} />
-        <div style={{ fontSize: 11, color: "#64748b", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 6 }}>Go-Go Phase Base Spending</div>
+      <div style={{ background: "linear-gradient(135deg, #1c3829 0%, #2d5a47 40%, #1c3829 100%)", borderRadius: 16, padding: "28px 36px", marginBottom: 20, color: "#fff", position: "relative", overflow: "hidden", borderBottom: "2px solid #b8860b" }}>
+        <div style={{ position: "absolute", top: -40, right: -40, width: 250, height: 250, background: "radial-gradient(circle,rgba(184,134,11,0.15) 0%,transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ fontSize: 11, color: "rgba(247,243,234,0.5)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 6 }}>Go-Go Phase Base Spending</div>
         <div style={{ fontSize: 48, fontWeight: 800, fontFamily: FONT_MONO, color: C.goGo, lineHeight: 1, marginBottom: 2 }}>
           {fmtFull(le.baseSpending)}<span style={{ fontSize: 18, color: "#64748b", fontWeight: 400, marginLeft: 8 }}>/year</span>
         </div>
-        <div style={{ fontSize: 16, color: "#94a3b8", marginBottom: 20 }}>
+        <div style={{ fontSize: 16, color: "rgba(247,243,234,0.65)", marginBottom: 20 }}>
           {fmtFull(Math.floor(le.baseSpending / 12))} / month in your active years
         </div>
 
@@ -112,24 +112,24 @@ export default function SpendingPhasesTab({
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                   <div style={{ width: 10, height: 10, borderRadius: "50%", background: C[ph.color] }} />
                   <span style={{ fontSize: 12, fontWeight: 700, color: C[ph.color] }}>{ph.name}</span>
-                  <span style={{ fontSize: 10, color: "#64748b" }}>Ages {idx === 0 ? retirementAge : ph.startAge}–{endAge}</span>
+                  <span style={{ fontSize: 10, color: "rgba(247,243,234,0.4)" }}>Ages {idx === 0 ? retirementAge : ph.startAge}–{endAge}</span>
                 </div>
-                <div style={{ fontSize: 22, fontWeight: 700, fontFamily: FONT_MONO }}>{fmtFull(spending)}<span style={{ fontSize: 11, color: "#64748b" }}>/yr</span></div>
-                <div style={{ fontSize: 11, color: "#94a3b8" }}>{fmtFull(Math.floor(spending / 12))}/mo · {ph.pct}% of base</div>
+                <div style={{ fontSize: 22, fontWeight: 700, fontFamily: FONT_MONO }}>{fmtFull(spending)}<span style={{ fontSize: 11, color: "rgba(247,243,234,0.4)" }}>/yr</span></div>
+                <div style={{ fontSize: 11, color: "rgba(247,243,234,0.5)" }}>{fmtFull(Math.floor(spending / 12))}/mo · {ph.pct}% of base</div>
               </div>
             );
           })}
           {/* End balance card */}
           <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: "14px 20px", border: "1px solid rgba(255,255,255,0.08)" }}>
-            <div style={{ fontSize: 10, color: "#64748b", textTransform: "uppercase", marginBottom: 4 }}>Portfolio at {lifeExpectancy}</div>
+            <div style={{ fontSize: 10, color: "rgba(247,243,234,0.45)", textTransform: "uppercase", marginBottom: 4 }}>Portfolio at {lifeExpectancy}</div>
             <div style={{ fontSize: 22, fontWeight: 700, fontFamily: FONT_MONO }}>{fmtCompact(le.finalBalance)}</div>
-            <div style={{ fontSize: 11, color: "#94a3b8" }}>Target: {fmtCompact(targetEndBalance)}</div>
+            <div style={{ fontSize: 11, color: "rgba(247,243,234,0.5)" }}>Target: {fmtCompact(targetEndBalance)}</div>
           </div>
           {/* SS card */}
           <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: "14px 20px", border: "1px solid rgba(255,255,255,0.08)" }}>
-            <div style={{ fontSize: 10, color: "#64748b", textTransform: "uppercase", marginBottom: 4 }}>Social Security</div>
+            <div style={{ fontSize: 10, color: "rgba(247,243,234,0.45)", textTransform: "uppercase", marginBottom: 4 }}>Social Security</div>
             <div style={{ fontSize: 22, fontWeight: 700, fontFamily: FONT_MONO }}>{fmtFull(ssMonthly)}<span style={{ fontSize: 11, color: "#64748b" }}>/mo</span></div>
-            <div style={{ fontSize: 11, color: "#94a3b8" }}>Claiming age {ssStartAge}{ssStartAge !== 67 ? ` (${Math.round((ssMult - 1) * 100)}%)` : ""}</div>
+            <div style={{ fontSize: 11, color: "rgba(247,243,234,0.5)" }}>Claiming age {ssStartAge}{ssStartAge !== 67 ? ` (${Math.round((ssMult - 1) * 100)}%)` : ""}</div>
           </div>
         </div>
 
@@ -322,9 +322,9 @@ export default function SpendingPhasesTab({
         <div style={{ overflowY: "auto", maxHeight: "55vh" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ background: "#f8fafc" }}>
+              <tr style={{ background: C.pageBg }}>
                 {["Year", "Age", "Phase", "Return", "Portfolio", "Growth", "Spending", "+/-", "SS", "From Portfolio", "Tax", "End Balance", "vs Target"].map((h) => (
-                  <th key={h} style={{ padding: "8px 8px", textAlign: h === "Return" || h === "+/-" ? "center" : "right", fontWeight: 700, fontSize: 9, color: C.gray, borderBottom: `2px solid ${C.border}`, position: "sticky", top: 0, background: "#f8fafc", zIndex: 1, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>{h}</th>
+                  <th key={h} style={{ padding: "8px 8px", textAlign: h === "Return" || h === "+/-" ? "center" : "right", fontWeight: 700, fontSize: 9, color: C.gray, borderBottom: `2px solid ${C.border}`, position: "sticky", top: 0, background: C.pageBg, zIndex: 1, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -340,7 +340,7 @@ export default function SpendingPhasesTab({
                   <Fragment key={d.year}>
                     <tr
                       style={{
-                        background: getSegmentDirection(d.year) === 'down' ? "#fef2f2" : getSegmentDirection(d.year) === 'up' ? "#f0fdf4" : d.age === retirementAge ? "#dbeafe" : hasReturnOverride ? (d.returnPct < 0 ? C.redBg : d.returnPct > defaultReturn ? C.greenBg : "#fffbeb") : rowIdx % 2 === 0 ? "#fff" : "#fafbfc",
+                        background: getSegmentDirection(d.year) === 'down' ? "#fef2f2" : getSegmentDirection(d.year) === 'up' ? "#f0fdf4" : d.age === retirementAge ? "#e8f5e9" : hasReturnOverride ? (d.returnPct < 0 ? C.redBg : d.returnPct > defaultReturn ? C.greenBg : "#fffbeb") : rowIdx % 2 === 0 ? "#fff" : C.pageBg,
                         cursor: "pointer",
                         borderLeft: getSegmentDirection(d.year) === 'down' ? `3px solid ${C.red}` : getSegmentDirection(d.year) === 'up' ? `3px solid ${C.green}` : "3px solid transparent",
                       }}
@@ -440,7 +440,7 @@ export default function SpendingPhasesTab({
 
                     {/* Expanded detail row */}
                     {isExpanded && (
-                      <tr style={{ background: "#f1f5f9" }}>
+                      <tr style={{ background: C.pageBg }}>
                         <td colSpan={13} style={{ padding: "12px 20px 14px 40px", borderBottom: `2px solid ${C.border}` }}>
                           <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr 0.8fr", gap: 20, fontSize: 12 }}>
                             {/* Account balances */}
@@ -485,7 +485,7 @@ export default function SpendingPhasesTab({
                                   {d.portfolioWd > 0 && <span style={{ fontSize: 9, color: C.ltGray }}>(detail)</span>}
                                 </div>
                                 {expandedWds[d.year] && d.portfolioWd > 0 && (
-                                  <div style={{ marginTop: 4, marginLeft: 10, padding: '8px 10px', background: '#fff', borderRadius: 8, border: `1px solid ${C.border}` }}>
+                                  <div style={{ marginTop: 4, marginLeft: 10, padding: '8px 10px', background: C.cardBg, borderRadius: 8, border: `1px solid ${C.border}` }}>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto auto auto', gap: '0 8px', fontSize: 9, marginBottom: 4 }}>
                                       <span style={{ color: C.gray, fontWeight: 700 }}>Account</span>
                                       <span style={{ color: C.gray, fontWeight: 700, textAlign: 'right' }}>Avail</span>

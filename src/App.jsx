@@ -237,7 +237,7 @@ export default function App() {
       }}>
         <div>
           <div style={{ color: "#f7f3ea", fontSize: 20, fontWeight: 800 }}>
-            <span style={{ color: "#b8860b" }}>◆</span> Retirement Spending Allowance
+            <span style={{ color: "#b8860b" }}>◆</span> Retirement Spending Analyzer
           </div>
           <div style={{ color: "rgba(247,243,234,0.55)", fontSize: 13, marginTop: 2 }}>
             Spend more when you're active, less when you slow down

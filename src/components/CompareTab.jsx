@@ -82,7 +82,7 @@ export default function CompareTab({ compareData, loading, error, baseSpending, 
         <div style={{ fontSize: 12, color: "#7aaa8a", letterSpacing: "0.14em",
           textTransform: "uppercase", marginBottom: 10 }}>Your App vs The 4% Rule</div>
         <div style={{ fontSize: 26, fontWeight: 800, color: "#f7f3ea", marginBottom: 8 }}>
-          <span style={{ color: "#b8860b" }}>◆</span> Retirement Spending Allowance{" "}
+          <span style={{ color: "#b8860b" }}>◆</span> Retirement Spending Analyzer{" "}
           <span style={{ color: "#7aaa8a", fontWeight: 400 }}>vs</span>{" "}
           <span style={{ color: "#10b981" }}>4% Rule</span>
         </div>
@@ -128,7 +128,7 @@ export default function CompareTab({ compareData, loading, error, baseSpending, 
           borderRadius: 14, padding: "22px 24px", background: "#f0f8f4" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
             <span style={{ color: C.goGo, fontSize: 18 }}>◆</span>
-            <span style={{ fontSize: 16, fontWeight: 700, color: C.navy }}>Retirement Spending Allowance</span>
+            <span style={{ fontSize: 16, fontWeight: 700, color: C.navy }}>Retirement Spending Analyzer</span>
             <span style={{ fontSize: 11, background: "#2d6a4f", color: "#fff",
               padding: "2px 10px", borderRadius: 100, fontWeight: 700 }}>Dynamic</span>
           </div>

@@ -13,19 +13,19 @@ export default function InstructionsTab() {
 
       {/* Hero banner */}
       <div style={{
-        background: "linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0f172a 100%)",
+        background: "linear-gradient(135deg, #1c3829 0%, #2d5a47 40%, #1c3829 100%)",
         borderRadius: 16, padding: "40px 44px", marginBottom: 28,
-        color: "#fff", position: "relative", overflow: "hidden",
+        color: "#fff", position: "relative", overflow: "hidden", borderBottom: "2px solid #b8860b",
       }}>
         <div style={{
           position: "absolute", top: -40, right: -40, width: 250, height: 250,
-          background: "radial-gradient(circle,rgba(245,158,11,0.1) 0%,transparent 70%)",
+          background: "radial-gradient(circle,rgba(184,134,11,0.15) 0%,transparent 70%)",
           pointerEvents: "none",
         }} />
         <div style={{ fontSize: 30, fontWeight: 800, marginBottom: 12 }}>
-          <span style={{ color: C.goGo }}>◆</span> Retirement Spending Allowance
+          <span style={{ color: "#b8860b" }}>◆</span> Retirement Spending Analyzer
         </div>
-        <div style={{ fontSize: 18, color: "#94a3b8", lineHeight: 1.7 }}>
+        <div style={{ fontSize: 18, color: "rgba(247,243,234,0.75)", lineHeight: 1.7 }}>
           Spend more when you're active, less when you slow down. This tool calculates
           the maximum sustainable spending across three retirement phases while ensuring
           your portfolio lasts.
