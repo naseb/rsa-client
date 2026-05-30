@@ -308,8 +308,7 @@ export default function LandingPage() {
         <section className="lp-hero">
           <div className="lp-eyebrow-pill">The Smarter Retirement Income Planning Tool</div>
           <h1 className="lp-hero-title">
-            Not "how little can I live on" —<br />
-            but "how much can I actually <span className="accent">spend</span>?"
+            "Stop Guessing How Much You Can Spend In Retirement. Know Exactly What Your Accounts Can Pay You."
           </h1>
           <p className="lp-hero-sub">
             You spent decades building your accounts. Now comes the question
