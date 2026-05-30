@@ -4,9 +4,8 @@
  * Personal info, Social Security, return assumptions,
  * target balance, and investment accounts.
  *
- * NEW IN THIS VERSION: Employer match fields (matchPct, matchLimit)
- * are now exposed in the UI. Previously they existed in the data model
- * but had no input fields.
+ * Updated: font sizes increased for 50+ readability,
+ * account card backgrounds updated to match money theme.
  */
 
 import NumericInput from "./NumericInput";
@@ -39,141 +38,171 @@ export default function SettingsTab({
     setAccounts((prev) => prev.filter((_, i) => i !== idx));
   };
 
+  // Shared label style
+  const labelStyle = { fontSize: 13, color: C.gray, marginBottom: 5, fontWeight: 500 };
+
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, maxWidth: 900 }}>
-      {/* Personal */}
-      <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 24 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: C.navy, marginBottom: 16 }}>👤 Personal</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, maxWidth: 960 }}>
+
+      {/* ── Personal ── */}
+      <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 28 }}>
+        <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, marginBottom: 20 }}>👤 Personal</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {[
-            { l: "Current Age", v: currentAge, k: "currentAge" },
-            { l: "Retirement Age", v: retirementAge, k: "retirementAge" },
+            { l: "Current Age",     v: currentAge,     k: "currentAge" },
+            { l: "Retirement Age",  v: retirementAge,  k: "retirementAge" },
             { l: "Life Expectancy", v: lifeExpectancy, k: "lifeExpectancy" },
           ].map((item) => (
             <div key={item.k}>
-              <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>{item.l}</div>
-              <NumericInput value={item.v} onChange={(v) => v !== null && setField(item.k, v)} width={60} />
+              <div style={labelStyle}>{item.l}</div>
+              <NumericInput value={item.v} onChange={(v) => v !== null && setField(item.k, v)} width={70} />
             </div>
           ))}
           <div>
-            <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>Filing Status</div>
+            <div style={labelStyle}>Filing Status</div>
             <select
               value={filingStatus}
               onChange={(e) => setField("filingStatus", Number(e.target.value))}
-              style={{ padding: "6px 10px", border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 12, fontFamily: FONT_BODY, background: "#fff" }}
+              style={{
+                padding: "8px 12px", border: `1px solid ${C.border}`, borderRadius: 6,
+                fontSize: 14, fontFamily: FONT_BODY, background: "#fff", color: C.navy,
+              }}
             >
-              <option value={2}>MFJ</option>
+              <option value={2}>Married Filing Jointly</option>
               <option value={1}>Single</option>
             </select>
           </div>
         </div>
-        <div style={{ marginTop: 12, padding: "8px 12px", background: C.blueBg, borderRadius: 8, fontSize: 11, color: C.navy }}>
-          Born ~{currentYear - currentAge} | RMDs at {rmdAge}
+        <div style={{ marginTop: 16, padding: "10px 14px", background: C.blueBg, borderRadius: 8, fontSize: 14, color: C.navy }}>
+          Born approximately {currentYear - currentAge} · Required Minimum Distributions begin at age {rmdAge}
         </div>
       </div>
 
-      {/* Income & Targets */}
-      <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 24 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: C.navy, marginBottom: 16 }}>💰 Income & Targets</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      {/* ── Income & Targets ── */}
+      <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 28 }}>
+        <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, marginBottom: 20 }}>💰 Income &amp; Targets</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           <div>
-            <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>SS at FRA (67) /mo</div>
-            <NumericInput value={ss67} onChange={(v) => v !== null && setField("ss67", v)} prefix="$" width={90} />
+            <div style={labelStyle}>SS Benefit at Age 67 /mo</div>
+            <NumericInput value={ss67} onChange={(v) => v !== null && setField("ss67", v)} prefix="$" width={100} />
           </div>
           <div>
-            <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>Claim at Age</div>
-            <NumericInput value={ssStartAge} onChange={(v) => v !== null && setField("ssStartAge", v)} width={60} />
+            <div style={labelStyle}>Claim SS at Age</div>
+            <NumericInput value={ssStartAge} onChange={(v) => v !== null && setField("ssStartAge", v)} width={70} />
             {ssStartAge !== 67 && (() => {
               const mult = ssClaimingMultiplier(ssStartAge);
-              const adj = Math.round(ss67 * mult);
-              const pct = Math.round((mult - 1) * 100);
+              const adj  = Math.round(ss67 * mult);
+              const pct  = Math.round((mult - 1) * 100);
               return (
-                <div style={{ fontSize: 10, color: ssStartAge < 67 ? C.red : C.green, marginTop: 2 }}>
+                <div style={{ fontSize: 12, color: ssStartAge < 67 ? C.red : C.green, marginTop: 4 }}>
                   Adjusted: ${adj.toLocaleString()}/mo ({pct > 0 ? "+" : ""}{pct}%)
                 </div>
               );
             })()}
           </div>
           <div>
-            <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>COLA</div>
-            <NumericInput value={(cola * 100).toFixed(1)} onChange={(v) => v !== null && setField("cola", v / 100)} suffix="%" width={60} step={0.1} />
+            <div style={labelStyle}>COLA (Cost of Living)</div>
+            <NumericInput value={(cola * 100).toFixed(1)} onChange={(v) => v !== null && setField("cola", v / 100)} suffix="%" width={70} step={0.1} />
           </div>
           <div>
-            <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>Default Return</div>
-            <NumericInput value={defaultReturn} onChange={(v) => v !== null && setField("defaultReturn", v)} suffix="%" width={60} step={0.1} />
+            <div style={labelStyle}>Default Annual Return</div>
+            <NumericInput value={defaultReturn} onChange={(v) => v !== null && setField("defaultReturn", v)} suffix="%" width={70} step={0.1} />
           </div>
           <div>
-            <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>Inflation</div>
-            <NumericInput value={inflationRate} onChange={(v) => v !== null && setField("inflationRate", v)} suffix="%" width={60} step={0.1} />
+            <div style={labelStyle}>Inflation Rate</div>
+            <NumericInput value={inflationRate} onChange={(v) => v !== null && setField("inflationRate", v)} suffix="%" width={70} step={0.1} />
           </div>
           <div>
-            <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>Target at {lifeExpectancy}</div>
-            <NumericInput value={targetEndBalance} onChange={(v) => v !== null && setField("targetEndBalance", v)} prefix="$" width={110} />
+            <div style={labelStyle}>Target Balance at {lifeExpectancy}</div>
+            <NumericInput value={targetEndBalance} onChange={(v) => v !== null && setField("targetEndBalance", v)} prefix="$" width={120} />
           </div>
         </div>
       </div>
 
-      {/* Investment Accounts */}
-      <div style={{ gridColumn: "1/-1", background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 24 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: C.navy }}>🏦 Investment Accounts</div>
-          <span style={{ fontSize: 13, fontWeight: 700, color: C.accent, fontFamily: FONT_MONO }}>{fmtCompact(totalBalance)} total</span>
+      {/* ── Investment Accounts ── */}
+      <div style={{ gridColumn: "1/-1", background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 28 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>🏦 Investment Accounts</div>
+          <span style={{ fontSize: 16, fontWeight: 700, color: C.accent, fontFamily: FONT_MONO }}>
+            {fmtCompact(totalBalance)} total
+          </span>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {accounts.map((acct, idx) => (
-            <div key={idx} style={{ background: "#f8fafc", borderRadius: 10, padding: 14, border: `1px solid ${C.border}` }}>
+            <div key={idx} style={{
+              background: C.pageBg,
+              borderRadius: 10, padding: 18,
+              border: `1px solid ${C.border}`,
+            }}>
               {/* Account header */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                 <input
                   value={acct.name}
                   onChange={(e) => updateAccount(idx, "name", e.target.value)}
-                  style={{ fontWeight: 600, fontSize: 13, border: `1px solid ${C.border}`, background: "#f8fafc", fontFamily: FONT_BODY, color: C.navy, flex: 1, padding: "4px 8px", borderRadius: 6, outline: "none" }}
+                  style={{
+                    fontWeight: 700, fontSize: 15, border: `1px solid ${C.border}`,
+                    background: C.pageBg, fontFamily: FONT_BODY, color: C.navy,
+                    flex: 1, padding: "5px 10px", borderRadius: 6, outline: "none",
+                  }}
                 />
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ fontSize: 9, padding: "2px 7px", borderRadius: 8, background: acct.taxTreatment === "Pre-tax" ? C.blueBg : acct.taxTreatment === "Tax-free" ? C.greenBg : C.goGoBg, color: C.navy, fontWeight: 600 }}>
-                    {acct.taxTreatment}
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 10 }}>
+                  <span style={{
+                    fontSize: 11, padding: "3px 9px", borderRadius: 8, fontWeight: 700,
+                    background: acct.taxTreatment === "Pre-tax" ? C.blueBg
+                              : acct.taxTreatment === "Tax-free" ? C.greenBg
+                              : C.goGoBg,
+                    color: acct.taxTreatment === "Pre-tax" ? C.accentDark
+                         : acct.taxTreatment === "Tax-free" ? "#065f46"
+                         : "#92400e",
+                  }}>
+                    {acct.taxTreatment === "Tax-free" ? "Roth" : acct.taxTreatment}
                   </span>
                   {accounts.length > 1 && (
-                    <button onClick={() => removeAccount(idx)} style={{ background: "none", border: "none", color: C.red, cursor: "pointer", fontSize: 14 }}>×</button>
+                    <button
+                      onClick={() => removeAccount(idx)}
+                      style={{ background: "none", border: "none", color: C.red, cursor: "pointer", fontSize: 18, lineHeight: 1 }}
+                    >×</button>
                   )}
                 </div>
               </div>
 
               {/* Account fields */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
-                  <span style={{ color: C.gray, fontSize: 10 }}>Balance</span><br />
-                  <NumericInput value={acct.balance} onChange={(v) => v !== null && updateAccount(idx, "balance", v)} prefix="$" width={100} />
+                  <div style={labelStyle}>Balance</div>
+                  <NumericInput value={acct.balance} onChange={(v) => v !== null && updateAccount(idx, "balance", v)} prefix="$" width={110} />
                 </div>
                 <div>
-                  <span style={{ color: C.gray, fontSize: 10 }}>Monthly Contrib.</span><br />
-                  <NumericInput value={acct.monthlyContribution} onChange={(v) => v !== null && updateAccount(idx, "monthlyContribution", v)} prefix="$" width={90} />
+                  <div style={labelStyle}>Monthly Contribution</div>
+                  <NumericInput value={acct.monthlyContribution} onChange={(v) => v !== null && updateAccount(idx, "monthlyContribution", v)} prefix="$" width={100} />
                 </div>
                 <div>
-                  <span style={{ color: C.gray, fontSize: 10 }}>Return %</span><br />
-                  <NumericInput value={acct.annualReturn} onChange={(v) => v !== null && updateAccount(idx, "annualReturn", v)} suffix="%" width={60} step={0.1} />
+                  <div style={labelStyle}>Annual Return</div>
+                  <NumericInput value={acct.annualReturn} onChange={(v) => v !== null && updateAccount(idx, "annualReturn", v)} suffix="%" width={70} step={0.1} />
                 </div>
                 <div>
-                  <span style={{ color: C.gray, fontSize: 10 }}>Tax Treatment</span><br />
+                  <div style={labelStyle}>Tax Treatment</div>
                   <select
                     value={acct.taxTreatment}
                     onChange={(e) => updateAccount(idx, "taxTreatment", e.target.value)}
-                    style={{ padding: "6px 8px", border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 11, fontFamily: FONT_BODY, background: "#fff" }}
+                    style={{
+                      padding: "7px 10px", border: `1px solid ${C.border}`, borderRadius: 6,
+                      fontSize: 13, fontFamily: FONT_BODY, background: "#fff", color: C.navy,
+                    }}
                   >
-                    <option value="Pre-tax">Pre-tax</option>
+                    <option value="Pre-tax">Pre-tax (401k / IRA)</option>
                     <option value="Tax-free">Tax-free (Roth)</option>
-                    <option value="Taxable">Taxable</option>
+                    <option value="Taxable">Taxable (Brokerage)</option>
                   </select>
                 </div>
-                {/* NEW: Employer Match fields */}
                 <div>
-                  <span style={{ color: C.gray, fontSize: 10 }}>Match %</span><br />
-                  <NumericInput value={acct.matchPct} onChange={(v) => v !== null && updateAccount(idx, "matchPct", v)} suffix="%" width={60} />
+                  <div style={labelStyle}>Employer Match %</div>
+                  <NumericInput value={acct.matchPct} onChange={(v) => v !== null && updateAccount(idx, "matchPct", v)} suffix="%" width={70} />
                 </div>
                 <div>
-                  <span style={{ color: C.gray, fontSize: 10 }}>Match Limit $/yr</span><br />
-                  <NumericInput value={acct.matchLimit} onChange={(v) => v !== null && updateAccount(idx, "matchLimit", v)} prefix="$" width={90} />
+                  <div style={labelStyle}>Match Limit / Year</div>
+                  <NumericInput value={acct.matchLimit} onChange={(v) => v !== null && updateAccount(idx, "matchLimit", v)} prefix="$" width={100} />
                 </div>
               </div>
             </div>
@@ -183,12 +212,19 @@ export default function SettingsTab({
         {accounts.length < 8 && (
           <button
             onClick={addAccount}
-            style={{ width: "100%", padding: 10, marginTop: 12, border: `2px dashed ${C.border}`, borderRadius: 8, background: "transparent", color: C.accent, fontWeight: 600, cursor: "pointer", fontSize: 12, fontFamily: FONT_BODY }}
+            style={{
+              width: "100%", padding: 12, marginTop: 16,
+              border: `2px dashed ${C.border}`, borderRadius: 8,
+              background: "transparent", color: C.accent,
+              fontWeight: 700, cursor: "pointer", fontSize: 15,
+              fontFamily: FONT_BODY, transition: "all 0.2s",
+            }}
           >
             + Add Account
           </button>
         )}
       </div>
+
     </div>
   );
 }
