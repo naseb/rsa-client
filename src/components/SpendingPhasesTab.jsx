@@ -63,6 +63,30 @@ export default function SpendingPhasesTab({
   const numReturnOverrides = Object.keys(marketReturns).length;
   const numSpendingOverrides = Object.keys(spendingOverrides).length;
 
+  const spendingLabels = [];
+  const spendDenom = Math.max(lifeExpectancy - retirementAge, 1);
+  for (let age = retirementAge; age <= lifeExpectancy; age++) {
+    if (age === retirementAge || age === lifeExpectancy || age % 5 === 0) {
+      if (spendingLabels.some((l) => Math.abs(l.age - age) < 2)) continue;
+      spendingLabels.push({
+        age,
+        x: ((age - retirementAge) / spendDenom) * 420 + 10,
+      });
+    }
+  }
+
+  const portfolioLabels = [];
+  const portDenom = Math.max(lifeExpectancy - currentAge, 1);
+  for (let age = currentAge; age <= lifeExpectancy; age++) {
+    if (age === currentAge || age === lifeExpectancy || age % 5 === 0) {
+      if (portfolioLabels.some((l) => Math.abs(l.age - age) < 2)) continue;
+      portfolioLabels.push({
+        age,
+        x: ((age - currentAge) / portDenom) * 420 + 10,
+      });
+    }
+  }
+
   // Find the most recent checkpoint that applies to a given year.
   // Returns the checkpoint year, or null if no checkpoint applies yet.
   const getActiveCheckpoint = (year) => {
@@ -257,8 +281,18 @@ export default function SpendingPhasesTab({
                   fill="none" stroke={C.goGo} strokeWidth={2.5}
                 />
               )}
-              <text x={10} y={154} fontSize="8" fill={C.gray}>{retirementAge}</text>
-              <text x={425} y={154} fontSize="8" fill={C.gray} textAnchor="end">{lifeExpectancy}</text>
+              {spendingLabels.map((lbl) => (
+                <text
+                  key={lbl.age}
+                  x={lbl.x}
+                  y={154}
+                  fontSize="8"
+                  fill={C.gray}
+                  textAnchor={lbl.age === retirementAge ? "start" : lbl.age === lifeExpectancy ? "end" : "middle"}
+                >
+                  {lbl.age}
+                </text>
+              ))}
             </svg>
           </div>
           {/* Portfolio chart */}
@@ -301,8 +335,18 @@ export default function SpendingPhasesTab({
                   })}
                 </>
               )}
-              <text x={10} y={154} fontSize="8" fill={C.gray}>{currentAge}</text>
-              <text x={425} y={154} fontSize="8" fill={C.gray} textAnchor="end">{lifeExpectancy}</text>
+              {portfolioLabels.map((lbl) => (
+                <text
+                  key={lbl.age}
+                  x={lbl.x}
+                  y={154}
+                  fontSize="8"
+                  fill={C.gray}
+                  textAnchor={lbl.age === currentAge ? "start" : lbl.age === lifeExpectancy ? "end" : "middle"}
+                >
+                  {lbl.age}
+                </text>
+              ))}
             </svg>
           </div>
         </div>
