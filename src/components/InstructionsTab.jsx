@@ -83,11 +83,21 @@ export default function InstructionsTab() {
           <div style={{ display: "flex", gap: 18, alignItems: "flex-start" }}>
             <div style={{ minWidth: 40, height: 40, borderRadius: "50%", background: C.green, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 18, flexShrink: 0 }}>3</div>
             <div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: C.navy, marginBottom: 8 }}>Year-by-Year Projection</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: C.navy, marginBottom: 8 }}>Year-by-Year Projection &amp; Annual Review</div>
               <div style={{ fontSize: 16, color: C.slate, lineHeight: 1.75 }}>
                 Scroll down on the Spending Phases tab to see the full projection table.
                 Click any row to expand detailed breakdowns including account balances,
                 withdrawal sources, tax impact, and RMD information.
+              </div>
+              <div style={{ marginTop: 14, background: "#f8fafc", borderRadius: 10, padding: "16px 20px", border: `1px solid ${C.border}` }}>
+                <div style={{ fontSize: 16, fontWeight: 700, color: C.navy, marginBottom: 8 }}>🔄 Annual Review Workflow (Keep Your Plan Up-to-Date)</div>
+                <div style={{ fontSize: 15, color: C.slate, lineHeight: 1.65 }}>
+                  Return to this portal once a year (e.g., every January) to update your numbers with actual data and see how the market has impacted your future:
+                  <ul style={{ margin: "8px 0 0 0", paddingLeft: 20, display: "flex", flexDirection: "column", gap: 6 }}>
+                    <li><strong>Option A (Simple &amp; Fast):</strong> Locate the current year row and type your actual total portfolio balance directly in the <strong>Portfolio</strong> column. The solver will automatically recalculate a new sustainable spending corridor forward from this new real balance.</li>
+                    <li><strong>Option B (Historical Return %):</strong> Enter the actual investment return percentage you achieved for the past year in the <strong>Return</strong> column. The system will compound this change and adjust your spending plan.</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
