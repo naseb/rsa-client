@@ -54,6 +54,9 @@ export default function SpendingPhasesTab({
   const le = solverData;
   const retiredYears = le.years.filter((y) => y.isRetired);
   const maxBalance = Math.max(...le.years.map((y) => y.totalEnd), targetEndBalance);
+  const maxSpend = retiredYears.length > 0
+    ? Math.max(...retiredYears.map((y) => y.annualSpending), le.baseSpending * 1.2)
+    : le.baseSpending * 1.2;
   const ssMult = ssClaimingMultiplier(ssStartAge);
   const ssMonthly = Math.round(ss67 * ssMult);
   const rmdAge = rmdStartAge(currentAge);
@@ -248,7 +251,6 @@ export default function SpendingPhasesTab({
                 <polyline
                   points={retiredYears.map((y, i) => {
                     const x = (i / (retiredYears.length - 1)) * 420 + 10;
-                    const maxSpend = le.baseSpending * 1.2;
                     const yPos = 155 - (y.annualSpending / maxSpend) * 140;
                     return `${x},${yPos}`;
                   }).join(" ")}
