@@ -121,12 +121,12 @@ export default function SpendingPhasesTab({
       {/* ===== RESULTS BANNER ===== */}
       <div style={{ background: "linear-gradient(135deg, #1c3829 0%, #2d5a47 40%, #1c3829 100%)", borderRadius: 16, padding: "28px 36px", marginBottom: 20, color: "#fff", position: "relative", overflow: "hidden", borderBottom: "2px solid #b8860b" }}>
         <div style={{ position: "absolute", top: -40, right: -40, width: 250, height: 250, background: "radial-gradient(circle,rgba(184,134,11,0.15) 0%,transparent 70%)", pointerEvents: "none" }} />
-        <div style={{ fontSize: 11, color: "rgba(247,243,234,0.5)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 6 }}>Go-Go Phase Base Spending</div>
+        <div style={{ fontSize: 11, color: "rgba(247,243,234,0.5)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 6 }}>Go-Go Phase Base Spending (Today's Dollars)</div>
         <div style={{ fontSize: 48, fontWeight: 800, fontFamily: FONT_MONO, color: C.goGo, lineHeight: 1, marginBottom: 2 }}>
           {fmtFull(le.baseSpending)}<span style={{ fontSize: 18, color: "#64748b", fontWeight: 400, marginLeft: 8 }}>/year</span>
         </div>
         <div style={{ fontSize: 16, color: "rgba(247,243,234,0.65)", marginBottom: 20 }}>
-          {fmtFull(Math.floor(le.baseSpending / 12))} / month in your active years
+          {fmtFull(Math.floor(le.baseSpending / 12))} / month in active years (in today's purchasing power)
         </div>
 
         {/* Phase summary cards */}
@@ -357,7 +357,9 @@ export default function SpendingPhasesTab({
         <div style={{ padding: "14px 20px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ fontSize: 15, fontWeight: 700, color: C.navy }}>Year-by-Year Projection</div>
-            <div style={{ fontSize: 11, color: C.gray, marginTop: 2 }}>Override returns to model crashes/booms. Click rows to expand.</div>
+            <div style={{ fontSize: 11, color: C.gray, marginTop: 2 }}>
+              Override returns to model crashes/booms. Spending column shows inflated future dollars to maintain purchasing power. Click rows to expand.
+            </div>
           </div>
           <div style={{ display: "flex", gap: 6 }}>
             {numReturnOverrides > 0 && (
