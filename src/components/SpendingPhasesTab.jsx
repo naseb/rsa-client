@@ -14,6 +14,7 @@
 import { useState, Fragment } from "react";
 import NumericInput from "./NumericInput";
 import LoadingOverlay from "./LoadingOverlay";
+import { useSubscription } from "../context/SubscriptionContext";
 import {
   C, FONT_BODY, FONT_MONO,
   fmtCompact, fmtFull, ssClaimingMultiplier, rmdStartAge,
@@ -29,11 +30,18 @@ export default function SpendingPhasesTab({
   const [expandedRows, setExpandedRows] = useState({});
   const [expandedWds, setExpandedWds] = useState({});
 
+  const { isTrialing } = useSubscription();
+
+  // Guard against null/undefined overrides from old localStorage versions
+  marketReturns = marketReturns || {};
+  spendingOverrides = spendingOverrides || {};
+  portfolioOverrides = portfolioOverrides || {};
+
   const {
-    currentAge, retirementAge, lifeExpectancy,
-    ss67, ssStartAge, phases, transitionYears, smoothTransition,
-    defaultReturn, targetEndBalance, accounts,
-  } = inputs;
+    currentAge = 50, retirementAge = 65, lifeExpectancy = 95,
+    ss67 = 0, ssStartAge = 67, phases = [], transitionYears = 3, smoothTransition = true,
+    defaultReturn = 7, targetEndBalance = 0, accounts = [], filingStatus = 2, inflationRate = 3,
+  } = inputs || {};
 
   // If no solver data yet, show loading
   if (!solverData && !error) {
@@ -116,10 +124,102 @@ export default function SpendingPhasesTab({
 
   return (
     <div>
+      <style>{`
+        /* Screen styling for print-only element */
+        .print-only {
+          display: none;
+        }
+
+        @media print {
+          /* Hide all standard UI elements */
+          nav, header, button, .no-print, input[type="range"], select {
+            display: none !important;
+          }
+
+          /* General layout resets */
+          body, html, #root {
+            background: #fff !important;
+            color: #1a2b1a !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            font-size: 10pt !important;
+          }
+
+          /* Show print-only header */
+          .print-only {
+            display: block !important;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #2d6a4f;
+          }
+
+          /* Make the projection table expand to show all rows */
+          .print-expand-table {
+            max-height: none !important;
+            overflow: visible !important;
+          }
+
+          /* Prevent table rows breaking awkwardly across pages */
+          tr {
+            page-break-inside: avoid !important;
+          }
+
+          /* Prevent charts splitting */
+          svg {
+            page-break-inside: avoid !important;
+            max-width: 100% !important;
+            height: auto !important;
+          }
+
+          /* Stylings for printable cards */
+          .print-card {
+            border: 1px solid #d4e8d8 !important;
+            background: #fff !important;
+            color: #1a2b1a !important;
+            box-shadow: none !important;
+            page-break-inside: avoid !important;
+            padding: 12px 16px !important;
+            margin-bottom: 16px !important;
+          }
+
+          .print-banner {
+            background: #fff !important;
+            color: #1c3829 !important;
+            border: 2px solid #b8860b !important;
+            padding: 16px 24px !important;
+            margin-bottom: 16px !important;
+          }
+          
+          .print-banner div, .print-banner span {
+            color: #1c3829 !important;
+          }
+        }
+      `}</style>
+
       <LoadingOverlay loading={loading} error={null} />
 
+      {/* ===== PRINT ONLY HEADER ===== */}
+      <div className="print-only" style={{ display: "none" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", borderBottom: "3px solid #2d6a4f", paddingBottom: 8, marginBottom: 16 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: "#1c3829", margin: 0 }}>◆ Retirement Spending Plan</h1>
+          <span style={{ fontSize: 10, color: "#4d6b55", fontFamily: FONT_MONO }}>Generated: {new Date().toLocaleDateString()}</span>
+        </div>
+        
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px 12px", marginBottom: 16, fontSize: 10, padding: "8px 12px", background: "#f0f8f4", borderRadius: 8, border: "1px solid #d4e8d8" }}>
+          <div><strong>Current Age:</strong> {currentAge} years</div>
+          <div><strong>Retirement Age:</strong> {retirementAge} years</div>
+          <div><strong>Life Expectancy:</strong> {lifeExpectancy} years</div>
+          <div><strong>Starting Portfolio:</strong> {fmtFull(accounts.reduce((s, a) => s + a.balance, 0))}</div>
+          <div><strong>Target End Balance:</strong> {fmtFull(targetEndBalance)}</div>
+          <div><strong>Default Return Rate:</strong> {defaultReturn.toFixed(1)}% / year</div>
+          <div><strong>Filing Status:</strong> {filingStatus}</div>
+          <div><strong>Social Security (FRA):</strong> {fmtFull(ss67)}/mo at {ssStartAge}</div>
+          <div><strong>Inflation rate (COLA):</strong> {inflationRate.toFixed(1)}%</div>
+        </div>
+      </div>
+
       {/* ===== RESULTS BANNER ===== */}
-      <div style={{ background: "linear-gradient(135deg, #1c3829 0%, #2d5a47 40%, #1c3829 100%)", borderRadius: 16, padding: "28px 36px", marginBottom: 20, color: "#fff", position: "relative", overflow: "hidden", borderBottom: "2px solid #b8860b" }}>
+      <div className="print-banner" style={{ background: "linear-gradient(135deg, #1c3829 0%, #2d5a47 40%, #1c3829 100%)", borderRadius: 16, padding: "28px 36px", marginBottom: 20, color: "#fff", position: "relative", overflow: "hidden", borderBottom: "2px solid #b8860b" }}>
         <div style={{ position: "absolute", top: -40, right: -40, width: 250, height: 250, background: "radial-gradient(circle,rgba(184,134,11,0.15) 0%,transparent 70%)", pointerEvents: "none" }} />
         <div style={{ fontSize: 11, color: "rgba(247,243,234,0.5)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 6 }}>Go-Go Phase Base Spending (Today's Dollars)</div>
         <div style={{ fontSize: 48, fontWeight: 800, fontFamily: FONT_MONO, color: C.goGo, lineHeight: 1, marginBottom: 2 }}>
@@ -174,7 +274,7 @@ export default function SpendingPhasesTab({
       </div>
 
       {/* ===== PHASE CONTROLS ===== */}
-      <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: "20px 24px", marginBottom: 20 }}>
+      <div className="no-print" style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: "20px 24px", marginBottom: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <div style={{ fontSize: 15, fontWeight: 700, color: C.navy }}>Spending Phases</div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -256,7 +356,7 @@ export default function SpendingPhasesTab({
       </div>
 
       {/* ===== CHARTS ===== */}
-      <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: "20px 24px", marginBottom: 20 }}>
+      <div className="print-card" style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: "20px 24px", marginBottom: 20 }}>
         <div style={{ fontSize: 15, fontWeight: 700, color: C.navy, marginBottom: 12 }}>Spending & Portfolio Over Time</div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
           {/* Spending chart */}
@@ -353,7 +453,7 @@ export default function SpendingPhasesTab({
       </div>
 
       {/* ===== PROJECTION TABLE ===== */}
-      <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden" }}>
+      <div className="print-card" style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden" }}>
         <div style={{ padding: "14px 20px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <div style={{ fontSize: 15, fontWeight: 700, color: C.navy }}>Year-by-Year Projection</div>
@@ -361,7 +461,17 @@ export default function SpendingPhasesTab({
               Override returns to model crashes/booms. Spending column shows inflated future dollars to maintain purchasing power. Click rows to expand.
             </div>
           </div>
-          <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            {isTrialing ? (
+              <span className="no-print" style={{ fontSize: 11, color: C.orange, fontWeight: 700, padding: "5px 12px", border: `1px solid ${C.border}`, borderRadius: 6, background: C.pageBg, display: "flex", alignItems: "center", gap: 4 }}>
+                🔒 PDF Printing is locked during the free trial
+              </span>
+            ) : (
+              <button onClick={() => window.print()}
+                style={{ padding: "5px 12px", border: `1px solid ${C.accent}`, borderRadius: 6, background: C.accent, color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: FONT_BODY, display: "flex", alignItems: "center", gap: 4 }}>
+                📄 Print PDF Report
+              </button>
+            )}
             {numReturnOverrides > 0 && (
               <button onClick={() => { if (window.confirm("Clear all return overrides?")) setMarketReturns({}); }}
                 style={{ padding: "5px 12px", border: `1px solid ${C.border}`, borderRadius: 6, background: "#fff", color: C.gray, fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: FONT_BODY }}>
@@ -383,7 +493,7 @@ export default function SpendingPhasesTab({
           </div>
         </div>
 
-        <div style={{ overflowY: "auto", maxHeight: "55vh" }}>
+        <div className="print-expand-table" style={{ overflowY: "auto", maxHeight: "55vh" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: C.pageBg }}>

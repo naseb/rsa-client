@@ -50,7 +50,8 @@ export function SubscriptionProvider({ children }) {
       setLoading(false)
     },
     hasAccess: ['trialing', 'active'].includes(subscription.status),
-    isPro: subscription.status === 'active' && subscription.tier === 'pro',
+    isPro: ['active', 'trialing'].includes(subscription.status) && (subscription.tier === 'pro' || subscription.tier === 'advisor'),
+    isAdvisor: ['active', 'trialing'].includes(subscription.status) && subscription.tier === 'advisor',
     isTrialing: subscription.status === 'trialing',
   }
 

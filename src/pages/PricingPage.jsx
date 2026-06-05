@@ -15,70 +15,109 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 const PLANS = [
   {
-    id: 'standard_monthly',
-    priceId: import.meta.env.VITE_PRICE_STANDARD_MONTHLY,
-    name: 'Standard',
-    billing: 'Monthly',
-    price: '$10',
-    period: '/month',
-    annualEquiv: null,
-    badge: null,
-    color: '#10b981',
+    id: 'report_pass',
+    priceId: import.meta.env.VITE_PRICE_REPORT_PASS || 'price_1TcO_report_pass_mock',
+    name: 'Report Pass',
+    billing: 'One-Time',
+    price: '$29',
+    period: '/report',
+    annualEquiv: 'Perfect for a single plan',
+    badge: 'SINGLE USE',
+    badgeColor: '#b8860b',
+    color: '#b8860b',
     features: [
-      'Full RSA calculator',
+      'Full RSA calculator access',
       'Go-Go / Slow-Go / No-Go phases',
       'Tax-optimized withdrawal sequencing',
-      'RMD & IRMAA modeling',
-      'Market crash scenario modeling',
-      'vs 4% Rule comparison',
-      'Export & import your plan',
+      'Printable premium PDF report',
+      'No recurring charges',
     ],
-    cta: 'Start Free Trial',
+    cta: 'Get Report Pass',
   },
   {
     id: 'standard_annual',
-    priceId: import.meta.env.VITE_PRICE_STANDARD_ANNUAL,
-    name: 'Standard',
-    billing: 'Annual',
+    priceId: import.meta.env.VITE_PRICE_STANDARD_ANNUAL || 'price_1TcOh9BjY5AWuxIOEw59XCbD',
+    name: 'Standard Annual',
+    billing: 'Annual Review Pass',
     price: '$89',
     period: '/year',
     annualEquiv: 'Just $7.42/month',
-    badge: 'BEST VALUE',
+    badge: 'POPULAR B2C',
     badgeColor: '#10b981',
     color: '#10b981',
     features: [
+      '1 year of unlimited updates',
       'Full RSA calculator',
       'Go-Go / Slow-Go / No-Go phases',
-      'Tax-optimized withdrawal sequencing',
       'RMD & IRMAA modeling',
-      'Market crash scenario modeling',
-      'vs 4% Rule comparison',
+      'Printable premium PDF report',
       'Export & import your plan',
     ],
     cta: 'Start Free Trial',
   },
   {
     id: 'pro_annual',
-    priceId: import.meta.env.VITE_PRICE_PRO_ANNUAL,
-    name: 'Pro',
-    billing: 'Annual',
+    priceId: import.meta.env.VITE_PRICE_PRO_ANNUAL || 'price_1TcOf7BjY5AWuxIO7UE3NsVq',
+    name: 'Pro Annual',
+    billing: 'Annual Review Pass',
     price: '$119',
     period: '/year',
     annualEquiv: 'Just $9.92/month',
-    badge: 'PRO',
-    badgeColor: '#1D4ED8',
-    color: '#1D4ED8',
+    badge: 'PRO TAX ENGINES',
+    badgeColor: '#1d4ed8',
+    color: '#1d4ed8',
     features: [
       'Everything in Standard',
       '— plus —',
-      'Tax Optimization Pro tab',
-      'Federal bracket filling',
-      'Roth conversion ladder',
-      'Dynamic withdrawal sequencing',
+      'Tax Optimization Pro features',
+      'Federal bracket filling solver',
+      'Roth conversion ladder planner',
       'Lifetime tax savings estimate',
     ],
     cta: 'Start Free Trial',
-    proOnly: true,
+    comingSoon: true,
+  },
+  {
+    id: 'advisor_monthly',
+    priceId: import.meta.env.VITE_PRICE_ADVISOR_MONTHLY || 'price_1TcO_advisor_monthly_mock',
+    name: 'Advisor Monthly',
+    billing: 'Advisor Portal',
+    price: '$99',
+    period: '/month',
+    annualEquiv: 'Billed monthly',
+    badge: 'ADVISOR',
+    badgeColor: '#8b5cf6',
+    color: '#8b5cf6',
+    features: [
+      'Manage unlimited client plans',
+      'Client profile dashboards',
+      'Advisor custom PDF branding',
+      'Upload firm logo & contact info',
+      'All Pro tax optimization engines',
+    ],
+    cta: 'Subscribe Advisor',
+    comingSoon: true,
+  },
+  {
+    id: 'advisor_annual',
+    priceId: import.meta.env.VITE_PRICE_ADVISOR_ANNUAL || 'price_1TcO_advisor_annual_mock',
+    name: 'Advisor Annual',
+    billing: 'Advisor Portal',
+    price: '$799',
+    period: '/year',
+    annualEquiv: 'Save 33% ($66/month)',
+    badge: 'ADVISOR BEST VALUE',
+    badgeColor: '#8b5cf6',
+    color: '#8b5cf6',
+    features: [
+      'Manage unlimited client plans',
+      'Client profile dashboards',
+      'Advisor custom PDF branding',
+      'Upload firm logo & contact info',
+      'All Pro tax optimization engines',
+    ],
+    cta: 'Subscribe Advisor',
+    comingSoon: true,
   },
 ]
 
@@ -174,7 +213,6 @@ export default function PricingPage() {
         </p>
       </div>
 
-      {/* Plan cards */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -186,15 +224,49 @@ export default function PricingPage() {
           <div
             key={plan.id}
             style={{
-              background: plan.proOnly ? 'rgba(29,78,216,0.04)' : '#1e293b',
-              border: `1px solid ${plan.proOnly ? 'rgba(29,78,216,0.35)' : plan.id === 'standard_annual' ? 'rgba(16,185,129,0.35)' : 'rgba(148,163,184,0.12)'}`,
+              background: plan.id.startsWith('advisor') ? 'rgba(139,92,246,0.04)' : plan.id.startsWith('pro') ? 'rgba(29,78,216,0.04)' : plan.id === 'report_pass' ? 'rgba(184,134,11,0.04)' : '#1e293b',
+              border: `1px solid ${plan.id.startsWith('advisor') ? 'rgba(139,92,246,0.35)' : plan.id.startsWith('pro') ? 'rgba(29,78,216,0.35)' : plan.id === 'report_pass' ? 'rgba(184,134,11,0.35)' : plan.id === 'standard_annual' ? 'rgba(16,185,129,0.35)' : 'rgba(148,163,184,0.12)'}`,
               borderRadius: 16,
               padding: '28px 24px',
               display: 'flex',
               flexDirection: 'column',
               position: 'relative',
+              opacity: plan.comingSoon ? 0.75 : 1,
             }}
           >
+            {/* Diagonal Coming Soon Watermark */}
+            {plan.comingSoon && (
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                pointerEvents: 'none',
+                overflow: 'hidden',
+                borderRadius: 16,
+                zIndex: 2,
+              }}>
+                <div style={{
+                  fontSize: '2.5rem',
+                  fontWeight: 900,
+                  color: 'rgba(255, 255, 255, 0.12)', // see-through white
+                  textTransform: 'uppercase',
+                  transform: 'rotate(-30deg)', // left bottom to top right
+                  whiteSpace: 'nowrap',
+                  letterSpacing: '0.12em',
+                  userSelect: 'none',
+                  border: '3px solid rgba(255, 255, 255, 0.08)',
+                  padding: '6px 14px',
+                  borderRadius: 6,
+                }}>
+                  Coming Soon
+                </div>
+              </div>
+            )}
             {/* Badge */}
             {plan.badge && (
               <div style={{
@@ -262,20 +334,21 @@ export default function PricingPage() {
 
             {/* CTA button */}
             <button
-              onClick={() => handleSelect(plan)}
-              disabled={loadingPlan !== null}
+              onClick={() => !plan.comingSoon && handleSelect(plan)}
+              disabled={loadingPlan !== null || plan.comingSoon}
               style={{
-                background: plan.color,
-                color: '#fff', border: 'none',
+                background: plan.comingSoon ? '#334155' : plan.color,
+                color: plan.comingSoon ? '#94a3b8' : '#fff',
+                border: 'none',
                 padding: '13px 24px', borderRadius: 10,
                 fontSize: 15, fontWeight: 600,
                 fontFamily: 'DM Sans, sans-serif',
-                cursor: loadingPlan ? 'wait' : 'pointer',
-                opacity: loadingPlan && loadingPlan !== plan.id ? 0.5 : 1,
+                cursor: plan.comingSoon ? 'not-allowed' : loadingPlan ? 'wait' : 'pointer',
+                opacity: plan.comingSoon ? 0.65 : loadingPlan && loadingPlan !== plan.id ? 0.5 : 1,
                 transition: 'all 0.2s',
               }}
             >
-              {loadingPlan === plan.id ? 'Redirecting...' : plan.cta}
+              {plan.comingSoon ? 'Coming Soon' : loadingPlan === plan.id ? 'Redirecting...' : plan.cta}
             </button>
           </div>
         ))}

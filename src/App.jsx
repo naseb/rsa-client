@@ -227,7 +227,7 @@ export default function App() {
       />
 
       {/* ══════════ HEADER ══════════ */}
-      <div style={{
+      <div className="no-print" style={{
         background: "linear-gradient(135deg,#1c3829 0%,#2d5a47 50%,#1c3829 100%)",
         padding: "13px 32px",
         display: "flex",
@@ -269,7 +269,7 @@ export default function App() {
       </div>
 
       {/* ══════════ TAB BAR ══════════ */}
-      <div style={{
+      <div className="no-print" style={{
         background: "#f7f3ea",
         borderBottom: "2px solid #b8860b",
         padding: "0 32px",
@@ -365,7 +365,7 @@ export default function App() {
       </div>
 
       {/* ══════════ FOOTER ══════════ */}
-      <div style={{
+      <div className="no-print" style={{
         padding: "12px 32px",
         textAlign: "center",
         fontSize: 14,
