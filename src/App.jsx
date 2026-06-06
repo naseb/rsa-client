@@ -236,7 +236,7 @@ export default function App() {
         borderBottom: "2px solid #b8860b",
       }}>
         <div>
-          <div style={{ color: "#f7f3ea", fontSize: 20, fontWeight: 800 }}>
+          <div onClick={() => navigate('/')} style={{ color: "#f7f3ea", fontSize: 20, fontWeight: 800, cursor: "pointer" }}>
             <span style={{ color: "#b8860b" }}>◆</span> Retirement Spending Analyzer
           </div>
           <div style={{ color: "rgba(247,243,234,0.55)", fontSize: 13, marginTop: 2 }}>

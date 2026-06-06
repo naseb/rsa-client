@@ -176,17 +176,22 @@ export default function PricingPage() {
         padding: '18px 24px', borderBottom: '1px solid rgba(148,163,184,0.12)',
         marginBottom: 60,
       }}>
-        <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
+        <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
           <span style={{ color: '#10b981', fontSize: 18 }}>◆</span>
           <span style={{ fontSize: 14, fontWeight: 600, color: '#f1f5f9' }}>
-            Retirement Spending Allowance
+            Retirement Spending Analyzer
           </span>
-        </a>
-        {isSignedIn && (
-          <div style={{ fontSize: 13, color: '#cbd5e1' }}>
-            Signed in as {user?.primaryEmailAddress?.emailAddress}
-          </div>
-        )}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <span onClick={() => navigate('/contact')} style={{ color: '#94a3b8', cursor: 'pointer', fontSize: 13, fontWeight: 600, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f1f5f9'} onMouseOut={(e) => e.target.style.color = '#94a3b8'}>
+            Contact Us
+          </span>
+          {isSignedIn && (
+            <div style={{ fontSize: 13, color: '#cbd5e1' }}>
+              Signed in as {user?.primaryEmailAddress?.emailAddress}
+            </div>
+          )}
+        </div>
       </nav>
 
       {/* Header */}

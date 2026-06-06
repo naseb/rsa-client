@@ -344,14 +344,19 @@ export default function LandingPage() {
 
         {/* ── NAV ── */}
         <nav className="lp-nav">
-          <div className="lp-logo">
+          <div className="lp-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
             <span className="lp-logo-diamond">◆</span>
             <div>
               <div className="lp-logo-text">Retirement Spending Analyzer</div>
               <div className="lp-logo-sub">Smarter retirement income planning</div>
             </div>
           </div>
-          <button className="lp-nav-cta" onClick={launchApp}>Launch App →</button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+            <span onClick={() => navigate('/contact')} style={{ color: '#8ab99a', cursor: 'pointer', fontWeight: 600, fontSize: 15, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#8ab99a'}>
+              Contact Us
+            </span>
+            <button className="lp-nav-cta" onClick={launchApp}>Launch App →</button>
+          </div>
         </nav>
 
         {/* ── HERO ── */}
