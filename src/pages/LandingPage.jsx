@@ -280,6 +280,56 @@ export default function LandingPage() {
           .lp-vs-grid { grid-template-columns: 1fr; }
           .lp-cta-band { padding: 64px 24px; }
           .lp-footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
+          .lp-faq { padding: 64px 24px; }
+          .lp-faq-item { padding: 24px 20px; }
+          .lp-faq-q { font-size: 18px; }
+        }
+
+        /* ── FAQ SECTION ── */
+        .lp-faq {
+          padding: 88px 56px;
+          max-width: 1040px;
+          margin: 0 auto;
+        }
+        .lp-faq-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+          margin-top: 52px;
+        }
+        .lp-faq-item {
+          background: #ffffff;
+          border: 1px solid rgba(45, 106, 79, 0.12);
+          border-radius: 14px;
+          padding: 32px;
+          box-shadow: 0 2px 12px rgba(26, 43, 26, 0.04);
+          transition: all 0.2s;
+        }
+        .lp-faq-item:hover {
+          border-color: rgba(45, 106, 79, 0.25);
+          box-shadow: 0 6px 20px rgba(26, 43, 26, 0.08);
+        }
+        .lp-faq-q {
+          font-family: 'Playfair Display', serif;
+          font-weight: 800;
+          font-size: 20px;
+          color: #1a2b1a;
+          margin-bottom: 12px;
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          line-height: 1.3;
+        }
+        .lp-faq-q::before {
+          content: 'Q:';
+          color: #b8860b;
+          font-weight: 900;
+        }
+        .lp-faq-a {
+          font-size: 16px;
+          color: #4d6b55;
+          line-height: 1.7;
+          padding-left: 28px;
         }
 
         /* ── ANIMATIONS ── */
@@ -517,6 +567,102 @@ export default function LandingPage() {
             </p>
           </div>
         </section>
+
+        {/* ── FAQ ── */}
+        <section className="lp-faq" id="faq">
+          <div className="lp-eyebrow">Frequently Asked Questions</div>
+          <h2 className="lp-sec-title">Common Questions about RSA</h2>
+          <div className="lp-faq-grid">
+            <div className="lp-faq-item">
+              <h3 className="lp-faq-q">What is the difference between the Retirement Spending Analyzer (RSA) and the 4% rule?</h3>
+              <p className="lp-faq-a">
+                The standard 4% rule assumes a flat, inflation-adjusted spending amount throughout your entire retirement, ignoring tax brackets, account-type withdrawal sequencing, and lifestyle changes. The RSA is a dynamic model that calculates your spending based on your actual accounts (Taxable, Roth, Pre-tax), Social Security claiming age, RMD mandates, and your natural lifestyle arc (Go-Go, Slow-Go, and No-Go phases) to maximize your safe spending.
+              </p>
+            </div>
+            <div className="lp-faq-item">
+              <h3 className="lp-faq-q">What are the Go-Go, Slow-Go, and No-Go spending phases?</h3>
+              <p className="lp-faq-a">
+                These phases represent how retirees actually spend money. The "Go-Go" phase (early retirement) is when you are active, traveling, and spending the most. The "Slow-Go" phase is when your pace slows and spending naturally tapers. The "No-Go" phase (late retirement) is when active travel spending decreases, often leaving basic living costs and healthcare. RSA allows you to plan your withdrawals around this natural lifestyle curve.
+              </p>
+            </div>
+            <div className="lp-faq-item">
+              <h3 className="lp-faq-q">Is my financial data secure on the Retirement Spending Analyzer?</h3>
+              <p className="lp-faq-a">
+                Yes, absolutely. The RSA is built with a privacy-first architecture. All your calculations run client-side in your browser, and your sensitive financial inputs are stored locally on your device. Your data is never sent to our servers, sold, or stored in any database.
+              </p>
+            </div>
+            <div className="lp-faq-item">
+              <h3 className="lp-faq-q">How does the RSA model market crashes and investment downturns?</h3>
+              <p className="lp-faq-a">
+                The RSA includes a dedicated market return override feature. You can select any calendar year in your projection and input a custom negative return (e.g., -20%) to see how a "sequence of returns" risk or market crash affects your portfolio's longevity and how your spending phases adapt.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── JSON-LD Structured Schema Markup (AEO / GEO / Google Rich Snippets) ── */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "SoftwareApplication",
+                  "@id": "https://howtospendyourretirement.com/#software",
+                  "name": "Retirement Spending Analyzer",
+                  "url": "https://howtospendyourretirement.com",
+                  "applicationCategory": "FinancialApplication",
+                  "operatingSystem": "All",
+                  "description": "Calculate your maximum sustainable retirement spending using a 3-phase model, tax optimization, and sequence of returns risk modeling.",
+                  "offers": {
+                    "@type": "Offer",
+                    "price": "29.00",
+                    "priceCurrency": "USD"
+                  }
+                },
+                {
+                  "@type": "FAQPage",
+                  "@id": "https://howtospendyourretirement.com/#faq",
+                  "mainEntity": [
+                    {
+                      "@type": "Question",
+                      "name": "What is the difference between the Retirement Spending Analyzer (RSA) and the 4% rule?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "The standard 4% rule assumes a flat, inflation-adjusted spending amount throughout your entire retirement, ignoring tax brackets, account-type withdrawal sequencing, and lifestyle changes. The RSA is a dynamic model that calculates your spending based on your actual accounts (Taxable, Roth, Pre-tax), Social Security claiming age, RMD mandates, and your natural lifestyle arc (Go-Go, Slow-Go, and No-Go phases) to maximize your safe spending."
+                      }
+                    },
+                    {
+                      "@type": "Question",
+                      "name": "What are the Go-Go, Slow-Go, and No-Go spending phases?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "These phases represent how retirees actually spend money. The 'Go-Go' phase (early retirement) is when you are active, traveling, and spending the most. The 'Slow-Go' phase is when your pace slows and spending naturally tapers. The 'No-Go' phase (late retirement) is when active travel spending decreases, often leaving basic living costs and healthcare. RSA allows you to plan your withdrawals around this natural lifestyle curve."
+                      }
+                    },
+                    {
+                      "@type": "Question",
+                      "name": "Is my financial data secure on the Retirement Spending Analyzer?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes, absolutely. The RSA is built with a privacy-first architecture. All your calculations run client-side in your browser, and your sensitive financial inputs are stored locally on your device. Your data is never sent to our servers, sold, or stored in any database."
+                      }
+                    },
+                    {
+                      "@type": "Question",
+                      "name": "How does the RSA model market crashes and investment downturns?",
+                      "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "The RSA includes a dedicated market return override feature. You can select any calendar year in your projection and input a custom negative return (e.g., -20%) to see how a 'sequence of returns' risk or market crash affects your portfolio's longevity and how your spending phases adapt."
+                      }
+                    }
+                  ]
+                }
+              ]
+            })
+          }}
+        />
 
         {/* ── FOOTER ── */}
         <footer className="lp-footer">

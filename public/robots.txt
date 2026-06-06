@@ -1,0 +1,10 @@
+# robots.txt for Retirement Spending Analyzer
+User-agent: *
+Allow: /
+Allow: /pricing
+Allow: /sign-in
+Allow: /sign-up
+Allow: /success
+Disallow: /app
+
+Sitemap: https://howtospendyourretirement.com/sitemap.xml
