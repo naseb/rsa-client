@@ -364,17 +364,16 @@ export default function LandingPage() {
 
         {/* ── HERO ── */}
         <section className="lp-hero">
-          <div className="lp-eyebrow-pill">The Smarter Retirement Income Planning Tool</div>
+          <div className="lp-eyebrow-pill">Retirement Income & Tax Optimization Calculator</div>
           <h1 className="lp-hero-title">
-            "Stop Guessing How Much You Can Spend In Retirement. Know Exactly What Your Accounts Can Pay You."
+            "Stop Guessing How Much You Can Spend in Retirement. Know Exactly What Your Accounts Can Pay You with our Smarter Retirement Income Calculator."
           </h1>
           <p className="lp-hero-sub">
-            You spent decades building your accounts. Now comes the question
-            that keeps retirees up at night:{' '}
-            <em>how much can I actually take out without running dry?</em>{' '}
-            Enter your balances once and get a precise, personalized answer —
-            built around your real taxes, Social Security, and how your
-            spending naturally changes as you age.
+            You spent decades building your retirement savings. Now you need a
+            <em>tax-efficient withdrawal strategy</em>. Stop relying on the rigid 4% rule of thumb.
+            Enter your balances once to model <em>sequence of returns risk</em>, calculate RMD taxes,
+            optimize Medicare IRMAA surcharges, and determine exactly how much you can spend
+            through your Go-Go, Slow-Go, and No-Go retirement spending phases.
           </p>
           <div className="lp-hero-btns">
             <button className="lp-btn-primary" onClick={launchApp}>
@@ -454,12 +453,12 @@ export default function LandingPage() {
           <h2 className="lp-sec-title">Built for how retirement<br />actually works</h2>
           <div className="lp-fg">
             {[
-              { icon: '◆', title: 'Three-Phase Spending', desc: 'Go-Go, Slow-Go, and No-Go phases reflect your real lifestyle arc. Spend more while you\'re active, taper naturally as your pace slows.' },
-              { icon: '📊', title: 'RMD & IRMAA Aware', desc: 'Accounts for Required Minimum Distributions and Medicare IRMAA surcharges — the details most retirement tools completely ignore.' },
-              { icon: '📉', title: 'Market Crash Modeling', desc: 'Override market returns in any year to see exactly how a downturn affects your plan — and how long your portfolio takes to recover.' },
+              { icon: '◆', title: 'Three-Phase Spending Model', desc: 'Go-Go, Slow-Go, and No-Go phases reflect your real retirement lifestyle arc. Spend more while you are active and taper naturally as your pace slows.' },
+              { icon: '📊', title: 'RMD & IRMAA Tax Planning', desc: 'Built-in Required Minimum Distribution (RMD) tax calculator and Medicare IRMAA surcharge models to optimize retirement tax brackets.' },
+              { icon: '📉', title: 'Sequence of Returns Risk', desc: 'Model custom market crash scenarios to see exactly how investment downturns affect portfolio longevity and your retirement income plan.' },
               { icon: '🔐', title: 'Fully Private', desc: 'Your data never leaves your browser. Export and import your complete plan as a local file at any time.' },
-              { icon: '🆚', title: 'vs. 4% Rule Comparison', desc: 'See side-by-side how your personalized RSA compares to the standard 4% rule using your actual numbers.' },
-              { icon: '⚡', title: 'Tax Optimization Pro', desc: 'Bracket filling, Roth conversion ladders, and dynamic withdrawal sequencing — personalized to your accounts to minimize lifetime federal taxes.', comingSoon: true },
+              { icon: '🆚', title: '4% Rule vs. RSA Calculator', desc: 'Compare your customized Retirement Spending Analyzer plan side-by-side with the standard 4% rule of thumb using your real balances.' },
+              { icon: '⚡', title: 'Tax-Efficient Withdrawal Strategy', desc: 'Bracket filling, Roth conversion ladders, and dynamic withdrawal sequencing designed to minimize lifetime federal taxes.', comingSoon: true },
             ].map(f => (
               <div className="lp-fc" key={f.title}>
                 <div className="lp-fi">{f.icon}</div>
@@ -622,7 +621,7 @@ export default function LandingPage() {
                   "url": "https://howtospendyourretirement.com",
                   "applicationCategory": "FinancialApplication",
                   "operatingSystem": "All",
-                  "description": "Calculate your maximum sustainable retirement spending using a 3-phase model, tax optimization, and sequence of returns risk modeling.",
+                  "description": "Calculate your maximum sustainable retirement spending and plan a tax-efficient withdrawal strategy with our Retirement Income Calculator. Model RMD taxes, IRMAA surcharges, and sequence of returns risk.",
                   "offers": {
                     "@type": "Offer",
                     "price": "29.00",
