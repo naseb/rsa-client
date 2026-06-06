@@ -352,6 +352,9 @@ export default function LandingPage() {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+            <span onClick={() => navigate('/pricing')} style={{ color: '#8ab99a', cursor: 'pointer', fontWeight: 600, fontSize: 15, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#8ab99a'}>
+              Pricing
+            </span>
             <span onClick={() => navigate('/contact')} style={{ color: '#8ab99a', cursor: 'pointer', fontWeight: 600, fontSize: 15, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#8ab99a'}>
               Contact Us
             </span>

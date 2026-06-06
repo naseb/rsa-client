@@ -82,7 +82,7 @@ const PLANS = [
     priceId: import.meta.env.VITE_PRICE_ADVISOR_MONTHLY || 'price_1TcO_advisor_monthly_mock',
     name: 'Advisor Monthly',
     billing: 'Advisor Portal',
-    price: '$99',
+    price: '$159',
     period: '/month',
     annualEquiv: 'Billed monthly',
     badge: 'ADVISOR',
