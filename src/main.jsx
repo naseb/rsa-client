@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import { ClerkProvider } from "@clerk/react"
 import { SubscriptionProvider } from './context/SubscriptionContext'
 import App from './App.jsx'
@@ -18,10 +18,24 @@ if (!PUBLISHABLE_KEY) {
   throw new Error('Missing VITE_CLERK_PUBLISHABLE_KEY environment variable')
 }
 
+function ClerkProviderWithRouter({ children }) {
+  const navigate = useNavigate()
+  return (
+    <ClerkProvider
+      publishableKey={PUBLISHABLE_KEY}
+      afterSignOutUrl="/"
+      routerPush={(to) => navigate(to)}
+      routerReplace={(to) => navigate(to, { replace: true })}
+    >
+      {children}
+    </ClerkProvider>
+  )
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
-      <BrowserRouter>
+    <BrowserRouter>
+      <ClerkProviderWithRouter>
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
@@ -45,7 +59,7 @@ createRoot(document.getElementById('root')).render(
             </SubscriptionProvider>
           } />
         </Routes>
-      </BrowserRouter>
-    </ClerkProvider>
+      </ClerkProviderWithRouter>
+    </BrowserRouter>
   </StrictMode>,
 )
