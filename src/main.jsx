@@ -21,26 +21,31 @@ if (!PUBLISHABLE_KEY) {
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
-      <SubscriptionProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/sign-in/*" element={<SignInPage />} />
-            <Route path="/sign-up/*" element={<SignUpPage />} />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/success" element={<SuccessPage />} />
-            <Route path="/contact" element={<ContactPage />} />
+      <BrowserRouter>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/sign-in/*" element={<SignInPage />} />
+          <Route path="/sign-up/*" element={<SignUpPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          
+          <Route path="/success" element={
+            <SubscriptionProvider>
+              <SuccessPage />
+            </SubscriptionProvider>
+          } />
 
-            {/* Protected route — requires login + active subscription */}
-            <Route path="/app" element={
+          {/* Protected route — requires login + active subscription */}
+          <Route path="/app" element={
+            <SubscriptionProvider>
               <ProtectedRoute>
                 <App />
               </ProtectedRoute>
-            } />
-          </Routes>
-        </BrowserRouter>
-      </SubscriptionProvider>
+            </SubscriptionProvider>
+          } />
+        </Routes>
+      </BrowserRouter>
     </ClerkProvider>
   </StrictMode>,
 )
