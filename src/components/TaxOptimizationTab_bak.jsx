@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth } from "@clerk/react";
 import { useSubscription } from '../context/SubscriptionContext';
 import { C, FONT_BODY, FONT_MONO, fmtCompact, fmtFull } from '../utils/theme';
 

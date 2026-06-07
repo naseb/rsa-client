@@ -11,7 +11,7 @@
  * Pro users (status: 'active', tier: 'pro') get everything.
  */
 
-import { useUser } from '@clerk/clerk-react'
+import { useUser } from "@clerk/react"
 import { Navigate } from 'react-router-dom'
 import { useSubscription } from '../context/SubscriptionContext'
 

@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { ClerkProvider } from '@clerk/clerk-react'
+import { ClerkProvider } from "@clerk/react"
 import { SubscriptionProvider } from './context/SubscriptionContext'
 import App from './App.jsx'
 import LandingPage from './pages/LandingPage.jsx'

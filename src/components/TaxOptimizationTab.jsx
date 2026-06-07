@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth } from "@clerk/react";
 import { useSubscription } from '../context/SubscriptionContext';
 import { C, FONT_BODY, FONT_MONO, fmtCompact, fmtFull } from '../utils/theme';
 
@@ -139,7 +139,6 @@ export default function TaxOptimizationTab({ inputs }) {
 
   return (
     <div>
-
       {/* ── HOW THIS WORKS (collapsible) ── */}
       <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, marginBottom: 16, overflow: 'hidden' }}>
         <button onClick={() => setHowOpen(o => !o)}
@@ -200,7 +199,6 @@ export default function TaxOptimizationTab({ inputs }) {
           </div>
         )}
       </div>
-
       {/* ── Only show tabs and content if data loaded ── */}
       {data && (
         <>
@@ -250,7 +248,7 @@ export default function TaxOptimizationTab({ inputs }) {
 
               {isAlreadyOptimized && zeroReason ? (
                 /* ── ALREADY OPTIMIZED MESSAGE ── */
-                <div>
+                (<div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
                     <div style={{ fontSize: 48, lineHeight: 1 }}>
                       {zeroReason.positive ? '✓' : 'ℹ'}
@@ -264,7 +262,6 @@ export default function TaxOptimizationTab({ inputs }) {
                       </div>
                     </div>
                   </div>
-
                   {zeroReason.tip && (
                         <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)',
                           borderRadius: 10, padding: '14px 18px', marginTop: 12, maxWidth: 680 }}>
@@ -276,7 +273,6 @@ export default function TaxOptimizationTab({ inputs }) {
                           </div>
                         </div>
                       )}
-
                   <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 20 }}>
                     {[
                       { label: 'Peak Bracket',        val: summary.peakBracket },
@@ -293,10 +289,10 @@ export default function TaxOptimizationTab({ inputs }) {
                       </div>
                     ))}
                   </div>
-                </div>
+                </div>)
               ) : (
                 /* ── SAVINGS FOUND MESSAGE ── */
-                <div>
+                (<div>
                   <div style={{ display: 'flex', alignItems: 'flex-end', gap: 16, marginBottom: 8, flexWrap: 'wrap' }}>
                     <div>
                       <div style={{ fontSize: 48, fontWeight: 800, fontFamily: FONT_MONO, color: '#10b981', lineHeight: 1 }}>
@@ -316,7 +312,6 @@ export default function TaxOptimizationTab({ inputs }) {
                       </div>
                     </div>
                   </div>
-
                   <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 20 }}>
                     {[
                       { label: 'Roth Conv. Years',    val: `${summary.rothConversionYears} years` },
@@ -333,7 +328,7 @@ export default function TaxOptimizationTab({ inputs }) {
                       </div>
                     ))}
                   </div>
-                </div>
+                </div>)
               )}
 
               <div style={{ marginTop: 14, padding: '10px 14px', background: 'rgba(245,158,11,0.08)',
@@ -617,7 +612,6 @@ export default function TaxOptimizationTab({ inputs }) {
           </div>
         </>
       )}
-
     </div>
   );
 }

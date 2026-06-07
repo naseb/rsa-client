@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
-import { useAuth } from '@clerk/clerk-react'
+import { useAuth } from "@clerk/react"
 
 const SubscriptionContext = createContext(null)
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'

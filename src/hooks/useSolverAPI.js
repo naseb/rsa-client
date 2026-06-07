@@ -16,7 +16,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth } from "@clerk/react";
 import { apiCall } from '../utils/api';
 
 /**

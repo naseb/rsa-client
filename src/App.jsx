@@ -10,7 +10,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth, UserButton } from "@clerk/clerk-react";
+import { useAuth, UserButton } from "@clerk/react";
 import { useSolverAPI, useCompareAPI } from "./hooks/useSolverAPI";
 import { C, FONT_BODY, FONT_MONO, fmtCompact, STORAGE_KEY } from "./utils/theme";
 import { DEFAULTS } from "./utils/defaults";
@@ -219,13 +219,11 @@ export default function App() {
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div style={{ fontFamily: FONT_BODY, background: C.pageBg, minHeight: "100vh" }}>
-
       {/* Fonts — Source Sans 3 + JetBrains Mono */}
       <link
         href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
       />
-
       {/* ══════════ HEADER ══════════ */}
       <div className="no-print" style={{
         background: "linear-gradient(135deg,#1c3829 0%,#2d5a47 50%,#1c3829 100%)",
@@ -261,13 +259,9 @@ export default function App() {
           <button onClick={handleExport} style={headerBtn}>💾 Export</button>
           <button onClick={handleImport} style={headerBtn}>📂 Import</button>
           <button onClick={handleReset}  style={headerBtn}>↺ Reset</button>
-          <UserButton
-            afterSignOutUrl="/"
-            appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }}
-          />
+          <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
         </div>
       </div>
-
       {/* ══════════ TAB BAR ══════════ */}
       <div className="no-print" style={{
         background: "#f7f3ea",
@@ -315,7 +309,6 @@ export default function App() {
           </button>
         ))}
       </div>
-
       {/* ══════════ TAB CONTENT ══════════ */}
       <div style={{ padding: "24px 32px", maxWidth: 1200, margin: "0 auto" }}>
 
@@ -363,7 +356,6 @@ export default function App() {
         )}
 
       </div>
-
       {/* ══════════ FOOTER ══════════ */}
       <div className="no-print" style={{
         padding: "12px 32px",
@@ -374,7 +366,6 @@ export default function App() {
       }}>
         Auto-saved in browser. Use Export for backups. This is a planning tool — consult a financial advisor.
       </div>
-
     </div>
   );
 }

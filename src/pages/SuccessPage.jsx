@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useAuth } from '@clerk/clerk-react'
+import { useAuth } from "@clerk/react"
 import { useSubscription } from '../context/SubscriptionContext'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
