@@ -39,7 +39,8 @@ export default function SpendingPhasesTab({
 
   const {
     currentAge = 50, retirementAge = 65, lifeExpectancy = 95,
-    ss67 = 0, ssStartAge = 67, phases = [], transitionYears = 3, smoothTransition = true,
+    ss67 = 0, ssStartAge = 67, pensionAmount = 0, pensionStartAge = 65, pensionHasCola = false,
+    phases = [], transitionYears = 3, smoothTransition = true,
     defaultReturn = 7, targetEndBalance = 0, accounts = [], filingStatus = 2, inflationRate = 3,
   } = inputs || {};
 
@@ -214,6 +215,7 @@ export default function SpendingPhasesTab({
           <div><strong>Default Return Rate:</strong> {defaultReturn.toFixed(1)}% / year</div>
           <div><strong>Filing Status:</strong> {filingStatus}</div>
           <div><strong>Social Security (FRA):</strong> {fmtFull(ss67)}/mo at {ssStartAge}</div>
+          <div><strong>Pension:</strong> {pensionAmount > 0 ? `${fmtFull(pensionAmount)}/mo at ${pensionStartAge} (${pensionHasCola ? "COLA" : "Fixed"})` : "None"}</div>
           <div><strong>Inflation rate (COLA):</strong> {inflationRate.toFixed(1)}%</div>
         </div>
       </div>
@@ -258,6 +260,14 @@ export default function SpendingPhasesTab({
             <div style={{ fontSize: 22, fontWeight: 700, fontFamily: FONT_MONO }}>{fmtFull(ssMonthly)}<span style={{ fontSize: 11, color: "#64748b" }}>/mo</span></div>
             <div style={{ fontSize: 11, color: "rgba(247,243,234,0.5)" }}>Claiming age {ssStartAge}{ssStartAge !== 67 ? ` (${Math.round((ssMult - 1) * 100)}%)` : ""}</div>
           </div>
+          {/* Pension card */}
+          {pensionAmount > 0 && (
+            <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: "14px 20px", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <div style={{ fontSize: 10, color: "rgba(247,243,234,0.45)", textTransform: "uppercase", marginBottom: 4 }}>Pension</div>
+              <div style={{ fontSize: 22, fontWeight: 700, fontFamily: FONT_MONO }}>{fmtFull(pensionAmount)}<span style={{ fontSize: 11, color: "rgba(247,243,234,0.4)" }}>/mo</span></div>
+              <div style={{ fontSize: 11, color: "rgba(247,243,234,0.5)" }}>Starts age {pensionStartAge} · {pensionHasCola ? "COLA" : "Fixed"}</div>
+            </div>
+          )}
         </div>
 
         {/* Reset spending alert */}
@@ -497,7 +507,7 @@ export default function SpendingPhasesTab({
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: C.pageBg }}>
-                {["Year", "Age", "Phase", "Return", "Portfolio", "Growth", "Spending", "+/-", "SS"].map((h) => (
+                {["Year", "Age", "Phase", "Return", "Portfolio", "Growth", "Spending", "+/-", "SS", "Pension"].map((h) => (
                   <th key={h} style={{ padding: "8px 8px", textAlign: h === "Return" || h === "+/-" ? "center" : "right", fontWeight: 700, fontSize: 11, color: C.gray, borderBottom: `2px solid ${C.border}`, position: "sticky", top: 0, background: C.pageBg, zIndex: 1, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>{h}</th>
                 ))}
               </tr>
@@ -604,13 +614,14 @@ export default function SpendingPhasesTab({
                         ) : <span style={{ color: C.ltGray }}>–</span>}
                       </td>
                       <td style={{ ...tdStyle, color: d.ssIncome > 0 ? "#0d9488" : C.ltGray }}>{d.ssIncome > 0 ? fmtCompact(d.ssIncome) : "–"}</td>
+                      <td style={{ ...tdStyle, color: d.pensionIncome > 0 ? "#0d9488" : C.ltGray }}>{d.pensionIncome > 0 ? fmtCompact(d.pensionIncome) : "–"}</td>
 
                     </tr>
 
                     {/* Expanded detail row */}
                     {isExpanded && (
                       <tr style={{ background: C.pageBg }}>
-                        <td colSpan={9} style={{ padding: "12px 20px 14px 40px", borderBottom: `2px solid ${C.border}` }}>
+                        <td colSpan={10} style={{ padding: "12px 20px 14px 40px", borderBottom: `2px solid ${C.border}` }}>
                           <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 1fr 0.8fr", gap: 20, fontSize: 12 }}>
                             {/* Account balances */}
                             <div>
@@ -643,6 +654,7 @@ export default function SpendingPhasesTab({
                                 <div>Spending: <strong style={{ fontFamily: FONT_MONO, color: phColor }}>{fmtFull(d.annualSpending)}</strong> <span style={{ fontSize: 10, color: C.ltGray }}>({d.phaseName} {Math.round(d.multiplier * 100)}%)</span></div>
                                 {d.spendAdj !== 0 && <div style={{ fontSize: 11, color: d.spendAdj > 0 ? "#166534" : "#991b1b" }}>↳ Adjustment: <strong style={{ fontFamily: FONT_MONO }}>{d.spendAdj > 0 ? "+" : ""}${Math.abs(d.spendAdj).toLocaleString()}</strong></div>}
                                 <div>Social Security: <strong style={{ fontFamily: FONT_MONO }}>{fmtCompact(d.ssIncome)}</strong></div>
+                                <div>Pension: <strong style={{ fontFamily: FONT_MONO }}>{fmtCompact(d.pensionIncome)}</strong></div>
                                 <div
                                   style={{ cursor: d.portfolioWd > 0 ? 'pointer' : 'default', userSelect: 'none', display: 'flex', alignItems: 'center', gap: 4 }}
                                   onClick={(e) => { e.stopPropagation(); d.portfolioWd > 0 && setExpandedWds(prev => ({ ...prev, [d.year]: !prev[d.year] })); }}
