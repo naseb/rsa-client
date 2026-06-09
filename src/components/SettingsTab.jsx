@@ -10,6 +10,7 @@
 
 import NumericInput from "./NumericInput";
 import { C, FONT_BODY, FONT_MONO, fmtCompact, ssClaimingMultiplier, rmdStartAge } from "../utils/theme";
+import { DEFAULTS } from "../utils/defaults";
 
 export default function SettingsTab({
   inputs, setField, accounts, setAccounts,
@@ -56,7 +57,7 @@ export default function SettingsTab({
           ].map((item) => (
             <div key={item.k}>
               <div style={labelStyle}>{item.l}</div>
-              <NumericInput value={item.v} onChange={(v) => v !== null && setField(item.k, v)} width={70} />
+              <NumericInput value={item.v} onChange={(v) => setField(item.k, v ?? DEFAULTS[item.k])} width={70} />
             </div>
           ))}
           <div>
@@ -86,11 +87,11 @@ export default function SettingsTab({
           {/* Guaranteed Income Streams */}
           <div>
             <div style={labelStyle}>SS Benefit at Age 67 /mo</div>
-            <NumericInput value={ss67} onChange={(v) => v !== null && setField("ss67", v)} prefix="$" width={100} />
+            <NumericInput value={ss67} onChange={(v) => setField("ss67", v ?? 0)} prefix="$" width={100} />
           </div>
           <div>
             <div style={labelStyle}>Claim SS at Age</div>
-            <NumericInput value={ssStartAge} onChange={(v) => v !== null && setField("ssStartAge", v)} width={70} />
+            <NumericInput value={ssStartAge} onChange={(v) => setField("ssStartAge", v ?? DEFAULTS.ssStartAge)} width={70} />
             {ssStartAge !== 67 && (() => {
               const mult = ssClaimingMultiplier(ssStartAge);
               const adj  = Math.round(ss67 * mult);
@@ -104,11 +105,11 @@ export default function SettingsTab({
           </div>
           <div>
             <div style={labelStyle}>Pension Benefit /mo</div>
-            <NumericInput value={pensionAmount} onChange={(v) => v !== null && setField("pensionAmount", v)} prefix="$" width={100} />
+            <NumericInput value={pensionAmount} onChange={(v) => setField("pensionAmount", v ?? 0)} prefix="$" width={100} />
           </div>
           <div>
             <div style={labelStyle}>Claim Pension at Age</div>
-            <NumericInput value={pensionStartAge} onChange={(v) => v !== null && setField("pensionStartAge", v)} width={70} />
+            <NumericInput value={pensionStartAge} onChange={(v) => setField("pensionStartAge", v ?? DEFAULTS.pensionStartAge)} width={70} />
           </div>
           <div>
             <div style={labelStyle}>Pension inflation-adjusted?</div>
@@ -133,19 +134,19 @@ export default function SettingsTab({
           {/* Planning Assumptions */}
           <div>
             <div style={labelStyle}>COLA (Cost of Living)</div>
-            <NumericInput value={(cola * 100).toFixed(1)} onChange={(v) => v !== null && setField("cola", v / 100)} suffix="%" width={70} step={0.1} />
+            <NumericInput value={(cola * 100).toFixed(1)} onChange={(v) => setField("cola", v !== null ? v / 100 : DEFAULTS.cola)} suffix="%" width={70} step={0.1} />
           </div>
           <div>
             <div style={labelStyle}>Default Annual Return</div>
-            <NumericInput value={defaultReturn} onChange={(v) => v !== null && setField("defaultReturn", v)} suffix="%" width={70} step={0.1} />
+            <NumericInput value={defaultReturn} onChange={(v) => setField("defaultReturn", v ?? DEFAULTS.defaultReturn)} suffix="%" width={70} step={0.1} />
           </div>
           <div>
             <div style={labelStyle}>Inflation Rate</div>
-            <NumericInput value={inflationRate} onChange={(v) => v !== null && setField("inflationRate", v)} suffix="%" width={70} step={0.1} />
+            <NumericInput value={inflationRate} onChange={(v) => setField("inflationRate", v ?? DEFAULTS.inflationRate)} suffix="%" width={70} step={0.1} />
           </div>
           <div>
             <div style={labelStyle}>Target Balance at {lifeExpectancy}</div>
-            <NumericInput value={targetEndBalance} onChange={(v) => v !== null && setField("targetEndBalance", v)} prefix="$" width={120} />
+            <NumericInput value={targetEndBalance} onChange={(v) => setField("targetEndBalance", v ?? 0)} prefix="$" width={120} />
           </div>
         </div>
       </div>
@@ -202,15 +203,15 @@ export default function SettingsTab({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <div style={labelStyle}>Balance</div>
-                  <NumericInput value={acct.balance} onChange={(v) => v !== null && updateAccount(idx, "balance", v)} prefix="$" width={110} />
+                  <NumericInput value={acct.balance} onChange={(v) => updateAccount(idx, "balance", v ?? 0)} prefix="$" width={110} />
                 </div>
                 <div>
                   <div style={labelStyle}>Monthly Contribution</div>
-                  <NumericInput value={acct.monthlyContribution} onChange={(v) => v !== null && updateAccount(idx, "monthlyContribution", v)} prefix="$" width={100} />
+                  <NumericInput value={acct.monthlyContribution} onChange={(v) => updateAccount(idx, "monthlyContribution", v ?? 0)} prefix="$" width={100} />
                 </div>
                 <div>
                   <div style={labelStyle}>Annual Return</div>
-                  <NumericInput value={acct.annualReturn} onChange={(v) => v !== null && updateAccount(idx, "annualReturn", v)} suffix="%" width={70} step={0.1} />
+                  <NumericInput value={acct.annualReturn} onChange={(v) => updateAccount(idx, "annualReturn", v ?? 0)} suffix="%" width={70} step={0.1} />
                 </div>
                 <div>
                   <div style={labelStyle}>Tax Treatment</div>
@@ -229,11 +230,11 @@ export default function SettingsTab({
                 </div>
                 <div>
                   <div style={labelStyle}>Employer Match %</div>
-                  <NumericInput value={acct.matchPct} onChange={(v) => v !== null && updateAccount(idx, "matchPct", v)} suffix="%" width={70} />
+                  <NumericInput value={acct.matchPct} onChange={(v) => updateAccount(idx, "matchPct", v ?? 0)} suffix="%" width={70} />
                 </div>
                 <div>
                   <div style={labelStyle}>Match Limit / Year</div>
-                  <NumericInput value={acct.matchLimit} onChange={(v) => v !== null && updateAccount(idx, "matchLimit", v)} prefix="$" width={100} />
+                  <NumericInput value={acct.matchLimit} onChange={(v) => updateAccount(idx, "matchLimit", v ?? 0)} prefix="$" width={100} />
                 </div>
               </div>
             </div>
