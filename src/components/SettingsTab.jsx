@@ -16,7 +16,8 @@ export default function SettingsTab({
 }) {
   const {
     currentAge, retirementAge, lifeExpectancy, filingStatus,
-    ss67, ssStartAge, cola, defaultReturn, inflationRate, targetEndBalance,
+    ss67, ssStartAge, pensionAmount, pensionStartAge, pensionHasCola, cola, defaultReturn,
+    inflationRate, targetEndBalance,
   } = inputs;
 
   const totalBalance = accounts.reduce((s, a) => s + a.balance, 0);
@@ -82,6 +83,7 @@ export default function SettingsTab({
       <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 28 }}>
         <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, marginBottom: 20 }}>💰 Income &amp; Targets</div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          {/* Guaranteed Income Streams */}
           <div>
             <div style={labelStyle}>SS Benefit at Age 67 /mo</div>
             <NumericInput value={ss67} onChange={(v) => v !== null && setField("ss67", v)} prefix="$" width={100} />
@@ -100,6 +102,35 @@ export default function SettingsTab({
               );
             })()}
           </div>
+          <div>
+            <div style={labelStyle}>Pension Benefit /mo</div>
+            <NumericInput value={pensionAmount} onChange={(v) => v !== null && setField("pensionAmount", v)} prefix="$" width={100} />
+          </div>
+          <div>
+            <div style={labelStyle}>Claim Pension at Age</div>
+            <NumericInput value={pensionStartAge} onChange={(v) => v !== null && setField("pensionStartAge", v)} width={70} />
+          </div>
+          <div>
+            <div style={labelStyle}>Pension inflation-adjusted?</div>
+            <select
+              value={pensionHasCola ? "true" : "false"}
+              onChange={(e) => setField("pensionHasCola", e.target.value === "true")}
+              style={{
+                padding: "8px 12px", border: `1px solid ${C.border}`, borderRadius: 6,
+                fontSize: 14, fontFamily: FONT_BODY, background: "#fff", color: C.navy,
+                width: "100%", maxWidth: 150,
+              }}
+            >
+              <option value="false">No (Fixed Pension)</option>
+              <option value="true">Yes (Adjusts/COLA)</option>
+            </select>
+          </div>
+          <div /> {/* spacing alignment */}
+
+          {/* Section Divider */}
+          <div style={{ gridColumn: "1/-1", borderTop: `1px dashed ${C.border}`, margin: "4px 0" }} />
+
+          {/* Planning Assumptions */}
           <div>
             <div style={labelStyle}>COLA (Cost of Living)</div>
             <NumericInput value={(cola * 100).toFixed(1)} onChange={(v) => v !== null && setField("cola", v / 100)} suffix="%" width={70} step={0.1} />

@@ -39,6 +39,9 @@ export default function App() {
   const [filingStatus,     setFilingStatus]     = useState(DEFAULTS.filingStatus);
   const [ss67,             setSs67]             = useState(DEFAULTS.ss67);
   const [ssStartAge,       setSsStartAge]       = useState(DEFAULTS.ssStartAge);
+  const [pensionAmount,    setPensionAmount]    = useState(DEFAULTS.pensionAmount);
+  const [pensionStartAge,  setPensionStartAge]  = useState(DEFAULTS.pensionStartAge);
+  const [pensionHasCola,   setPensionHasCola]   = useState(DEFAULTS.pensionHasCola);
   const [cola,             setCola]             = useState(DEFAULTS.cola);
   const [defaultReturn,    setDefaultReturn]    = useState(DEFAULTS.defaultReturn);
   const [inflationRate,    setInflationRate]    = useState(DEFAULTS.inflationRate);
@@ -60,7 +63,9 @@ export default function App() {
         const setters = {
           currentAge: setCurrentAge, retirementAge: setRetirementAge,
           lifeExpectancy: setLifeExpectancy, filingStatus: setFilingStatus,
-          ss67: setSs67, ssStartAge: setSsStartAge, cola: setCola,
+          ss67: setSs67, ssStartAge: setSsStartAge,
+          pensionAmount: setPensionAmount, pensionStartAge: setPensionStartAge,
+          pensionHasCola: setPensionHasCola, cola: setCola,
           defaultReturn: setDefaultReturn, inflationRate: setInflationRate,
           targetEndBalance: setTargetEndBalance, phases: setPhases,
           transitionYears: setTransitionYears, smoothTransition: setSmoothTransition,
@@ -79,7 +84,7 @@ export default function App() {
   // ── Inputs object sent to the API ──────────────────────────────────────────
   const inputs = {
     currentAge, retirementAge, lifeExpectancy, filingStatus,
-    ss67, ssStartAge, cola, defaultReturn, inflationRate, targetEndBalance,
+    ss67, ssStartAge, pensionAmount, pensionStartAge, pensionHasCola, cola, defaultReturn, inflationRate, targetEndBalance,
     phases, transitionYears, smoothTransition,
     marketReturns, spendingOverrides, portfolioOverrides, accounts,
   };
@@ -98,7 +103,7 @@ export default function App() {
     return () => clearTimeout(saveTimer.current);
   }, [
     currentAge, retirementAge, lifeExpectancy, filingStatus,
-    ss67, ssStartAge, cola, defaultReturn, inflationRate, targetEndBalance,
+    ss67, ssStartAge, pensionAmount, pensionStartAge, pensionHasCola, cola, defaultReturn, inflationRate, targetEndBalance,
     phases, transitionYears, smoothTransition,
     marketReturns, spendingOverrides, accounts, portfolioOverrides,
   ]);
@@ -112,7 +117,9 @@ export default function App() {
     const setters = {
       currentAge: setCurrentAge, retirementAge: setRetirementAge,
       lifeExpectancy: setLifeExpectancy, filingStatus: setFilingStatus,
-      ss67: setSs67, ssStartAge: setSsStartAge, cola: setCola,
+      ss67: setSs67, ssStartAge: setSsStartAge,
+      pensionAmount: setPensionAmount, pensionStartAge: setPensionStartAge,
+      pensionHasCola: setPensionHasCola, cola: setCola,
       defaultReturn: setDefaultReturn, inflationRate: setInflationRate,
       targetEndBalance: setTargetEndBalance, phases: setPhases,
       transitionYears: setTransitionYears, smoothTransition: setSmoothTransition,

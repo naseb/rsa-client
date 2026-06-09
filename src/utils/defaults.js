@@ -12,6 +12,9 @@ export const DEFAULTS = {
   filingStatus: 2, // 1 = Single, 2 = MFJ
   ss67: 0,         // Monthly SS benefit at FRA (67)
   ssStartAge: 67,
+  pensionAmount: 0, // Monthly pension benefit
+  pensionStartAge: 65,
+  pensionHasCola: false,
   cola: 0.025,     // 2.5%
   defaultReturn: 7,
   inflationRate: 3,
