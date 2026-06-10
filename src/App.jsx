@@ -135,13 +135,17 @@ export default function App() {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Portal unavailable');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Portal unavailable');
+      }
       const { url } = await res.json();
       window.location.href = url;
     } catch (err) {
-      alert('Could not open billing portal. Please try again.');
+      alert(err.message);
     }
   };
+
 
   // ── Export / Import / Reset ─────────────────────────────────────────────────
   const handleExport = () => {
