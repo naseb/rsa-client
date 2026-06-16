@@ -37,12 +37,11 @@ export default function BlogPostPage() {
   // Convert markdown to HTML
   let htmlContent = ''
   try {
-    // Configure marked options if needed, e.g., break on newlines
-    marked.setOptions({
+    // In marked v18, parse options are passed directly as the second argument
+    htmlContent = marked.parse(rawMarkdown, {
       breaks: true,
       gfm: true
     })
-    htmlContent = marked.parse(rawMarkdown)
   } catch (err) {
     console.error('Failed to parse markdown:', err)
     htmlContent = '<p>Error loading content.</p>'
