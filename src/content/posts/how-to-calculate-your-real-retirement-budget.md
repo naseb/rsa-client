@@ -1,5 +1,3 @@
-# How to Calculate Your Real Retirement Budget? (Not Just Guesses)
-
 As I’m approaching retirement I have been using a financial adviser for most of my working years (30+). In that time, I’ve been fed stories after stories. Some people with $5 million who were absolutely terrified to pull the trigger and retire, and some people with $300,000 who were completely fine.
 
 Why the disconnect? It comes down to one fundamental problem: **almost every traditional retirement calculator is lying to you.** 
