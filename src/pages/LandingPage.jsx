@@ -355,6 +355,9 @@ export default function LandingPage() {
             <span onClick={() => navigate('/pricing')} style={{ color: '#8ab99a', cursor: 'pointer', fontWeight: 600, fontSize: 15, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#8ab99a'}>
               Pricing
             </span>
+            <span onClick={() => navigate('/blog')} style={{ color: '#8ab99a', cursor: 'pointer', fontWeight: 600, fontSize: 15, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#8ab99a'}>
+              Blog
+            </span>
             <span onClick={() => navigate('/contact')} style={{ color: '#8ab99a', cursor: 'pointer', fontWeight: 600, fontSize: 15, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#8ab99a'}>
               Contact Us
             </span>
@@ -676,6 +679,12 @@ export default function LandingPage() {
           <div className="lp-fl">
             <span style={{ color: '#b8860b' }}>◆</span>
             Retirement Spending Analyzer
+          </div>
+          <div style={{ display: 'flex', gap: 24, fontSize: 14, margin: '8px 0', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <span onClick={() => navigate('/')} style={{ color: '#7aaa8a', cursor: 'pointer', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#7aaa8a'}>Home</span>
+            <span onClick={() => navigate('/pricing')} style={{ color: '#7aaa8a', cursor: 'pointer', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#7aaa8a'}>Pricing</span>
+            <span onClick={() => navigate('/blog')} style={{ color: '#7aaa8a', cursor: 'pointer', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#7aaa8a'}>Blog</span>
+            <span onClick={() => navigate('/contact')} style={{ color: '#7aaa8a', cursor: 'pointer', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#7aaa8a'}>Contact Us</span>
           </div>
           <div className="lp-fn">
             Not financial advice. Consult a qualified advisor for personalized guidance.

@@ -183,6 +183,9 @@ export default function PricingPage() {
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <span onClick={() => navigate('/blog')} style={{ color: '#94a3b8', cursor: 'pointer', fontSize: 13, fontWeight: 600, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f1f5f9'} onMouseOut={(e) => e.target.style.color = '#94a3b8'}>
+            Blog
+          </span>
           <span onClick={() => navigate('/contact')} style={{ color: '#94a3b8', cursor: 'pointer', fontSize: 13, fontWeight: 600, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f1f5f9'} onMouseOut={(e) => e.target.style.color = '#94a3b8'}>
             Contact Us
           </span>

@@ -10,6 +10,8 @@ import SignUpPage from './pages/SignUpPage.jsx'
 import PricingPage from './pages/PricingPage.jsx'
 import SuccessPage from './pages/SuccessPage.jsx'
 import ContactPage from './pages/ContactPage.jsx'
+import BlogListPage from './pages/BlogListPage.jsx'
+import BlogPostPage from './pages/BlogPostPage.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
@@ -43,6 +45,8 @@ createRoot(document.getElementById('root')).render(
           <Route path="/sign-up/*" element={<SignUpPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/blog" element={<BlogListPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
           
           <Route path="/success" element={
             <SubscriptionProvider>

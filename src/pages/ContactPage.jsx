@@ -307,6 +307,7 @@ export default function ContactPage() {
           <div className="cp-nav-links">
             <span className="cp-nav-link" onClick={handleBackHome}>Home</span>
             <span className="cp-nav-link" onClick={() => navigate('/pricing')}>Pricing</span>
+            <span className="cp-nav-link" onClick={() => navigate('/blog')}>Blog</span>
             <button className="cp-nav-cta" onClick={() => navigate('/app')}>Launch App →</button>
           </div>
         </nav>
