@@ -32,19 +32,20 @@ export default function BlogPostPage() {
 
   // Get raw markdown from imported files
   const fileKey = `../content/posts/${slug}.md`
-  const rawMarkdown = markdownFiles[fileKey] || ''
+  const fileModule = markdownFiles[fileKey]
+  const rawMarkdown = fileModule ? (fileModule.default || fileModule) : ''
 
   // Convert markdown to HTML
   let htmlContent = ''
   try {
     // In marked v18, parse options are passed directly as the second argument
-    htmlContent = marked.parse(rawMarkdown, {
+    htmlContent = marked.parse(typeof rawMarkdown === 'string' ? rawMarkdown : '', {
       breaks: true,
       gfm: true
     })
   } catch (err) {
     console.error('Failed to parse markdown:', err)
-    htmlContent = '<p>Error loading content.</p>'
+    htmlContent = `<p>Error loading content: ${err.message}</p>`
   }
 
   return (
