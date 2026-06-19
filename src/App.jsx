@@ -24,7 +24,7 @@ import CompareTab           from "./components/CompareTab";
 
 export default function App() {
   const navigate  = useNavigate();
-  const { isPro } = useSubscription(); // kept for future Tax Optimization tab
+  const { isPro, isTrialing } = useSubscription(); // kept for future Tax Optimization tab
   const { getToken } = useAuth();
   const API_URL   = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -149,6 +149,10 @@ export default function App() {
 
   // ── Export / Import / Reset ─────────────────────────────────────────────────
   const handleExport = () => {
+    if (isTrialing) {
+      alert("Exporting your data backup is a premium feature. Please upgrade your plan or complete your free trial to download your backup files.");
+      return;
+    }
     const blob = new Blob([JSON.stringify(inputs, null, 2)], { type: "application/json" });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement("a");
@@ -267,7 +271,12 @@ export default function App() {
           <button onClick={handleManageBilling} style={{ ...headerBtn, background: "rgba(184,134,11,0.2)", borderColor: "rgba(184,134,11,0.4)", color: "#fcd34d" }}>
             ⚙ Account
           </button>
-          <button onClick={handleExport} style={headerBtn}>💾 Export</button>
+          <button onClick={handleExport} style={{
+            ...headerBtn,
+            color: isTrialing ? "rgba(247,243,234,0.6)" : "#f7f3ea",
+          }}>
+            {isTrialing ? "🔒 Export" : "💾 Export"}
+          </button>
           <button onClick={handleImport} style={headerBtn}>📂 Import</button>
           <button onClick={handleReset}  style={headerBtn}>↺ Reset</button>
           <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
