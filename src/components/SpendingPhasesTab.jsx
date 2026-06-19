@@ -12,6 +12,7 @@
  */
 
 import { useState, Fragment } from "react";
+import { useNavigate } from "react-router-dom";
 import NumericInput from "./NumericInput";
 import LoadingOverlay from "./LoadingOverlay";
 import { useSubscription } from "../context/SubscriptionContext";
@@ -27,6 +28,7 @@ export default function SpendingPhasesTab({
   spendingOverrides, setSpendingOverrides,
   portfolioOverrides, setPortfolioOverrides,
 }) {
+  const navigate = useNavigate();
   const [expandedRows, setExpandedRows] = useState({});
   const [expandedWds, setExpandedWds] = useState({});
 
@@ -473,9 +475,29 @@ export default function SpendingPhasesTab({
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             {isTrialing ? (
-              <span className="no-print" style={{ fontSize: 11, color: C.orange, fontWeight: 700, padding: "5px 12px", border: `1px solid ${C.border}`, borderRadius: 6, background: C.pageBg, display: "flex", alignItems: "center", gap: 4 }}>
-                🔒 PDF Printing is locked during the free trial
-              </span>
+              <button
+                onClick={() => navigate("/pricing")}
+                className="no-print"
+                style={{
+                  padding: "5px 12px",
+                  border: `1px solid ${C.orange}`,
+                  borderRadius: 6,
+                  background: "rgba(245,158,11,0.1)",
+                  color: C.orange,
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  fontFamily: FONT_BODY,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                  transition: "background 0.2s",
+                }}
+                onMouseOver={(e) => e.target.style.background = "rgba(245,158,11,0.2)"}
+                onMouseOut={(e) => e.target.style.background = "rgba(245,158,11,0.1)"}
+              >
+                🔒 PDF Printing is locked (Upgrade to Unlock)
+              </button>
             ) : (
               <button onClick={() => window.print()}
                 style={{ padding: "5px 12px", border: `1px solid ${C.accent}`, borderRadius: 6, background: C.accent, color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", fontFamily: FONT_BODY, display: "flex", alignItems: "center", gap: 4 }}>

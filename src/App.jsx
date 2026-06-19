@@ -150,7 +150,9 @@ export default function App() {
   // ── Export / Import / Reset ─────────────────────────────────────────────────
   const handleExport = () => {
     if (isTrialing) {
-      alert("Exporting your data backup is a premium feature. Please upgrade your plan or complete your free trial to download your backup files.");
+      if (window.confirm("Exporting your data backup is a premium feature. Would you like to view our pricing plans and upgrade to unlock exports?")) {
+        navigate("/pricing");
+      }
       return;
     }
     const blob = new Blob([JSON.stringify(inputs, null, 2)], { type: "application/json" });
@@ -268,6 +270,17 @@ export default function App() {
           <button onClick={() => navigate("/")} style={{ ...headerBtn, background: "rgba(45,106,79,0.2)", borderColor: "rgba(45,106,79,0.4)", color: "#a7f3d0" }}>
             ⌂ Home
           </button>
+          {isTrialing && (
+            <button onClick={() => navigate("/pricing")} style={{
+              ...headerBtn,
+              background: "rgba(245,158,11,0.25)",
+              borderColor: "rgba(245,158,11,0.5)",
+              color: "#fcd34d",
+              fontWeight: 700,
+            }}>
+              ★ Upgrade to Premium
+            </button>
+          )}
           <button onClick={handleManageBilling} style={{ ...headerBtn, background: "rgba(184,134,11,0.2)", borderColor: "rgba(184,134,11,0.4)", color: "#fcd34d" }}>
             ⚙ Account
           </button>
