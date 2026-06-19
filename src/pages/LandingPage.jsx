@@ -1,8 +1,15 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
+import usePageMeta from '../hooks/usePageMeta'
 
 export default function LandingPage() {
   const navigate = useNavigate()
   const launchApp = () => navigate('/app')
+
+  usePageMeta({
+    title: "Retirement Income Calculator — Tax-Efficient Spending Analyzer",
+    description: "Calculate your maximum sustainable retirement spending and plan a tax-efficient withdrawal strategy with our Retirement Income Calculator. Model RMD taxes, IRMAA surcharges, and sequence of returns risk.",
+    canonicalPath: "/"
+  });
 
   return (
     <>
@@ -352,15 +359,15 @@ export default function LandingPage() {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-            <span onClick={() => navigate('/pricing')} style={{ color: '#8ab99a', cursor: 'pointer', fontWeight: 600, fontSize: 15, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#8ab99a'}>
+            <Link to="/pricing" style={{ color: '#c8e6d2', textDecoration: 'none', fontWeight: 600, fontSize: 15, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#c8e6d2'}>
               Pricing
-            </span>
-            <span onClick={() => navigate('/blog')} style={{ color: '#8ab99a', cursor: 'pointer', fontWeight: 600, fontSize: 15, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#8ab99a'}>
+            </Link>
+            <Link to="/blog" style={{ color: '#c8e6d2', textDecoration: 'none', fontWeight: 600, fontSize: 15, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#c8e6d2'}>
               Blog
-            </span>
-            <span onClick={() => navigate('/contact')} style={{ color: '#8ab99a', cursor: 'pointer', fontWeight: 600, fontSize: 15, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#8ab99a'}>
+            </Link>
+            <Link to="/contact" style={{ color: '#c8e6d2', textDecoration: 'none', fontWeight: 600, fontSize: 15, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#c8e6d2'}>
               Contact Us
-            </span>
+            </Link>
             <button className="lp-nav-cta" onClick={launchApp}>Launch App →</button>
           </div>
         </nav>
@@ -681,10 +688,10 @@ export default function LandingPage() {
             Retirement Spending Analyzer
           </div>
           <div style={{ display: 'flex', gap: 24, fontSize: 14, margin: '8px 0', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <span onClick={() => navigate('/')} style={{ color: '#7aaa8a', cursor: 'pointer', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#7aaa8a'}>Home</span>
-            <span onClick={() => navigate('/pricing')} style={{ color: '#7aaa8a', cursor: 'pointer', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#7aaa8a'}>Pricing</span>
-            <span onClick={() => navigate('/blog')} style={{ color: '#7aaa8a', cursor: 'pointer', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#7aaa8a'}>Blog</span>
-            <span onClick={() => navigate('/contact')} style={{ color: '#7aaa8a', cursor: 'pointer', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#7aaa8a'}>Contact Us</span>
+            <Link to="/" style={{ color: '#7aaa8a', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#7aaa8a'}>Home</Link>
+            <Link to="/pricing" style={{ color: '#7aaa8a', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#7aaa8a'}>Pricing</Link>
+            <Link to="/blog" style={{ color: '#7aaa8a', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#7aaa8a'}>Blog</Link>
+            <Link to="/contact" style={{ color: '#7aaa8a', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f7f3ea'} onMouseOut={(e) => e.target.style.color = '#7aaa8a'}>Contact Us</Link>
           </div>
           <div className="lp-fn">
             Not financial advice. Consult a qualified advisor for personalized guidance.

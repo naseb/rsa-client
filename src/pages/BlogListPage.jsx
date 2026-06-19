@@ -1,8 +1,15 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { BLOG_POSTS } from '../content/blogData'
+import usePageMeta from '../hooks/usePageMeta'
 
 export default function BlogListPage() {
   const navigate = useNavigate()
+
+  usePageMeta({
+    title: "Retirement spending strategies & insights — Retirement Spending Analyzer Blog",
+    description: "Read practical strategies, mathematical insights, and guides to help you confidently plan and manage your retirement spending and tax optimization.",
+    canonicalPath: "/blog"
+  });
 
   return (
     <>
@@ -32,18 +39,19 @@ export default function BlogListPage() {
           z-index: 100;
           border-bottom: 3px solid #b8860b;
         }
-        .blog-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .blog-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
         .blog-logo-diamond { color: #b8860b; font-size: 22px; }
         .blog-logo-text { font-family: 'Source Sans 3', sans-serif; font-weight: 700; font-size: 18px; color: #f7f3ea; letter-spacing: 0.01em; }
         .blog-logo-sub { font-size: 12px; color: #7aaa8a; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 1px; }
         .blog-nav-links { display: flex; align-items: center; gap: 24px; }
-        .blog-nav-link { color: #8ab99a; text-decoration: none; font-size: 15px; font-weight: 600; cursor: pointer; transition: color 0.2s; }
+        .blog-nav-link { color: #c8e6d2; text-decoration: none; font-size: 15px; font-weight: 600; cursor: pointer; transition: color 0.2s; }
         .blog-nav-link:hover { color: #f7f3ea; }
         .blog-nav-cta {
           background: #b8860b; color: #fff; border: none;
           padding: 11px 28px; border-radius: 6px;
           font-family: 'Source Sans 3', sans-serif; font-size: 16px; font-weight: 700;
           cursor: pointer; transition: background 0.2s; letter-spacing: 0.01em;
+          text-decoration: none; display: inline-block;
         }
         .blog-nav-cta:hover { background: #9a700a; }
 
@@ -101,6 +109,8 @@ export default function BlogListPage() {
           box-shadow: 0 4px 20px rgba(26, 43, 26, 0.04);
           transition: all 0.25s ease;
           cursor: pointer;
+          text-decoration: none;
+          color: inherit;
         }
         .blog-card:hover {
           transform: translateY(-6px);
@@ -187,18 +197,18 @@ export default function BlogListPage() {
       <div className="blog-root">
         {/* Nav */}
         <nav className="blog-nav">
-          <div className="blog-logo" onClick={() => navigate('/')}>
+          <Link className="blog-logo" to="/">
             <span className="blog-logo-diamond">◆</span>
             <div>
               <div className="blog-logo-text">Retirement Spending Analyzer</div>
               <div className="blog-logo-sub">Smarter retirement income planning</div>
             </div>
-          </div>
+          </Link>
           <div className="blog-nav-links">
-            <span className="blog-nav-link" onClick={() => navigate('/')}>Home</span>
-            <span className="blog-nav-link" onClick={() => navigate('/pricing')}>Pricing</span>
-            <span className="blog-nav-link" onClick={() => navigate('/contact')}>Contact Us</span>
-            <button className="blog-nav-cta" onClick={() => navigate('/app')}>Launch App →</button>
+            <Link className="blog-nav-link" to="/">Home</Link>
+            <Link className="blog-nav-link" to="/pricing">Pricing</Link>
+            <Link className="blog-nav-link" to="/contact">Contact Us</Link>
+            <Link className="blog-nav-cta" to="/app">Launch App →</Link>
           </div>
         </nav>
 
@@ -215,10 +225,10 @@ export default function BlogListPage() {
         <main className="blog-container">
           <div className="blog-grid">
             {BLOG_POSTS.map((post) => (
-              <article
+              <Link
                 key={post.slug}
                 className="blog-card"
-                onClick={() => navigate(`/blog/${post.slug}`)}
+                to={`/blog/${post.slug}`}
               >
                 <div className="blog-card-content">
                   <div className="blog-meta">
@@ -235,7 +245,7 @@ export default function BlogListPage() {
                     </span>
                   </div>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         </main>

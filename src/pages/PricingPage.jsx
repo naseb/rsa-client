@@ -9,7 +9,8 @@
 
 import { useState } from 'react'
 import { useAuth, useUser } from "@clerk/react"
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
+import usePageMeta from '../hooks/usePageMeta'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
@@ -128,6 +129,12 @@ export default function PricingPage() {
   const [loadingPlan, setLoadingPlan] = useState(null)
   const [error, setError] = useState(null)
 
+  usePageMeta({
+    title: "Simple, Transparent Pricing — Retirement Spending Analyzer",
+    description: "Start with a 7-day free trial. Choose a plan that fits your retirement planning needs, from standard annual calculators to advanced tax optimization and advisor portals.",
+    canonicalPath: "/pricing"
+  });
+
   const handleSelect = async (plan) => {
     // If not signed in, go to sign-up first
     if (!isSignedIn) {
@@ -176,19 +183,19 @@ export default function PricingPage() {
         padding: '18px 24px', borderBottom: '1px solid rgba(148,163,184,0.12)',
         marginBottom: 60,
       }}>
-        <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', textDecoration: 'none' }}>
           <span style={{ color: '#10b981', fontSize: 18 }}>◆</span>
           <span style={{ fontSize: 14, fontWeight: 600, color: '#f1f5f9' }}>
             Retirement Spending Analyzer
           </span>
-        </div>
+        </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <span onClick={() => navigate('/blog')} style={{ color: '#94a3b8', cursor: 'pointer', fontSize: 13, fontWeight: 600, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f1f5f9'} onMouseOut={(e) => e.target.style.color = '#94a3b8'}>
+          <Link to="/blog" style={{ color: '#94a3b8', textDecoration: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f1f5f9'} onMouseOut={(e) => e.target.style.color = '#94a3b8'}>
             Blog
-          </span>
-          <span onClick={() => navigate('/contact')} style={{ color: '#94a3b8', cursor: 'pointer', fontSize: 13, fontWeight: 600, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f1f5f9'} onMouseOut={(e) => e.target.style.color = '#94a3b8'}>
+          </Link>
+          <Link to="/contact" style={{ color: '#94a3b8', textDecoration: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#f1f5f9'} onMouseOut={(e) => e.target.style.color = '#94a3b8'}>
             Contact Us
-          </span>
+          </Link>
           {isSignedIn && (
             <div style={{ fontSize: 13, color: '#cbd5e1' }}>
               Signed in as {user?.primaryEmailAddress?.emailAddress}

@@ -1,7 +1,8 @@
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useEffect } from 'react'
 import { BLOG_POSTS } from '../content/blogData'
 import { marked } from 'marked'
+import usePageMeta from '../hooks/usePageMeta'
 
 // Eagerly load all markdown files in the content/posts folder as raw strings
 const markdownFiles = import.meta.glob('../content/posts/*.md', { query: '?raw', eager: true })
@@ -13,6 +14,12 @@ export default function BlogPostPage() {
   // Find the post metadata
   const postMeta = BLOG_POSTS.find((p) => p.slug === slug)
 
+  usePageMeta({
+    title: postMeta ? `${postMeta.title} — Retirement Spending Analyzer` : "Article Not Found",
+    description: postMeta ? postMeta.description : "The article you are looking for does not exist.",
+    canonicalPath: postMeta ? `/blog/${postMeta.slug}` : "/blog"
+  });
+
   // Scroll to top on mount
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -23,9 +30,9 @@ export default function BlogPostPage() {
       <div style={{ padding: '80px 24px', textAlign: 'center', fontFamily: 'system-ui' }}>
         <h2>Article Not Found</h2>
         <p style={{ margin: '12px 0 24px', color: '#666' }}>The article you are looking for does not exist.</p>
-        <button onClick={() => navigate('/blog')} style={{ padding: '10px 20px', cursor: 'pointer' }}>
+        <Link to="/blog" style={{ display: 'inline-block', padding: '10px 20px', cursor: 'pointer', textDecoration: 'none', background: '#2d6a4f', color: '#fff', border: 'none', borderRadius: 4, fontWeight: 'bold' }}>
           Back to Blog
-        </button>
+        </Link>
       </div>
     )
   }
@@ -76,18 +83,19 @@ export default function BlogPostPage() {
           z-index: 100;
           border-bottom: 3px solid #b8860b;
         }
-        .post-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .post-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
         .post-logo-diamond { color: #b8860b; font-size: 22px; }
         .post-logo-text { font-family: 'Source Sans 3', sans-serif; font-weight: 700; font-size: 18px; color: #f7f3ea; }
         .post-logo-sub { font-size: 12px; color: #7aaa8a; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 1px; }
         .post-nav-links { display: flex; align-items: center; gap: 24px; }
-        .post-nav-link { color: #8ab99a; text-decoration: none; font-size: 15px; font-weight: 600; cursor: pointer; transition: color 0.2s; }
+        .post-nav-link { color: #c8e6d2; text-decoration: none; font-size: 15px; font-weight: 600; cursor: pointer; transition: color 0.2s; }
         .post-nav-link:hover { color: #f7f3ea; }
         .post-nav-cta {
           background: #b8860b; color: #fff; border: none;
           padding: 11px 28px; border-radius: 6px;
           font-family: 'Source Sans 3', sans-serif; font-size: 16px; font-weight: 700;
           cursor: pointer; transition: background 0.2s;
+          text-decoration: none; display: inline-block;
         }
         .post-nav-cta:hover { background: #9a700a; }
 
@@ -114,6 +122,7 @@ export default function BlogPostPage() {
           align-items: center;
           gap: 8px;
           margin-bottom: 40px;
+          text-decoration: none;
         }
         .post-back-btn:hover {
           background: rgba(45,106,79,0.06);
@@ -278,27 +287,27 @@ export default function BlogPostPage() {
       <div className="post-root">
         {/* Nav */}
         <nav className="post-nav">
-          <div className="post-logo" onClick={() => navigate('/')}>
+          <Link className="post-logo" to="/">
             <span className="post-logo-diamond">◆</span>
             <div>
               <div className="post-logo-text">Retirement Spending Analyzer</div>
               <div className="post-logo-sub">Smarter retirement income planning</div>
             </div>
-          </div>
+          </Link>
           <div className="post-nav-links">
-            <span className="post-nav-link" onClick={() => navigate('/')}>Home</span>
-            <span className="post-nav-link" onClick={() => navigate('/pricing')}>Pricing</span>
-            <span className="post-nav-link" onClick={() => navigate('/blog')}>Blog</span>
-            <span className="post-nav-link" onClick={() => navigate('/contact')}>Contact Us</span>
-            <button className="post-nav-cta" onClick={() => navigate('/app')}>Launch App →</button>
+            <Link className="post-nav-link" to="/">Home</Link>
+            <Link className="post-nav-link" to="/pricing">Pricing</Link>
+            <Link className="post-nav-link" to="/blog">Blog</Link>
+            <Link className="post-nav-link" to="/contact">Contact Us</Link>
+            <Link className="post-nav-cta" to="/app">Launch App →</Link>
           </div>
         </nav>
 
         {/* Article Body */}
         <main className="post-container">
-          <button className="post-back-btn" onClick={() => navigate('/blog')}>
+          <Link className="post-back-btn" to="/blog">
             <span>←</span> Back to Blog
-          </button>
+          </Link>
 
           <article>
             <header className="post-header">
@@ -321,9 +330,9 @@ export default function BlogPostPage() {
             />
           </article>
 
-          <button className="post-back-btn" onClick={() => navigate('/blog')} style={{ marginTop: 60 }}>
+          <Link className="post-back-btn" to="/blog" style={{ marginTop: 60 }}>
             <span>←</span> Back to Blog
-          </button>
+          </Link>
         </main>
 
         {/* Footer */}

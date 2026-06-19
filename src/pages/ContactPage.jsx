@@ -1,8 +1,15 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
+import usePageMeta from '../hooks/usePageMeta'
 
 export default function ContactPage() {
   const navigate = useNavigate()
+
+  usePageMeta({
+    title: "Contact Us — Retirement Spending Analyzer",
+    description: "Get in touch with the Retirement Spending Analyzer team. Ask questions about our calculations, subscription plans, security, or share your feedback.",
+    canonicalPath: "/contact"
+  });
   
   // Form fields state
   const [name, setName] = useState('')
@@ -55,18 +62,19 @@ export default function ContactPage() {
           background: #1c3829;
           border-bottom: 3px solid #b8860b;
         }
-        .cp-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .cp-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
         .cp-logo-diamond { color: #b8860b; font-size: 22px; }
         .cp-logo-text { font-family: 'Source Sans 3', sans-serif; font-weight: 700; font-size: 18px; color: #f7f3ea; }
         .cp-logo-sub { font-size: 12px; color: #7aaa8a; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 1px; }
         .cp-nav-links { display: flex; align-items: center; gap: 24px; }
-        .cp-nav-link { color: #8ab99a; text-decoration: none; font-size: 15px; font-weight: 600; cursor: pointer; transition: color 0.2s; }
+        .cp-nav-link { color: #c8e6d2; text-decoration: none; font-size: 15px; font-weight: 600; cursor: pointer; transition: color 0.2s; }
         .cp-nav-link:hover { color: #f7f3ea; }
         .cp-nav-cta {
           background: #b8860b; color: #fff; border: none;
           padding: 9px 20px; border-radius: 6px;
           font-family: 'Source Sans 3', sans-serif; font-size: 14px; font-weight: 700;
           cursor: pointer; transition: background 0.2s;
+          text-decoration: none; display: inline-block;
         }
         .cp-nav-cta:hover { background: #9a700a; }
 
@@ -297,18 +305,18 @@ export default function ContactPage() {
       <div className="cp-root">
         {/* Nav */}
         <nav className="cp-nav">
-          <div className="cp-logo" onClick={handleBackHome}>
+          <Link className="cp-logo" to="/">
             <span className="cp-logo-diamond">◆</span>
             <div>
               <div className="cp-logo-text">Retirement Spending Analyzer</div>
               <div className="cp-logo-sub">Smarter retirement income planning</div>
             </div>
-          </div>
+          </Link>
           <div className="cp-nav-links">
-            <span className="cp-nav-link" onClick={handleBackHome}>Home</span>
-            <span className="cp-nav-link" onClick={() => navigate('/pricing')}>Pricing</span>
-            <span className="cp-nav-link" onClick={() => navigate('/blog')}>Blog</span>
-            <button className="cp-nav-cta" onClick={() => navigate('/app')}>Launch App →</button>
+            <Link className="cp-nav-link" to="/">Home</Link>
+            <Link className="cp-nav-link" to="/pricing">Pricing</Link>
+            <Link className="cp-nav-link" to="/blog">Blog</Link>
+            <Link className="cp-nav-cta" to="/app">Launch App →</Link>
           </div>
         </nav>
 
@@ -413,9 +421,9 @@ export default function ContactPage() {
                 <button className="cp-secondary-btn" onClick={() => setSubmitted(false)}>
                   Modify Message
                 </button>
-                <button className="cp-secondary-btn" style={{ borderColor: 'transparent', color: '#64748b' }} onClick={handleBackHome}>
+                <Link to="/" className="cp-secondary-btn" style={{ borderColor: 'transparent', color: '#64748b', textDecoration: 'none', display: 'block' }}>
                   Return to Home
-                </button>
+                </Link>
               </div>
             )}
           </div>
