@@ -103,7 +103,7 @@ export default function CompareTab({ compareData, loading, error, baseSpending, 
         {card(
           "4% Rule Spending",
           fmtFull(fourPctTotal),
-          fmtCompact(fourPctTotal / 12) + "/mo — flat forever",
+          fmtCompact(fourPctTotal / 12) + "/mo — Year 1",
           C.gray
         )}
         {card(
@@ -202,14 +202,14 @@ export default function CompareTab({ compareData, loading, error, baseSpending, 
           <div style={{ background: "#f8fafc", border: `1px solid ${C.border}`,
             borderRadius: 6, padding: "10px 14px", marginBottom: 18, textAlign: "center",
             fontSize: 13, color: C.gray }}>
-            Flat {fmtFull(fourPctTotal)} every year for {retirementYears} years
+            Starts at {fmtFull(fourPctTotal)}/yr, adjusting for inflation
           </div>
 
           {/* 4% Rule spending rows */}
           {[
-            { label: `Year 1`,                        val: fourPctTotal },
-            { label: `Year ${Math.round(retirementYears / 2)}`, val: fourPctTotal },
-            { label: `Year ${retirementYears}`,       val: fourPctTotal },
+            { label: `Year 1`,                        val: cmp?.fourPctYearlySpending?.[0] || fourPctTotal },
+            { label: `Year ${Math.round(retirementYears / 2)}`, val: cmp?.fourPctYearlySpending?.[Math.round(retirementYears / 2) - 1] || fourPctTotal },
+            { label: `Year ${retirementYears}`,       val: cmp?.fourPctYearlySpending?.[retirementYears - 1] || fourPctTotal },
           ].map((r, i) => (
             <div key={i} style={{ display: "flex", justifyContent: "space-between",
               alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${C.border}` }}>
