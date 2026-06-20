@@ -24,6 +24,7 @@ export default function TaxOptimizationTab({ inputs }) {
   const [activeSection, setSection]   = useState('instructions');
   const [howOpen, setHowOpen]         = useState(true);
   const [inputsAtRun, setInputsAtRun] = useState(null);
+  const [rmdGuideOpen, setRmdGuideOpen] = useState(false);
   const hasFetched = useRef(false);
 
   useEffect(() => {
@@ -367,14 +368,12 @@ export default function TaxOptimizationTab({ inputs }) {
                 <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, background: '#f0fdf4' }}>
                   <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>Roth Conversion Ladder</div>
                   <div style={{ fontSize: 15, color: C.gray, marginTop: 8, lineHeight: 1.75, maxWidth: 700 }}>
-                    Your tax picture year by year — using the <strong>exact same numbers as the Spending Phases tab</strong>.
+                    Your custom year-by-year Roth conversion plan based on your spending phase parameters.
                     <br />
-                    <strong>How your bracket is calculated:</strong> Pre-tax withdrawals + 85% of Social Security
-                    = Gross income. Minus the standard deduction (plus senior bonus at 65+) = Taxable income.
-                    That taxable income determines your bracket.
-                    <br />
-                    <strong>Bracket Room</strong> = how much more taxable income before crossing into the next bracket.
-                    <strong> In Window?</strong> = YES if before your RMD start age — where Roth conversions are most valuable.
+                    <strong>Convert Amount</strong> = pre-tax amount to convert to Roth.
+                    <strong> Tax Cost Now</strong> = estimated tax on the conversion.
+                    <strong> Marginal Rate</strong> = tax bracket for the conversion.
+                    <strong> Recommendation</strong> = rationale for the conversion.
                   </div>
                 </div>
                 {rothConversions.length > 0 ? (
@@ -411,6 +410,57 @@ export default function TaxOptimizationTab({ inputs }) {
                     ]}
                   />
                 )}
+
+                {/* Educational circumvention panel */}
+                <div style={{ marginTop: 24, background: '#fefaf0', border: '1px solid #fde8c4', borderRadius: 10, padding: 20 }}>
+                  <div 
+                    onClick={() => setRmdGuideOpen(!rmdGuideOpen)}
+                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', userSelect: 'none' }}
+                  >
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#b8860b', display: 'flex', alignItems: 'center', gap: 8 }}>
+                      💡 How to Defuse the RMD Tax Bomb (Action Guide)
+                    </div>
+                    <span style={{ fontSize: 18, color: '#b8860b', fontWeight: 'bold' }}>{rmdGuideOpen ? '−' : '+'}</span>
+                  </div>
+
+                  {rmdGuideOpen && (
+                    <div style={{ marginTop: 16, borderTop: '1px solid #fde8c4', paddingTop: 16 }}>
+                      <div style={{ fontSize: 14.5, color: C.slate, lineHeight: 1.6, marginBottom: 16 }}>
+                        When you have large pre-tax balances (like <strong>Scenario B's $1.8M Traditional 401(k)</strong>), forced Required Minimum Distributions (RMDs) starting at age 73 or 75 can push your income into much higher tax brackets (up to 35% for single filers). Here are the key actions to circumvent this:
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
+                        <div style={{ background: '#fff', borderRadius: 8, padding: 14, border: '1px solid #f3ebd7' }}>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: C.navy, marginBottom: 4 }}>1. Targeted Roth Conversions in "Gap Years"</div>
+                          <div style={{ fontSize: 13.5, color: C.slate, lineHeight: 1.5 }}>
+                            Move assets from Traditional accounts to a Roth IRA during low-income "gap years" (between retirement and age 73/75). You pay tax now at lower rates (e.g. 10% or 12%), drawing down the pre-tax balance early so future RMDs are small and safe.
+                          </div>
+                        </div>
+
+                        <div style={{ background: '#fff', borderRadius: 8, padding: 14, border: '1px solid #f3ebd7' }}>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: C.navy, marginBottom: 4 }}>2. Delay Social Security Claiming</div>
+                          <div style={{ fontSize: 13.5, color: C.slate, lineHeight: 1.5 }}>
+                            Delaying Social Security to age 70 increases your benefit by 8% per year and keeps your taxable income very low in your early 60s. This creates a wider, cleaner "gap window" to perform larger, low-tax Roth conversions.
+                          </div>
+                        </div>
+
+                        <div style={{ background: '#fff', borderRadius: 8, padding: 14, border: '1px solid #f3ebd7' }}>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: C.navy, marginBottom: 4 }}>3. Qualified Charitable Distributions (QCDs)</div>
+                          <div style={{ fontSize: 13.5, color: C.slate, lineHeight: 1.5 }}>
+                            If you are charitably inclined, once you reach age 70½, you can direct up to $105,000/year of your RMD directly from your Traditional IRA to charity. The amount counts toward your RMD but is excluded from your taxable income.
+                          </div>
+                        </div>
+
+                        <div style={{ background: '#fff', borderRadius: 8, padding: 14, border: '1px solid #f3ebd7' }}>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: C.navy, marginBottom: 4 }}>4. Qualified Longevity Annuity Contracts (QLACs)</div>
+                          <div style={{ fontSize: 13.5, color: C.slate, lineHeight: 1.5 }}>
+                            Invest up to $200,000 of your pre-tax IRA into a QLAC. The amount invested is excluded from your RMD calculations, and payouts can be deferred until age 85, giving your traditional assets an extra 10 years of tax-free deferral.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )
           )}

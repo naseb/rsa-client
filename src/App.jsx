@@ -17,6 +17,7 @@ import { DEFAULTS } from "./utils/defaults";
 import { useSubscription } from "./context/SubscriptionContext";
 
 import InstructionsTab      from "./components/InstructionsTab";
+import ExamplesTab          from "./components/ExamplesTab";
 import TaxOptimizationTab from "./components/TaxOptimizationTab";
 import SettingsTab          from "./components/SettingsTab";
 import SpendingPhasesTab    from "./components/SpendingPhasesTab";
@@ -144,6 +145,29 @@ export default function App() {
     } catch (err) {
       alert(err.message);
     }
+  };
+  const handleLoadScenario = (scenarioData, targetTab) => {
+    setCurrentAge(scenarioData.currentAge);
+    setRetirementAge(scenarioData.retirementAge);
+    setLifeExpectancy(scenarioData.lifeExpectancy);
+    setFilingStatus(scenarioData.filingStatus);
+    setSs67(scenarioData.ss67);
+    setSsStartAge(scenarioData.ssStartAge);
+    setPensionAmount(scenarioData.pensionAmount ?? 0);
+    setPensionStartAge(scenarioData.pensionStartAge ?? 65);
+    setPensionHasCola(scenarioData.pensionHasCola ?? false);
+    setCola(scenarioData.cola);
+    setDefaultReturn(scenarioData.defaultReturn);
+    setInflationRate(scenarioData.inflationRate);
+    setTargetEndBalance(scenarioData.targetEndBalance);
+    setPhases(scenarioData.phases);
+    setTransitionYears(scenarioData.transitionYears);
+    setSmoothTransition(scenarioData.smoothTransition);
+    setMarketReturns(scenarioData.marketReturns || {});
+    setSpendingOverrides(scenarioData.spendingOverrides || {});
+    setPortfolioOverrides(scenarioData.portfolioOverrides || {});
+    setAccounts(scenarioData.accounts);
+    setActiveTab(targetTab || "phases");
   };
 
 
@@ -305,6 +329,7 @@ export default function App() {
       }}>
         {[
           { id: "instructions", label: "Instructions" },
+          { id: "examples",     label: "Demo Scenarios" },
           { id: "settings",     label: "Settings & Accounts" },
           { id: "phases",       label: "Spending Phases" },
           { id: "compare",      label: "vs 4% Rule" },
@@ -346,6 +371,8 @@ export default function App() {
       <div style={{ padding: "24px 32px", maxWidth: 1200, margin: "0 auto" }}>
 
         {activeTab === "instructions" && <InstructionsTab />}
+
+        {activeTab === "examples" && <ExamplesTab onLoadScenario={handleLoadScenario} />}
 
         {activeTab === "settings" && (
           <SettingsTab

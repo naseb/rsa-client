@@ -468,7 +468,7 @@ export default function LandingPage() {
               { icon: '📉', title: 'Sequence of Returns Risk', desc: 'Model custom market crash scenarios to see exactly how investment downturns affect portfolio longevity and your retirement income plan.' },
               { icon: '🔐', title: 'Fully Private', desc: 'Your data never leaves your browser. Export and import your complete plan as a local file at any time.' },
               { icon: '🆚', title: '4% Rule vs. RSA Calculator', desc: 'Compare your customized Retirement Spending Analyzer plan side-by-side with the standard 4% rule of thumb using your real balances.' },
-              { icon: '⚡', title: 'Tax-Efficient Withdrawal Strategy', desc: 'Bracket filling, Roth conversion ladders, and dynamic withdrawal sequencing designed to minimize lifetime federal taxes.', comingSoon: true },
+              { icon: '⚡', title: 'Tax-Efficient Withdrawal Strategy', desc: 'Bracket filling, Roth conversion ladders, and dynamic withdrawal sequencing designed to minimize lifetime federal taxes.' },
             ].map(f => (
               <div className="lp-fc" key={f.title}>
                 <div className="lp-fi">{f.icon}</div>

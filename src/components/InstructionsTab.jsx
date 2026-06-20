@@ -7,6 +7,99 @@
 
 import { C, FONT_BODY } from "../utils/theme";
 
+const SCENARIO_A = {
+  currentAge: 57,
+  retirementAge: 62,
+  lifeExpectancy: 95,
+  filingStatus: 2,
+  ss67: 4182,
+  ssStartAge: 67,
+  cola: 0.025,
+  defaultReturn: 5.6,
+  inflationRate: 3,
+  targetEndBalance: 250000,
+  phases: [
+    { name: "Go-Go", startAge: 65, pct: 100, color: "goGo" },
+    { name: "Slow-Go", startAge: 75, pct: 70, color: "slowGo" },
+    { name: "No-Go", startAge: 85, pct: 50, color: "noGo" }
+  ],
+  transitionYears: 3,
+  smoothTransition: true,
+  marketReturns: {
+    "2031": -20,
+    "2033": 9,
+    "2036": 10,
+    "2042": -10,
+    "2045": 18
+  },
+  spendingOverrides: {},
+  portfolioOverrides: {},
+  accounts: [
+    { name: "Traditional 401(k)", balance: 1200000, monthlyContribution: 2041, annualReturn: 5.6, taxTreatment: "Pre-tax", matchPct: 3, matchLimit: 6000 },
+    { name: "Roth IRA", balance: 0, monthlyContribution: 666, annualReturn: 5.6, taxTreatment: "Tax-free", matchPct: 0, matchLimit: 0 },
+    { name: "Traditional IRA", balance: 520000, monthlyContribution: 0, annualReturn: 5.6, taxTreatment: "Pre-tax", matchPct: 0, matchLimit: 0 },
+    { name: "Brokerage", balance: 214000, monthlyContribution: 0, annualReturn: 5.6, taxTreatment: "Taxable", matchPct: 0, matchLimit: 0 },
+    { name: "HYSA", balance: 100000, monthlyContribution: 0, annualReturn: 3.5, taxTreatment: "Taxable", matchPct: 0, matchLimit: 0 }
+  ]
+};
+
+const SCENARIO_B = {
+  currentAge: 55,
+  retirementAge: 60,
+  lifeExpectancy: 95,
+  filingStatus: 1,
+  ss67: 3500,
+  ssStartAge: 70,
+  cola: 0.025,
+  defaultReturn: 7,
+  inflationRate: 3,
+  targetEndBalance: 250000,
+  phases: [
+    { name: "Go-Go", startAge: 60, pct: 100, color: "goGo" },
+    { name: "Slow-Go", startAge: 75, pct: 70, color: "slowGo" },
+    { name: "No-Go", startAge: 85, pct: 50, color: "noGo" }
+  ],
+  transitionYears: 3,
+  smoothTransition: true,
+  marketReturns: {},
+  spendingOverrides: {},
+  portfolioOverrides: {},
+  accounts: [
+    { name: "Traditional 401(k)", balance: 1800000, monthlyContribution: 1500, annualReturn: 7, taxTreatment: "Pre-tax", matchPct: 3, matchLimit: 6000 },
+    { name: "Roth IRA", balance: 50000, monthlyContribution: 500, annualReturn: 7, taxTreatment: "Tax-free", matchPct: 0, matchLimit: 0 },
+    { name: "Brokerage", balance: 300000, monthlyContribution: 0, annualReturn: 7, taxTreatment: "Taxable", matchPct: 0, matchLimit: 0 },
+    { name: "HYSA", balance: 100000, monthlyContribution: 0, annualReturn: 3.5, taxTreatment: "Taxable", matchPct: 0, matchLimit: 0 }
+  ]
+};
+
+const SCENARIO_C = {
+  currentAge: 53,
+  retirementAge: 55,
+  lifeExpectancy: 95,
+  filingStatus: 2,
+  ss67: 4000,
+  ssStartAge: 70,
+  cola: 0.025,
+  defaultReturn: 7,
+  inflationRate: 3,
+  targetEndBalance: 250000,
+  phases: [
+    { name: "Go-Go", startAge: 55, pct: 100, color: "goGo" },
+    { name: "Slow-Go", startAge: 75, pct: 70, color: "slowGo" },
+    { name: "No-Go", startAge: 85, pct: 50, color: "noGo" }
+  ],
+  transitionYears: 3,
+  smoothTransition: true,
+  marketReturns: {},
+  spendingOverrides: {},
+  portfolioOverrides: {},
+  accounts: [
+    { name: "Traditional 401(k)", balance: 2500000, monthlyContribution: 0, annualReturn: 7, taxTreatment: "Pre-tax", matchPct: 0, matchLimit: 0 },
+    { name: "Brokerage", balance: 1200000, monthlyContribution: 0, annualReturn: 7, taxTreatment: "Taxable", matchPct: 0, matchLimit: 0 },
+    { name: "HYSA", balance: 150000, monthlyContribution: 0, annualReturn: 3.5, taxTreatment: "Taxable", matchPct: 0, matchLimit: 0 }
+  ]
+};
+
 export default function InstructionsTab() {
   return (
     <div style={{ maxWidth: 820 }}>
