@@ -252,6 +252,28 @@ export default function CompareTab({ compareData, loading, error, baseSpending, 
         </div>
       )}
 
+      {/* ── Today's vs. Future Dollars explanation ── */}
+      {(() => {
+        const yearsToRetire = (inputs?.retirementAge || 65) - (inputs?.currentAge || 60);
+        return (
+          <div style={{
+            background: "#f8fafc",
+            border: `1px solid ${C.border}`,
+            borderRadius: 12,
+            padding: "16px 20px",
+            marginBottom: 20,
+            display: "flex",
+            gap: 12,
+            alignItems: "flex-start"
+          }}>
+            <span style={{ fontSize: 18, marginTop: -2 }}>💡</span>
+            <div style={{ fontSize: 13.5, color: C.slate, lineHeight: 1.5 }}>
+              <strong>Why are these numbers higher than my Spending Phases?</strong> The "Spending Phases" tab displays your targets in <em>today's purchasing power</em> (what the money buys today). This comparison tab shows the actual <em>future dollars</em> you will spend, which are higher due to inflation compounding over time {yearsToRetire > 0 ? `(${yearsToRetire} years before retirement plus each year during retirement)` : "(each year during retirement)"}, as well as adjustments to protect your portfolio from market crashes.
+            </div>
+          </div>
+        );
+      })()}
+
       {/* ── Portfolio Trajectory chart ── */}
       {cmp?.fourPctBalances && cmp?.rsaBalances && (
         <div style={{ background: C.cardBg, border: `1px solid ${C.border}`,
