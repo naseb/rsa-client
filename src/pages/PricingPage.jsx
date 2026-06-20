@@ -42,7 +42,7 @@ const PLANS = [
     billing: 'Annual Review Pass',
     price: '$89',
     period: '/year',
-    annualEquiv: 'Just $7.42/month',
+    annualEquiv: 'Just $7.42/month (Billed Annually)',
     badge: 'POPULAR B2C',
     badgeColor: '#10b981',
     color: '#10b981',
@@ -63,7 +63,7 @@ const PLANS = [
     billing: 'Annual Review Pass',
     price: '$119',
     period: '/year',
-    annualEquiv: 'Just $9.92/month',
+    annualEquiv: 'Just $9.92/month (Billed Annually)',
     badge: 'PRO TAX ENGINES',
     badgeColor: '#1d4ed8',
     color: '#1d4ed8',
@@ -76,7 +76,6 @@ const PLANS = [
       'Lifetime tax savings estimate',
     ],
     cta: 'Start Free Trial',
-    comingSoon: true,
   },
   {
     id: 'advisor_monthly',
@@ -387,7 +386,7 @@ export default function PricingPage() {
       }}>
         7-day free trial on all plans · Cancel anytime · Secure payment via Stripe
         <br />
-        Pro plan is annual only · Tax Optimization tab coming soon
+        Pro plan is annual only
       </div>
     </div>
   )

@@ -85,6 +85,21 @@ export default function TaxOptimizationTab({ inputs }) {
   const { summary, rothConversions, bracketFilling, sequencingInsights, yearlyComparison, taxAnalysis } = data || {};
   const isAlreadyOptimized = data && summary.totalSavings === 0;
 
+  // Calculate cumulative taxes for comparison chart
+  let cumulativeCurrent = 0;
+  let cumulativeOptimized = 0;
+  const cumulativeComparison = (yearlyComparison || []).map(row => {
+    cumulativeCurrent += (row.currentTax || 0);
+    cumulativeOptimized += (row.optimizedTax || 0);
+    return {
+      year: row.year,
+      age: row.age,
+      cumulativeCurrent,
+      cumulativeOptimized,
+    };
+  });
+  const maxTax = Math.max(...cumulativeComparison.map(r => Math.max(r.cumulativeCurrent, r.cumulativeOptimized)), 1000);
+
   // ── Derive a plain-English reason why savings = $0 ──────────────────────
   const getZeroReason = () => {
     if (!taxAnalysis || taxAnalysis.length === 0) return null;
@@ -342,215 +357,333 @@ export default function TaxOptimizationTab({ inputs }) {
 
           {/* ── ROTH CONVERSIONS ── */}
           {activeSection === 'roth' && (
-            <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
-              <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, background: '#f0fdf4' }}>
-                <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>Roth Conversion Ladder</div>
-                <div style={{ fontSize: 15, color: C.gray, marginTop: 8, lineHeight: 1.75, maxWidth: 700 }}>
-                  Your tax picture year by year — using the <strong>exact same numbers as the Spending Phases tab</strong>.
-                  <br />
-                  <strong>How your bracket is calculated:</strong> Pre-tax withdrawals + 85% of Social Security
-                  = Gross income. Minus the standard deduction (plus senior bonus at 65+) = Taxable income.
-                  That taxable income determines your bracket.
-                  <br />
-                  <strong>Bracket Room</strong> = how much more taxable income before crossing into the next bracket.
-                  <strong> In Window?</strong> = YES if before your RMD start age — where Roth conversions are most valuable.
+            isTrialing ? (
+              <LockedOverlay
+                title="Roth Conversion Ladder"
+                desc="Unlock your custom year-by-year Roth conversion plan. Learn exactly how much to convert each year to grow your wealth tax-free and avoid forced RMDs."
+              />
+            ) : (
+              <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
+                <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, background: '#f0fdf4' }}>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>Roth Conversion Ladder</div>
+                  <div style={{ fontSize: 15, color: C.gray, marginTop: 8, lineHeight: 1.75, maxWidth: 700 }}>
+                    Your tax picture year by year — using the <strong>exact same numbers as the Spending Phases tab</strong>.
+                    <br />
+                    <strong>How your bracket is calculated:</strong> Pre-tax withdrawals + 85% of Social Security
+                    = Gross income. Minus the standard deduction (plus senior bonus at 65+) = Taxable income.
+                    That taxable income determines your bracket.
+                    <br />
+                    <strong>Bracket Room</strong> = how much more taxable income before crossing into the next bracket.
+                    <strong> In Window?</strong> = YES if before your RMD start age — where Roth conversions are most valuable.
+                  </div>
                 </div>
-              </div>
-              {rothConversions.length > 0 ? (
-                <div style={{ overflowY: 'auto', maxHeight: '50vh' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ background: '#f8fafc' }}>
-                        {['Year', 'Age', 'Convert Amount', 'Tax Cost Now', 'Marginal Rate', 'Recommendation'].map(h => (
-                          <th key={h} style={thS}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rothConversions.map((r, i) => (
-                        <tr key={r.year} style={{ background: i % 2 === 0 ? '#fff' : '#f0fdf4' }}>
-                          <td style={tdS}>{r.year}</td>
-                          <td style={tdS}>{r.age}</td>
-                          <td style={{ ...tdS, fontFamily: FONT_MONO, fontWeight: 700, color: '#10b981' }}>{fmtFull(r.conversionAmount)}</td>
-                          <td style={{ ...tdS, fontFamily: FONT_MONO, color: '#ef4444' }}>{fmtFull(r.taxCost)}</td>
-                          <td style={{ ...tdS, fontFamily: FONT_MONO }}>{(r.marginalRate * 100).toFixed(0)}%</td>
-                          <td style={{ ...tdS, fontSize: 11, color: C.gray }}>{r.rationale}</td>
+                {rothConversions.length > 0 ? (
+                  <div style={{ overflowY: 'auto', maxHeight: '50vh' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ background: '#f8fafc' }}>
+                          {['Year', 'Age', 'Convert Amount', 'Tax Cost Now', 'Marginal Rate', 'Recommendation'].map(h => (
+                            <th key={h} style={thS}>{h}</th>
+                          ))}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <EmptyState
-                  title="No Roth conversion opportunities found"
-                  reasons={[
-                    'Your Pre-tax balance depletes naturally during the conversion window through your spending plan',
-                    'Your income is already at or above the target conversion bracket (22%) — converting would not reduce your rate',
-                    'Your Pre-tax balance is already low or $0',
-                  ]}
-                />
-              )}
-            </div>
+                      </thead>
+                      <tbody>
+                        {rothConversions.map((r, i) => (
+                          <tr key={r.year} style={{ background: i % 2 === 0 ? '#fff' : '#f0fdf4' }}>
+                            <td style={tdS}>{r.year}</td>
+                            <td style={tdS}>{r.age}</td>
+                            <td style={{ ...tdS, fontFamily: FONT_MONO, fontWeight: 700, color: '#10b981' }}>{fmtFull(r.conversionAmount)}</td>
+                            <td style={{ ...tdS, fontFamily: FONT_MONO, color: '#ef4444' }}>{fmtFull(r.taxCost)}</td>
+                            <td style={{ ...tdS, fontFamily: FONT_MONO }}>{(r.marginalRate * 100).toFixed(0)}%</td>
+                            <td style={{ ...tdS, fontSize: 11, color: C.gray }}>{r.rationale}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <EmptyState
+                    title="No Roth conversion opportunities found"
+                    reasons={[
+                      'Your Pre-tax balance depletes naturally during the conversion window through your spending plan',
+                      'Your income is already at or above the target conversion bracket (22%) — converting would not reduce your rate',
+                      'Your Pre-tax balance is already low or $0',
+                    ]}
+                  />
+                )}
+              </div>
+            )
           )}
 
           {/* ── BRACKET FILLING ── */}
           {activeSection === 'bracket' && (
-            <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
-              <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, background: '#eff6ff' }}>
-                <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>Bracket Filling</div>
-                <div style={{ fontSize: 15, color: C.gray, marginTop: 8, lineHeight: 1.75, maxWidth: 700 }}>
-                  <strong>What this shows:</strong> Years where your taxable income is below the ceiling of your
-                  current bracket — meaning you could pull more from Pre-tax at the same rate.
-                  The "Room Available" column shows how much more you could withdraw before hitting
-                  the next bracket. The "Suggested Extra" is 80% of that room — a conservative recommendation
-                  that leaves a buffer for unexpected income.
+            isTrialing ? (
+              <LockedOverlay
+                title="Bracket Filling Strategy"
+                desc="Unlock your bracket filling opportunities. See exactly how much Traditional IRA/401(k) money to pull forward each year at your lowest tax rates."
+              />
+            ) : (
+              <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
+                <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}`, background: '#eff6ff' }}>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>Bracket Filling</div>
+                  <div style={{ fontSize: 15, color: C.gray, marginTop: 8, lineHeight: 1.75, maxWidth: 700 }}>
+                    <strong>What this shows:</strong> Years where your taxable income is below the ceiling of your
+                    current bracket — meaning you could pull more from Pre-tax at the same rate.
+                    The "Room Available" column shows how much more you could withdraw before hitting
+                    the next bracket. The "Suggested Extra" is 80% of that room — a conservative recommendation
+                    that leaves a buffer for unexpected income.
+                  </div>
                 </div>
-              </div>
-              {bracketFilling.length > 0 ? (
-                <div style={{ overflowY: 'auto', maxHeight: '50vh' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ background: '#f8fafc' }}>
-                        {['Year', 'Age', 'Bracket', 'Room Available', 'Suggested Extra', 'Tax Cost', 'Notes'].map(h => (
-                          <th key={h} style={thS}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {bracketFilling.map((b, i) => (
-                        <tr key={b.year} style={{ background: i % 2 === 0 ? '#fff' : '#eff6ff' }}>
-                          <td style={tdS}>{b.year}</td>
-                          <td style={tdS}>{b.age}</td>
-                          <td style={{ ...tdS, fontFamily: FONT_MONO }}>{b.currentBracket}</td>
-                          <td style={{ ...tdS, fontFamily: FONT_MONO, color: C.accent }}>{fmtFull(b.bracketRoom)}</td>
-                          <td style={{ ...tdS, fontFamily: FONT_MONO, fontWeight: 700, color: '#1d4ed8' }}>{fmtFull(b.additionalWithdrawal)}</td>
-                          <td style={{ ...tdS, fontFamily: FONT_MONO, color: '#ef4444' }}>{fmtFull(b.taxCost)}</td>
-                          <td style={{ ...tdS, fontSize: 11, color: C.gray }}>{b.rationale}</td>
+                {bracketFilling.length > 0 ? (
+                  <div style={{ overflowY: 'auto', maxHeight: '50vh' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ background: '#f8fafc' }}>
+                          {['Year', 'Age', 'Bracket', 'Room Available', 'Suggested Extra', 'Tax Cost', 'Notes'].map(h => (
+                            <th key={h} style={thS}>{h}</th>
+                          ))}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <EmptyState
-                  title="No bracket filling opportunities found"
-                  reasons={[
-                    'Your income is near or above the current bracket ceiling in most years',
-                    'Your Pre-tax balance reaches $0 during the withdrawal window — no balance remains to fill with',
-                    'Pulling more Pre-tax would push you into the next higher bracket, costing more not less',
-                  ]}
-                />
-              )}
-            </div>
+                      </thead>
+                      <tbody>
+                        {bracketFilling.map((b, i) => (
+                          <tr key={b.year} style={{ background: i % 2 === 0 ? '#fff' : '#eff6ff' }}>
+                            <td style={tdS}>{b.year}</td>
+                            <td style={tdS}>{b.age}</td>
+                            <td style={{ ...tdS, fontFamily: FONT_MONO }}>{b.currentBracket}</td>
+                            <td style={{ ...tdS, fontFamily: FONT_MONO, color: C.accent }}>{fmtFull(b.bracketRoom)}</td>
+                            <td style={{ ...tdS, fontFamily: FONT_MONO, fontWeight: 700, color: '#1d4ed8' }}>{fmtFull(b.additionalWithdrawal)}</td>
+                            <td style={{ ...tdS, fontFamily: FONT_MONO, color: '#ef4444' }}>{fmtFull(b.taxCost)}</td>
+                            <td style={{ ...tdS, fontSize: 11, color: C.gray }}>{b.rationale}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <EmptyState
+                    title="No bracket filling opportunities found"
+                    reasons={[
+                      'Your income is near or above the current bracket ceiling in most years',
+                      'Your Pre-tax balance reaches $0 during the withdrawal window — no balance remains to fill with',
+                      'Pulling more Pre-tax would push you into the next higher bracket, costing more not less',
+                    ]}
+                  />
+                )}
+              </div>
+            )
           )}
 
           {/* ── DYNAMIC SEQUENCING ── */}
           {activeSection === 'sequence' && (
-            <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
-              <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
-                <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>Dynamic Withdrawal Sequencing</div>
-                <div style={{ fontSize: 15, color: C.gray, marginTop: 8, lineHeight: 1.75, maxWidth: 700 }}>
-                  <strong>What this shows:</strong> Specific years where changing the standard withdrawal order
-                  (Taxable → Roth → Pre-tax) could reduce taxes. Common triggers include being near an
-                  IRMAA Medicare surcharge threshold, having an unusually low-income year, or approaching
-                  RMD start age with a large Pre-tax balance.
+            isTrialing ? (
+              <LockedOverlay
+                title="Dynamic Withdrawal Sequencing"
+                desc="Unlock sequencing optimizations. Get specific alerts for when to deviate from the standard withdrawal order to stay below IRMAA thresholds and optimize tax rates."
+              />
+            ) : (
+              <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
+                <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>Dynamic Withdrawal Sequencing</div>
+                  <div style={{ fontSize: 15, color: C.gray, marginTop: 8, lineHeight: 1.75, maxWidth: 700 }}>
+                    <strong>What this shows:</strong> Specific years where changing the standard withdrawal order
+                    (Taxable → Roth → Pre-tax) could reduce taxes. Common triggers include being near an
+                    IRMAA Medicare surcharge threshold, having an unusually low-income year, or approaching
+                    RMD start age with a large Pre-tax balance.
+                  </div>
                 </div>
-              </div>
-              {sequencingInsights.length > 0 ? (
-                <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {sequencingInsights.map(s => (
-                    <div key={s.year} style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '14px 18px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                        <span style={{ fontWeight: 700, color: C.navy, fontSize: 16 }}>Age {s.age} ({s.year})</span>
-                        {s.recommendedSequence && (
-                          <span style={{ fontSize: 13, background: '#fef3c7', color: '#92400e',
-                            padding: '2px 10px', borderRadius: 100, fontWeight: 600 }}>
-                            {s.recommendedSequence}
-                          </span>
-                        )}
-                      </div>
-                      {s.insights.map((ins, i) => (
-                        <div key={i} style={{ fontSize: 15, color: '#78350f', lineHeight: 1.75,
-                          marginBottom: i < s.insights.length - 1 ? 6 : 0 }}>
-                          • {ins}
+                {sequencingInsights.length > 0 ? (
+                  <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {sequencingInsights.map(s => (
+                      <div key={s.year} style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10, padding: '14px 18px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                          <span style={{ fontWeight: 700, color: C.navy, fontSize: 16 }}>Age {s.age} ({s.year})</span>
+                          {s.recommendedSequence && (
+                            <span style={{ fontSize: 13, background: '#fef3c7', color: '#92400e',
+                              padding: '2px 10px', borderRadius: 100, fontWeight: 600 }}>
+                              {s.recommendedSequence}
+                            </span>
+                          )}
                         </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <EmptyState
-                  title="No sequencing adjustments needed"
-                  reasons={[
-                    'Your income does not approach IRMAA Medicare surcharge thresholds',
-                    'No unusually low-income years were identified where Pre-tax withdrawals would be cheaper',
-                    'Your standard withdrawal sequence appears near-optimal for your income profile',
-                  ]}
-                />
-              )}
-            </div>
+                        {s.insights.map((ins, i) => (
+                          <div key={i} style={{ fontSize: 15, color: '#78350f', lineHeight: 1.75,
+                            marginBottom: i < s.insights.length - 1 ? 6 : 0 }}>
+                            • {ins}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState
+                    title="No sequencing adjustments needed"
+                    reasons={[
+                      'Your income does not approach IRMAA Medicare surcharge thresholds',
+                      'No unusually low-income years were identified where Pre-tax withdrawals would be cheaper',
+                      'Your standard withdrawal sequence appears near-optimal for your income profile',
+                    ]}
+                  />
+                )}
+              </div>
+            )
           )}
 
           {/* ── YEAR-BY-YEAR COMPARISON ── */}
           {activeSection === 'compare' && (
-            <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
-              <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
-                <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>Year-by-Year Tax Comparison</div>
-                <div style={{ fontSize: 15, color: C.gray, marginTop: 8, lineHeight: 1.75 }}>
-                  <strong>Current Tax</strong> = what you pay under your existing plan.{' '}
-                  <strong>Optimized Tax</strong> = estimated tax after applying recommendations.{' '}
-                  <strong>Savings</strong> = the net benefit in that year. Rows highlighted green have identified savings.
-                  <br />
-                  <em>Note: Roth conversions cost more tax now but save more later — the "Savings" column shows the net lifetime benefit allocated to each year.</em>
+            isTrialing ? (
+              <LockedOverlay
+                title="Year-by-Year Comparison"
+                desc="Unlock the cumulative tax trajectory chart and detailed year-by-year comparison table showing exactly when and where you save on taxes."
+              />
+            ) : (
+              <div>
+                {/* ── SVG Chart ── */}
+                <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: "24px 28px", marginBottom: 20 }}>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: C.navy, marginBottom: 4 }}>
+                    Cumulative Tax Trajectory
+                  </div>
+                  <div style={{ fontSize: 14, color: C.gray, marginBottom: 12, lineHeight: 1.6 }}>
+                    Visualize how early Roth conversions cost more tax up front, but result in much lower lifetime taxes later in retirement.
+                  </div>
+                  <div style={{ display: "flex", gap: 20, marginBottom: 12, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 13 }}>
+                      <span style={{ display: "inline-block", width: 24, height: 2,
+                        background: '#ef4444', borderTop: `2px dashed #ef4444`, marginRight: 6, verticalAlign: "middle" }} />
+                      Current Plan (Unoptimized)
+                    </span>
+                    <span style={{ fontSize: 13 }}>
+                      <span style={{ display: "inline-block", width: 24, height: 3,
+                        background: '#10b981', marginRight: 6, verticalAlign: "middle" }} />
+                      Optimized Plan (Pro Strategy)
+                    </span>
+                  </div>
+                  <svg viewBox="0 0 580 250" style={{ width: "100%", height: 250 }}>
+                    {(() => {
+                      const LEFT   = 80;
+                      const RIGHT  = 560;
+                      const TOP    = 14;
+                      const BOTTOM = 205;
+                      const W      = RIGHT - LEFT;
+                      const H      = BOTTOM - TOP;
+                      const n      = cumulativeComparison.length;
+                      
+                      const retirementAge = cumulativeComparison[0]?.age || 65;
+
+                      const toX = i => LEFT + (i / Math.max(n - 1, 1)) * W;
+                      const toY = b => BOTTOM - (b / maxTax) * H;
+
+                      const currentPoints   = cumulativeComparison.map((r, i) => `${toX(i)},${toY(r.cumulativeCurrent)}`).join(" ");
+                      const optimizedPoints = cumulativeComparison.map((r, i) => `${toX(i)},${toY(r.cumulativeOptimized)}`).join(" ");
+
+                      // Y gridlines
+                      const steps = [0, 0.25, 0.5, 0.75, 1.0];
+
+                      // Age labels every 5 years
+                      const ageLabels = [];
+                      for (let i = 0; i < n; i++) {
+                        const age = retirementAge + i;
+                        if (age === retirementAge || age % 5 === 0) ageLabels.push({ i, age });
+                      }
+
+                      return (
+                        <>
+                          {steps.map(pct => {
+                            const y = BOTTOM - pct * H;
+                            return (
+                              <g key={pct}>
+                                <line x1={LEFT} y1={y} x2={RIGHT} y2={y}
+                                  stroke={C.border} strokeWidth={1} opacity={0.8} />
+                                <text x={LEFT - 4} y={y + 4} fontSize="10"
+                                  fill={C.gray} textAnchor="end" fontFamily="monospace">
+                                  {fmtCompact(pct * maxTax)}
+                                </text>
+                              </g>
+                            );
+                          })}
+
+                          <polyline points={currentPoints} fill="none" stroke="#ef4444"
+                            strokeWidth={2} strokeDasharray="6,3" opacity={0.9} />
+                          <polyline points={optimizedPoints} fill="none" stroke="#10b981" strokeWidth={2.5} />
+
+                          {/* X axis */}
+                          <line x1={LEFT} y1={BOTTOM} x2={RIGHT} y2={BOTTOM}
+                            stroke={C.border} strokeWidth={1} />
+                          {ageLabels.map(({ i, age }) => (
+                            <g key={age}>
+                              <line x1={toX(i)} y1={BOTTOM} x2={toX(i)} y2={BOTTOM + 4}
+                                stroke={C.ltGray} strokeWidth={1} />
+                              <text x={toX(i)} y={BOTTOM + 15} fontSize="11"
+                                fill={C.gray} textAnchor="middle">{age}</text>
+                            </g>
+                          ))}
+                          <text x={LEFT + W / 2} y={BOTTOM + 28} fontSize="11"
+                            fill={C.ltGray} textAnchor="middle">Age</text>
+                        </>
+                      );
+                    })()}
+                  </svg>
+                </div>
+
+                {/* ── Details Table ── */}
+                <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: 'hidden' }}>
+                  <div style={{ padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
+                    <div style={{ fontSize: 17, fontWeight: 700, color: C.navy }}>Year-by-Year Tax Comparison</div>
+                    <div style={{ fontSize: 15, color: C.gray, marginTop: 8, lineHeight: 1.75 }}>
+                      <strong>Current Tax</strong> = what you pay under your existing plan.{' '}
+                      <strong>Optimized Tax</strong> = estimated tax after applying recommendations.{' '}
+                      <strong>Savings</strong> = the net benefit in that year. Rows highlighted green have identified savings.
+                      <br />
+                      <em>Note: Roth conversions cost more tax now but save more later — the "Savings" column shows the net lifetime benefit allocated to each year.</em>
+                    </div>
+                  </div>
+                  <div style={{ overflowY: 'auto', maxHeight: '55vh' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ background: '#f8fafc' }}>
+                          {['Year', 'Age', 'Bracket', 'Current Tax', 'Optimized Tax', 'Savings', 'Roth Convert', 'Bracket Fill'].map(h => (
+                            <th key={h} style={thS}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {yearlyComparison.map((row, i) => (
+                          <tr key={row.year} style={{ background: row.savings > 0 ? '#f0fdf4' : i % 2 === 0 ? '#fff' : '#fafbfc' }}>
+                            <td style={{ ...tdS, fontWeight: 600, color: C.navy }}>{row.year}</td>
+                            <td style={tdS}>{row.age}</td>
+                            <td style={{ ...tdS, fontFamily: FONT_MONO }}>{row.currentBracket}</td>
+                            <td style={{ ...tdS, fontFamily: FONT_MONO, color: '#ef4444' }}>{fmtCompact(row.currentTax)}</td>
+                            <td style={{ ...tdS, fontFamily: FONT_MONO, color: '#10b981', fontWeight: row.savings > 0 ? 700 : 400 }}>{fmtCompact(row.optimizedTax)}</td>
+                            <td style={{ ...tdS, fontFamily: FONT_MONO, fontWeight: 700, color: row.savings > 0 ? '#10b981' : C.ltGray }}>
+                              {row.savings > 0 ? `+${fmtCompact(row.savings)}` : '—'}
+                            </td>
+                            <td style={{ ...tdS, fontFamily: FONT_MONO, color: C.accent }}>
+                              {row.rothConversion > 0 ? fmtCompact(row.rothConversion) : '—'}
+                            </td>
+                            <td style={{ ...tdS, fontFamily: FONT_MONO, color: '#1d4ed8' }}>
+                              {row.bracketFill > 0 ? fmtCompact(row.bracketFill) : '—'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot>
+                        <tr style={{ background: '#f1f5f9', borderTop: `2px solid ${C.border}` }}>
+                          <td style={{ ...tdS, fontWeight: 700, color: C.navy }} colSpan={3}>Totals</td>
+                          <td style={{ ...tdS, fontFamily: FONT_MONO, fontWeight: 700, color: '#ef4444' }}>
+                            {fmtCompact(yearlyComparison.reduce((s, r) => s + r.currentTax, 0))}
+                          </td>
+                          <td style={{ ...tdS, fontFamily: FONT_MONO, fontWeight: 700, color: '#10b981' }}>
+                            {fmtCompact(yearlyComparison.reduce((s, r) => s + r.optimizedTax, 0))}
+                          </td>
+                          <td style={{ ...tdS, fontFamily: FONT_MONO, fontWeight: 800, color: '#10b981' }}>
+                            {(() => { const s = yearlyComparison.reduce((a, r) => a + r.savings, 0); return s > 0 ? `+${fmtCompact(s)}` : '—'; })()}
+                          </td>
+                          <td style={tdS} colSpan={2} />
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
                 </div>
               </div>
-              <div style={{ overflowY: 'auto', maxHeight: '55vh' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ background: '#f8fafc' }}>
-                      {['Year', 'Age', 'Bracket', 'Current Tax', 'Optimized Tax', 'Savings', 'Roth Convert', 'Bracket Fill'].map(h => (
-                        <th key={h} style={thS}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {yearlyComparison.map((row, i) => (
-                      <tr key={row.year} style={{ background: row.savings > 0 ? '#f0fdf4' : i % 2 === 0 ? '#fff' : '#fafbfc' }}>
-                        <td style={{ ...tdS, fontWeight: 600, color: C.navy }}>{row.year}</td>
-                        <td style={tdS}>{row.age}</td>
-                        <td style={{ ...tdS, fontFamily: FONT_MONO }}>{row.currentBracket}</td>
-                        <td style={{ ...tdS, fontFamily: FONT_MONO, color: '#ef4444' }}>{fmtCompact(row.currentTax)}</td>
-                        <td style={{ ...tdS, fontFamily: FONT_MONO, color: '#10b981', fontWeight: row.savings > 0 ? 700 : 400 }}>{fmtCompact(row.optimizedTax)}</td>
-                        <td style={{ ...tdS, fontFamily: FONT_MONO, fontWeight: 700, color: row.savings > 0 ? '#10b981' : C.ltGray }}>
-                          {row.savings > 0 ? `+${fmtCompact(row.savings)}` : '—'}
-                        </td>
-                        <td style={{ ...tdS, fontFamily: FONT_MONO, color: C.accent }}>
-                          {row.rothConversion > 0 ? fmtCompact(row.rothConversion) : '—'}
-                        </td>
-                        <td style={{ ...tdS, fontFamily: FONT_MONO, color: '#1d4ed8' }}>
-                          {row.bracketFill > 0 ? fmtCompact(row.bracketFill) : '—'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr style={{ background: '#f1f5f9', borderTop: `2px solid ${C.border}` }}>
-                      <td style={{ ...tdS, fontWeight: 700, color: C.navy }} colSpan={3}>Totals</td>
-                      <td style={{ ...tdS, fontFamily: FONT_MONO, fontWeight: 700, color: '#ef4444' }}>
-                        {fmtCompact(yearlyComparison.reduce((s, r) => s + r.currentTax, 0))}
-                      </td>
-                      <td style={{ ...tdS, fontFamily: FONT_MONO, fontWeight: 700, color: '#10b981' }}>
-                        {fmtCompact(yearlyComparison.reduce((s, r) => s + r.optimizedTax, 0))}
-                      </td>
-                      <td style={{ ...tdS, fontFamily: FONT_MONO, fontWeight: 800, color: '#10b981' }}>
-                        {(() => { const s = yearlyComparison.reduce((a, r) => a + r.savings, 0); return s > 0 ? `+${fmtCompact(s)}` : '—'; })()}
-                      </td>
-                      <td style={tdS} colSpan={2} />
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </div>
+            )
           )}
 
           {/* ── TAX DIAGNOSIS ── */}
@@ -655,6 +788,47 @@ function UpgradePrompt() {
         padding: '12px 28px', borderRadius: 10, textDecoration: 'none',
         fontSize: 17, fontWeight: 700, fontFamily: "'DM Sans', sans-serif" }}>
         Upgrade to Pro →
+      </a>
+    </div>
+  );
+}
+
+
+// ── Locked paywall overlay ───────────────────────────────────────────────────
+function LockedOverlay({ title, desc }) {
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+      border: '1px solid #334155',
+      borderRadius: 16,
+      padding: '44px 36px',
+      color: '#fff',
+      textAlign: 'center',
+      maxWidth: 580,
+      margin: '32px auto',
+      boxShadow: '0 10px 25px -5px rgba(0,0,0,0.3), 0 8px 10px -6px rgba(0,0,0,0.3)',
+    }}>
+      <div style={{ fontSize: 44, marginBottom: 18, filter: 'drop-shadow(0 2px 8px rgba(245,158,11,0.2))' }}>🔒</div>
+      <h3 style={{ fontSize: 21, fontWeight: 800, color: '#f8fafc', marginBottom: 14, fontFamily: "'DM Sans', sans-serif" }}>
+        {title} is a Pro Feature
+      </h3>
+      <p style={{ fontSize: 15, color: '#94a3b8', lineHeight: 1.7, marginBottom: 28, maxWidth: 440, margin: '0 auto 28px' }}>
+        {desc}
+      </p>
+      <a href="/pricing" style={{
+        display: 'inline-block',
+        background: '#2d6a4f',
+        color: '#fff',
+        padding: '11px 26px',
+        borderRadius: 8,
+        textDecoration: 'none',
+        fontSize: 15,
+        fontWeight: 700,
+        fontFamily: "'DM Sans', sans-serif",
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.15)',
+        transition: 'background 0.2s',
+      }}>
+        Upgrade to Pro & Unlock →
       </a>
     </div>
   );

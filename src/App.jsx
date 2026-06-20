@@ -17,7 +17,7 @@ import { DEFAULTS } from "./utils/defaults";
 import { useSubscription } from "./context/SubscriptionContext";
 
 import InstructionsTab      from "./components/InstructionsTab";
-// import TaxOptimizationTab from "./components/TaxOptimizationTab"; // hidden — Phase 5 branch
+import TaxOptimizationTab from "./components/TaxOptimizationTab";
 import SettingsTab          from "./components/SettingsTab";
 import SpendingPhasesTab    from "./components/SpendingPhasesTab";
 import CompareTab           from "./components/CompareTab";
@@ -308,7 +308,7 @@ export default function App() {
           { id: "settings",     label: "Settings & Accounts" },
           { id: "phases",       label: "Spending Phases" },
           { id: "compare",      label: "vs 4% Rule" },
-          { id: "taxopt", label: "⚡ Tax Optimization Pro", comingSoon: true },
+          { id: "taxopt", label: "⚡ Tax Optimization Pro" },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -372,11 +372,9 @@ export default function App() {
           />
         )}
 
-        {/* Tax Optimization tab content — hidden until Phase 5 rewrite
         {activeTab === "taxopt" && (
           <TaxOptimizationTab inputs={inputs} />
         )}
-        */}
 
         {activeTab === "compare" && (
           <CompareTab
