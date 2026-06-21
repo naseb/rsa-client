@@ -25,9 +25,15 @@ export default function LoadingOverlay({ loading, error }) {
         }}
       >
         <strong>Solver Error:</strong> {error}
-        <div style={{ fontSize: 11, color: C.gray, marginTop: 4 }}>
-          Make sure the API server is running on localhost:3001
-        </div>
+        {window.location.hostname === "localhost" ? (
+          <div style={{ fontSize: 11, color: C.gray, marginTop: 4 }}>
+            Make sure the API server is running on localhost:3001
+          </div>
+        ) : (
+          <div style={{ fontSize: 11, color: C.gray, marginTop: 4 }}>
+            If this persists, please try reloading or contact support.
+          </div>
+        )}
       </div>
     );
   }
