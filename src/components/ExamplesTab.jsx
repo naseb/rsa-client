@@ -169,7 +169,7 @@ export default function ExamplesTab({ onLoadScenario }) {
         
         {/* Card A */}
         <div 
-          onClick={() => onLoadScenario && onLoadScenario(SCENARIO_A, "compare")}
+          onClick={() => onLoadScenario && onLoadScenario(SCENARIO_A, "compare", "Sequence Risk")}
           className="demo-card demo-card-a"
           style={{
             border: `1px solid #fde68a`, 
@@ -220,7 +220,7 @@ export default function ExamplesTab({ onLoadScenario }) {
 
         {/* Card B */}
         <div 
-          onClick={() => onLoadScenario && onLoadScenario(SCENARIO_B, "taxopt")}
+          onClick={() => onLoadScenario && onLoadScenario(SCENARIO_B, "taxopt", "RMD Tax Bomb")}
           className="demo-card demo-card-b"
           style={{
             border: `1px solid #bfdbfe`, 
@@ -271,7 +271,7 @@ export default function ExamplesTab({ onLoadScenario }) {
 
         {/* Card C */}
         <div 
-          onClick={() => onLoadScenario && onLoadScenario(SCENARIO_C, "taxopt")}
+          onClick={() => onLoadScenario && onLoadScenario(SCENARIO_C, "taxopt", "Brokerage Bridge")}
           className="demo-card demo-card-c"
           style={{
             border: `1px solid #a7f3d0`, 

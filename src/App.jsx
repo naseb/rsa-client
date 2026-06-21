@@ -16,8 +16,6 @@ import { C, FONT_BODY, FONT_MONO, fmtCompact, STORAGE_KEY } from "./utils/theme"
 import { DEFAULTS } from "./utils/defaults";
 import { useSubscription } from "./context/SubscriptionContext";
 
-import InstructionsTab      from "./components/InstructionsTab";
-import ExamplesTab          from "./components/ExamplesTab";
 import TaxOptimizationTab from "./components/TaxOptimizationTab";
 import SettingsTab          from "./components/SettingsTab";
 import SpendingPhasesTab    from "./components/SpendingPhasesTab";
@@ -30,8 +28,9 @@ export default function App() {
   const API_URL   = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
   // ── Tab state ───────────────────────────────────────────────────────────────
-  const [activeTab, setActiveTab] = useState("instructions");
+  const [activeTab, setActiveTab] = useState("phases");
   const [saveMsg,   setSaveMsg]   = useState("");
+  const [loadedScenario, setLoadedScenario] = useState(null);
 
   // ── All user input state ────────────────────────────────────────────────────
   const [currentAge,       setCurrentAge]       = useState(DEFAULTS.currentAge);
@@ -72,6 +71,7 @@ export default function App() {
           transitionYears: setTransitionYears, smoothTransition: setSmoothTransition,
           marketReturns: setMarketReturns, spendingOverrides: setSpendingOverrides,
           portfolioOverrides: setPortfolioOverrides, accounts: setAccounts,
+          loadedScenario: setLoadedScenario,
         };
         Object.entries(setters).forEach(([key, setter]) => {
           if (data[key] != null) setter(data[key]);
@@ -88,6 +88,7 @@ export default function App() {
     ss67, ssStartAge, pensionAmount, pensionStartAge, pensionHasCola, cola, defaultReturn, inflationRate, targetEndBalance,
     phases, transitionYears, smoothTransition,
     marketReturns, spendingOverrides, portfolioOverrides, accounts,
+    loadedScenario,
   };
 
   // ── Auto-save to localStorage (debounced) ──────────────────────────────────
@@ -106,7 +107,7 @@ export default function App() {
     currentAge, retirementAge, lifeExpectancy, filingStatus,
     ss67, ssStartAge, pensionAmount, pensionStartAge, pensionHasCola, cola, defaultReturn, inflationRate, targetEndBalance,
     phases, transitionYears, smoothTransition,
-    marketReturns, spendingOverrides, accounts, portfolioOverrides,
+    marketReturns, spendingOverrides, accounts, portfolioOverrides, loadedScenario,
   ]);
 
   // ── API hooks ───────────────────────────────────────────────────────────────
@@ -146,7 +147,7 @@ export default function App() {
       alert(err.message);
     }
   };
-  const handleLoadScenario = (scenarioData, targetTab) => {
+  const handleLoadScenario = (scenarioData, targetTab, scenarioName) => {
     setCurrentAge(scenarioData.currentAge);
     setRetirementAge(scenarioData.retirementAge);
     setLifeExpectancy(scenarioData.lifeExpectancy);
@@ -167,6 +168,7 @@ export default function App() {
     setSpendingOverrides(scenarioData.spendingOverrides || {});
     setPortfolioOverrides(scenarioData.portfolioOverrides || {});
     setAccounts(scenarioData.accounts);
+    setLoadedScenario(scenarioName || "Demo Scenario");
     setActiveTab(targetTab || "phases");
   };
 
@@ -208,10 +210,14 @@ export default function App() {
             transitionYears: setTransitionYears, smoothTransition: setSmoothTransition,
             marketReturns: setMarketReturns, spendingOverrides: setSpendingOverrides,
             portfolioOverrides: setPortfolioOverrides, accounts: setAccounts,
+            loadedScenario: setLoadedScenario,
           };
           Object.entries(setters).forEach(([key, setter]) => {
             if (data[key] != null) setter(data[key]);
           });
+          if (data.loadedScenario === undefined) {
+            setLoadedScenario(null);
+          }
         } catch {
           alert("Invalid file — please select a valid RSA backup.");
         }
@@ -237,192 +243,268 @@ export default function App() {
       });
       setSpendingOverrides({});
       setPortfolioOverrides({});
+      setLoadedScenario(null);
     }
   };
 
   const totalBalance = accounts.reduce((s, a) => s + a.balance, 0);
 
   // ── Header button style ─────────────────────────────────────────────────────
-  // Buttons sit on the dark forest-green header — use cream/ivory tones
+  // Buttons sit on the light actions header bar — use dark navy/forest-green tones
   const headerBtn = {
-    padding: "5px 11px",
-    border: "1px solid rgba(247,243,234,0.18)",
+    padding: "6px 12px",
+    border: `1px solid ${C.border}`,
     borderRadius: 7,
-    background: "rgba(247,243,234,0.08)",
-    color: "#f7f3ea",
-    fontSize: 11,
+    background: "#ffffff",
+    color: C.navy,
+    fontSize: 12,
     fontWeight: 600,
     cursor: "pointer",
     fontFamily: FONT_BODY,
-    transition: "background 0.15s",
+    transition: "all 0.15s",
   };
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div style={{ fontFamily: FONT_BODY, background: C.pageBg, minHeight: "100vh" }}>
+    <div style={{ fontFamily: FONT_BODY, background: C.pageBg, minHeight: "100vh", display: "flex" }}>
       {/* Fonts — Source Sans 3 + JetBrains Mono */}
       <link
         href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
       />
-      {/* ══════════ HEADER ══════════ */}
+
+      {/* ══════════ LEFT SIDEBAR ══════════ */}
       <div className="no-print" style={{
-        background: "linear-gradient(135deg,#1c3829 0%,#2d5a47 50%,#1c3829 100%)",
-        padding: "13px 32px",
+        width: 260,
+        background: "linear-gradient(180deg, #1c3829 0%, #11261a 100%)",
+        borderRight: "2px solid #b8860b",
+        color: "#f7f3ea",
         display: "flex",
+        flexDirection: "column",
         justifyContent: "space-between",
-        alignItems: "center",
-        borderBottom: "2px solid #b8860b",
+        flexShrink: 0,
       }}>
         <div>
-          <div onClick={() => navigate('/')} style={{ color: "#f7f3ea", fontSize: 20, fontWeight: 800, cursor: "pointer" }}>
-            <span style={{ color: "#b8860b" }}>◆</span> Retirement Spending Analyzer
+          {/* Logo / Branding */}
+          <div onClick={() => navigate('/app')} style={{ padding: "24px 20px", borderBottom: "1px solid rgba(184, 134, 11, 0.2)", cursor: "pointer" }}>
+            <div style={{ color: "#f7f3ea", fontSize: 18, fontWeight: 800, letterSpacing: "0.02em" }}>
+              <span style={{ color: "#b8860b" }}>◆</span> RSA Planner
+            </div>
+            <div style={{ color: "rgba(247,243,234,0.5)", fontSize: 11, marginTop: 4 }}>
+              Retirement Spending Analyzer
+            </div>
           </div>
-          <div style={{ color: "rgba(247,243,234,0.55)", fontSize: 13, marginTop: 2 }}>
-            Spend more when you're active, less when you slow down
-            &nbsp;·&nbsp; Portfolio: {fmtCompact(totalBalance)}
-            &nbsp;·&nbsp; Goal: {fmtCompact(targetEndBalance)} at {lifeExpectancy}
+
+          {/* Navigation Links */}
+          <div style={{ padding: "20px 12px", display: "flex", flexDirection: "column", gap: 6 }}>
+            {[
+              { id: "phases",       label: "📊 Dashboard" },
+              { id: "compare",      label: "📈 vs 4% Rule" },
+              { id: "taxopt",       label: "⚡ Tax Optimization Pro" },
+              { id: "settings",     label: "👤 Your Data" },
+            ].map((tab) => {
+              const active = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 16px",
+                    border: "none",
+                    borderRadius: 8,
+                    background: active ? "rgba(184, 134, 11, 0.15)" : "transparent",
+                    color: active ? "#fcd34d" : "rgba(247, 243, 234, 0.8)",
+                    borderLeft: active ? "4px solid #b8860b" : "4px solid transparent",
+                    fontWeight: active ? 700 : 500,
+                    fontSize: 14.5,
+                    cursor: "pointer",
+                    textAlign: "left",
+                    fontFamily: FONT_BODY,
+                    transition: "all 0.15s",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    outline: "none",
+                  }}
+                  onMouseOver={(e) => {
+                    if (!active) {
+                      e.currentTarget.style.background = "rgba(247, 243, 234, 0.05)";
+                      e.currentTarget.style.color = "#f7f3ea";
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    if (!active) {
+                      e.currentTarget.style.background = "transparent";
+                      e.currentTarget.style.color = "rgba(247, 243, 234, 0.8)";
+                    }
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {saveMsg && (
-            <span style={{ fontSize: 11, background: "rgba(45,106,79,0.3)", color: "#a7f3d0", padding: "3px 10px", borderRadius: 10, fontWeight: 600 }}>
-              {saveMsg}
-            </span>
-          )}
-          <button onClick={() => navigate("/")} style={{ ...headerBtn, background: "rgba(45,106,79,0.2)", borderColor: "rgba(45,106,79,0.4)", color: "#a7f3d0" }}>
-            ⌂ Home
-          </button>
-          {isTrialing && (
-            <button onClick={() => navigate("/pricing")} style={{
-              ...headerBtn,
-              background: "rgba(245,158,11,0.25)",
-              borderColor: "rgba(245,158,11,0.5)",
-              color: "#fcd34d",
-              fontWeight: 700,
-            }}>
-              ★ Upgrade to Premium
-            </button>
-          )}
-          <button onClick={handleManageBilling} style={{ ...headerBtn, background: "rgba(184,134,11,0.2)", borderColor: "rgba(184,134,11,0.4)", color: "#fcd34d" }}>
-            ⚙ Account
-          </button>
-          <button onClick={handleExport} style={{
-            ...headerBtn,
-            color: isTrialing ? "rgba(247,243,234,0.6)" : "#f7f3ea",
-          }}>
-            {isTrialing ? "🔒 Export" : "💾 Export"}
-          </button>
-          <button onClick={handleImport} style={headerBtn}>📂 Import</button>
-          <button onClick={handleReset}  style={headerBtn}>↺ Reset</button>
-          <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
+        {/* Sidebar Footer Info */}
+        <div style={{ padding: 20, borderTop: "1px solid rgba(184, 134, 11, 0.1)", fontSize: 11, color: "rgba(247,243,234,0.4)" }}>
+          <div>Auto-saved in browser.</div>
+          <div style={{ marginTop: 4 }}>Use Export for backups.</div>
         </div>
       </div>
-      {/* ══════════ TAB BAR ══════════ */}
-      <div className="no-print" style={{
-        background: "#f7f3ea",
-        borderBottom: "2px solid #b8860b",
-        padding: "0 32px",
-        display: "flex",
-        gap: 4,
-      }}>
-        {[
-          { id: "instructions", label: "Instructions" },
-          { id: "examples",     label: "Demo Scenarios" },
-          { id: "settings",     label: "Settings & Accounts" },
-          { id: "phases",       label: "Spending Phases" },
-          { id: "compare",      label: "vs 4% Rule" },
-          { id: "taxopt", label: "⚡ Tax Optimization Pro" },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => !tab.comingSoon && setActiveTab(tab.id)}
-            title={tab.comingSoon ? "Coming Soon" : undefined}
-            style={{
-              padding: "13px 20px",
-              border: "none",
-              borderBottom: activeTab === tab.id ? `3px solid #2d6a4f` : "3px solid transparent",
-              background: "transparent",
-              color: tab.comingSoon ? C.ltGray : activeTab === tab.id ? "#2d6a4f" : C.gray,
-              fontWeight: activeTab === tab.id ? 700 : 500,
-              fontSize: 15,
-              cursor: tab.comingSoon ? "default" : "pointer",
-              fontFamily: FONT_BODY,
-              transition: "all 0.2s",
-              opacity: tab.comingSoon ? 0.65 : 1,
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            {tab.label}
-            {tab.comingSoon && (
-              <span style={{
-                fontSize: 9, fontWeight: 700, letterSpacing: "0.06em",
-                textTransform: "uppercase", padding: "2px 7px", borderRadius: 100,
-                background: "#b8860b", color: "#fff", whiteSpace: "nowrap",
-              }}>Soon</span>
+
+      {/* ══════════ RIGHT PANEL (HEADER + CONTENT + FOOTER) ══════════ */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100vh", overflowY: "auto" }}>
+        
+        {/* ══════════ TOP ACTIONS HEADER ══════════ */}
+        <div className="no-print" style={{
+          background: "#ffffff",
+          padding: "16px 32px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          borderBottom: `1px solid ${C.border}`,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
+        }}>
+          <div>
+            <div style={{ color: C.navy, fontSize: 14, fontWeight: 600 }}>
+              Portfolio: <span style={{ color: C.accent, fontFamily: FONT_MONO }}>{fmtCompact(totalBalance)}</span>
+              &nbsp;&nbsp;·&nbsp;&nbsp;
+              Goal: <span style={{ color: C.orange, fontFamily: FONT_MONO }}>{fmtCompact(targetEndBalance)}</span> at age {lifeExpectancy}
+            </div>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {saveMsg && (
+              <span style={{ fontSize: 11, background: "rgba(45,106,79,0.1)", color: C.accent, padding: "4px 10px", borderRadius: 10, fontWeight: 600 }}>
+                {saveMsg}
+              </span>
             )}
-          </button>
-        ))}
-      </div>
-      {/* ══════════ TAB CONTENT ══════════ */}
-      <div style={{ padding: "24px 32px", maxWidth: 1200, margin: "0 auto" }}>
+            <button onClick={() => navigate("/")} style={{ ...headerBtn, background: "rgba(45,106,79,0.05)", borderColor: "rgba(45,106,79,0.15)", color: C.accent }}>
+              ⌂ Home
+            </button>
+            {isTrialing && (
+              <button onClick={() => navigate("/pricing")} style={{
+                ...headerBtn,
+                background: "rgba(245,158,11,0.1)",
+                borderColor: "rgba(245,158,11,0.2)",
+                color: C.orange,
+                fontWeight: 700,
+              }}>
+                ★ Upgrade to Premium
+              </button>
+            )}
+            <button onClick={handleManageBilling} style={{ ...headerBtn, background: "rgba(184,134,11,0.05)", borderColor: "rgba(184,134,11,0.15)", color: C.orange }}>
+              ⚙ Account
+            </button>
+            <button onClick={handleExport} style={{
+              ...headerBtn,
+              color: isTrialing ? C.ltGray : C.navy,
+            }}>
+              {isTrialing ? "🔒 Export" : "💾 Export"}
+            </button>
+            <button onClick={handleImport} style={headerBtn}>📂 Import</button>
+            <button onClick={handleReset}  style={headerBtn}>↺ Reset</button>
+            <UserButton appearance={{ elements: { avatarBox: { width: 32, height: 32 } } }} />
+          </div>
+        </div>
 
-        {activeTab === "instructions" && <InstructionsTab />}
-
-        {activeTab === "examples" && <ExamplesTab onLoadScenario={handleLoadScenario} />}
-
-        {activeTab === "settings" && (
-          <SettingsTab
-            inputs={inputs}
-            setField={setField}
-            accounts={accounts}
-            setAccounts={setAccounts}
-          />
+        {/* ── Demo Mode Banner ── */}
+        {loadedScenario && (
+          <div className="no-print" style={{
+            background: "#fffbeb",
+            borderBottom: "1px solid #fcd34d",
+            padding: "12px 32px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            color: "#92400e",
+            fontSize: 14.5,
+            fontWeight: 500,
+            transition: "all 0.2s",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 16 }}>⚠️</span>
+              <span>
+                <strong>Simulated Data Active:</strong> You are currently viewing the <strong>{loadedScenario}</strong> case study. To work with your own data, click <span onClick={() => setActiveTab("settings")} style={{ textDecoration: "underline", fontWeight: 700, cursor: "pointer", color: C.accent }}>Your Data</span>. To clear this demo and start fresh, click <span onClick={handleReset} style={{ textDecoration: "underline", fontWeight: 700, cursor: "pointer", color: C.accent }}>Reset</span> in the top right.
+              </span>
+            </div>
+            <button
+              onClick={() => setLoadedScenario(null)}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "#b45309",
+                cursor: "pointer",
+                fontSize: 18,
+                fontWeight: 700,
+                lineHeight: 1,
+              }}
+              title="Dismiss banner"
+            >
+              ×
+            </button>
+          </div>
         )}
 
-        {activeTab === "phases" && (
-          <SpendingPhasesTab
-            inputs={inputs}
-            setField={setField}
-            solverData={solverData}
-            loading={solverLoading}
-            error={solverError}
-            marketReturns={marketReturns}
-            setMarketReturns={setMarketReturns}
-            spendingOverrides={spendingOverrides}
-            setSpendingOverrides={setSpendingOverrides}
-            portfolioOverrides={portfolioOverrides}
-            setPortfolioOverrides={setPortfolioOverrides}
-          />
-        )}
+        {/* ══════════ CONTENT AREA ══════════ */}
+        <div style={{ padding: "32px", flex: 1 }}>
 
-        {activeTab === "taxopt" && (
-          <TaxOptimizationTab inputs={inputs} />
-        )}
+          {activeTab === "settings" && (
+            <SettingsTab
+              inputs={inputs}
+              setField={setField}
+              accounts={accounts}
+              setAccounts={setAccounts}
+              onLoadScenario={handleLoadScenario}
+            />
+          )}
 
-        {activeTab === "compare" && (
-          <CompareTab
-            compareData={compareData}
-            loading={compareLoading}
-            error={compareError}
-            baseSpending={solverData?.baseSpending || 0}
-            inputs={inputs}
-          />
-        )}
+          {activeTab === "phases" && (
+            <SpendingPhasesTab
+              inputs={inputs}
+              setField={setField}
+              solverData={solverData}
+              loading={solverLoading}
+              error={solverError}
+              marketReturns={marketReturns}
+              setMarketReturns={setMarketReturns}
+              spendingOverrides={spendingOverrides}
+              setSpendingOverrides={setSpendingOverrides}
+              portfolioOverrides={portfolioOverrides}
+              setPortfolioOverrides={setPortfolioOverrides}
+            />
+          )}
 
-      </div>
-      {/* ══════════ FOOTER ══════════ */}
-      <div className="no-print" style={{
-        padding: "12px 32px",
-        textAlign: "center",
-        fontSize: 14,
-        color: C.ltGray,
-        borderTop: `1px solid ${C.border}`,
-      }}>
-        Auto-saved in browser. Use Export for backups. This is a planning tool — consult a financial advisor.
+          {activeTab === "taxopt" && (
+            <TaxOptimizationTab inputs={inputs} />
+          )}
+
+          {activeTab === "compare" && (
+            <CompareTab
+              compareData={compareData}
+              loading={compareLoading}
+              error={compareError}
+              baseSpending={solverData?.baseSpending || 0}
+              inputs={inputs}
+            />
+          )}
+
+        </div>
+
+        {/* ══════════ FOOTER ══════════ */}
+        <div className="no-print" style={{
+          padding: "16px 32px",
+          textAlign: "center",
+          fontSize: 13,
+          color: C.ltGray,
+          borderTop: `1px solid ${C.border}`,
+          background: "#ffffff",
+        }}>
+          This is a planning tool — consult a financial advisor. All calculations run locally in memory.
+        </div>
+
       </div>
     </div>
   );

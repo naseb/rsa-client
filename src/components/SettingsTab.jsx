@@ -8,13 +8,17 @@
  * account card backgrounds updated to match money theme.
  */
 
+import { useState } from "react";
 import NumericInput from "./NumericInput";
 import { C, FONT_BODY, FONT_MONO, fmtCompact, ssClaimingMultiplier, rmdStartAge } from "../utils/theme";
 import { DEFAULTS } from "../utils/defaults";
+import InstructionsTab from "./InstructionsTab";
+import ExamplesTab from "./ExamplesTab";
 
 export default function SettingsTab({
-  inputs, setField, accounts, setAccounts,
+  inputs, setField, accounts, setAccounts, onLoadScenario,
 }) {
+  const [subView, setSubView] = useState("settings");
   const {
     currentAge, retirementAge, lifeExpectancy, filingStatus,
     ss67, ssStartAge, pensionAmount, pensionStartAge, pensionHasCola, cola, defaultReturn,
@@ -43,8 +47,141 @@ export default function SettingsTab({
   // Shared label style
   const labelStyle = { fontSize: 13, color: C.gray, marginBottom: 5, fontWeight: 500 };
 
+  if (subView === "instructions") {
+    return (
+      <div>
+        <div style={{ marginBottom: 20, display: "flex", alignItems: "center" }}>
+          <button
+            onClick={() => setSubView("settings")}
+            style={{
+              padding: "8px 16px",
+              background: C.accent,
+              color: "#fff",
+              border: "none",
+              borderRadius: 6,
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              fontFamily: FONT_BODY,
+            }}
+          >
+            ← Back to Your Data
+          </button>
+        </div>
+        <InstructionsTab />
+      </div>
+    );
+  }
+
+  if (subView === "examples") {
+    return (
+      <div>
+        <div style={{ marginBottom: 20, display: "flex", alignItems: "center" }}>
+          <button
+            onClick={() => setSubView("settings")}
+            style={{
+              padding: "8px 16px",
+              background: C.accent,
+              color: "#fff",
+              border: "none",
+              borderRadius: 6,
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              fontFamily: FONT_BODY,
+            }}
+          >
+            ← Back to Your Data
+          </button>
+        </div>
+        <ExamplesTab onLoadScenario={onLoadScenario} />
+      </div>
+    );
+  }
+
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, maxWidth: 960 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 960 }}>
+      {/* ── Help & Demo Navigation Banners ── */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 20,
+        background: C.blueBg,
+        border: `1px solid ${C.border}`,
+        borderRadius: 12,
+        padding: 20,
+      }}>
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 8 }}>
+              📖 Setup &amp; Usage Instructions
+            </div>
+            <div style={{ fontSize: 13, color: C.slate, marginBottom: 12 }}>
+              Learn how the planner models spending phases, inflation, and tax optimization.
+            </div>
+          </div>
+          <button
+            onClick={() => setSubView("instructions")}
+            style={{
+              alignSelf: "flex-start",
+              padding: "8px 14px",
+              background: "transparent",
+              color: C.accent,
+              border: `1px solid ${C.accent}`,
+              borderRadius: 6,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: "pointer",
+              fontFamily: FONT_BODY,
+              transition: "background 0.15s",
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = "rgba(45, 106, 79, 0.05)"; }}
+            onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
+          >
+            Read Instructions →
+          </button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", borderLeft: `1px dashed ${C.border}`, paddingLeft: 20 }}>
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 600, color: C.navy, marginBottom: 8 }}>
+              💡 Interactive Demo Scenarios
+            </div>
+            <div style={{ fontSize: 13, color: C.slate, marginBottom: 12 }}>
+              Load pre-built financial profiles (Sequence Risk, RMD Tax Bomb) to see the app in action.
+            </div>
+          </div>
+          <button
+            onClick={() => setSubView("examples")}
+            style={{
+              alignSelf: "flex-start",
+              padding: "8px 14px",
+              background: "transparent",
+              color: C.accent,
+              border: `1px solid ${C.accent}`,
+              borderRadius: 6,
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: "pointer",
+              fontFamily: FONT_BODY,
+              transition: "background 0.15s",
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = "rgba(45, 106, 79, 0.05)"; }}
+            onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
+          >
+            Explore Case Studies →
+          </button>
+        </div>
+      </div>
+
+      {/* Main Settings Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
 
       {/* ── Personal ── */}
       <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: 28 }}>
@@ -256,6 +393,8 @@ export default function SettingsTab({
           </button>
         )}
       </div>
+
+    </div>
 
     </div>
   );
