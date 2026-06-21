@@ -107,7 +107,7 @@ export default function TaxOptimizationTab({ inputs }) {
     const windowRows = taxAnalysis.filter(r => r.isInConversionWindow);
     const lastWindowRow = windowRows[windowRows.length - 1];
     const preTaxGoneByEndOfWindow = lastWindowRow && lastWindowRow.preTaxBalance < 5000;
-    const alwaysAtPeakBracket = windowRows.every(r => r.currentBracketRate >= 0.24);
+    const alwaysAtPeakBracket = windowRows.length > 0 && windowRows.every(r => r.currentBracketRate >= 0.24);
     const noPretax = taxAnalysis.every(r => r.preTaxBalance < 5000);
 
     if (noPretax) return {
@@ -115,6 +115,14 @@ export default function TaxOptimizationTab({ inputs }) {
       body: 'Roth conversions and bracket filling only apply to Traditional 401(k) and Traditional IRA balances. Your accounts are already in Roth or Taxable accounts — no conversion action is needed.',
       positive: true,
     };
+
+    if (windowRows.length === 0) return {
+      title: 'Already past RMD start age',
+      body: `You are currently age ${inputs?.currentAge || 70}, which is past your RMD start age of ${summary?.rmdStartAge || 73}. Roth conversions are typically performed before RMDs begin to reduce forced taxable distributions. Since you are already in RMD age, the gap-year conversion window is closed.`,
+      tip: 'You can still look at the Bracket Filling tab for other tax-saving opportunities.',
+      positive: true,
+    };
+
     if (preTaxGoneByEndOfWindow && alwaysAtPeakBracket) return {
       title: 'Pre-tax balance depletes during retirement at your peak bracket',
       body: `Your spending plan withdraws your entire Pre-tax balance by age ${lastWindowRow.age} at the ${windowRows[0].currentBracketLabel} bracket. A Roth conversion would cost the same ${windowRows[0].currentBracketLabel} rate — so there is no tax saving from converting. Your withdrawal sequence is already efficient.`,

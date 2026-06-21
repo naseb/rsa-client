@@ -49,6 +49,14 @@ export default function CompareTab({ compareData, loading, error, baseSpending, 
   const slowGoYears = retiredYears.filter(y => y.phaseName === 'Slow-Go').length;
   const noGoYears   = retiredYears.filter(y => y.phaseName === 'No-Go').length;
 
+  const currentAge = inputs?.currentAge || 50;
+  const retirementAgeVal = inputs?.retirementAge || 65;
+  const phases = inputs?.phases || [];
+  const lifeExpectancyVal = inputs?.lifeExpectancy || 95;
+  
+  const goGoEndAge = phases[1] ? phases[1].startAge - 1 : lifeExpectancyVal;
+  const isGoGoPast = currentAge > goGoEndAge && currentAge >= retirementAgeVal;
+
   // ── Key metrics ────────────────────────────────────────────────────────────
   const fourPctTotal     = cmp?.fourPctTotalSpending  || 0;
   const rsaEndBalance    = cmp?.rsaBalances?.[cmp.rsaBalances.length - 1]         || 0;
@@ -60,9 +68,9 @@ export default function CompareTab({ compareData, loading, error, baseSpending, 
   const lifetimeDiff     = cmp?.lifetimeDiff || 0;
 
   // Shared styles
-  const card = (label, value, sub, color = C.navy) => (
+  const card = (label, value, sub, color = C.navy, opacity = 1) => (
     <div style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12,
-      padding: "20px 22px", flex: 1 }}>
+      padding: "20px 22px", flex: 1, opacity, transition: "opacity 0.2s" }}>
       <div style={{ fontSize: 11, color: C.gray, textTransform: "uppercase",
         letterSpacing: "0.1em", marginBottom: 8, fontWeight: 600 }}>{label}</div>
       <div style={{ fontSize: 28, fontWeight: 800, fontFamily: FONT_MONO, color, lineHeight: 1 }}>{value}</div>
@@ -95,10 +103,11 @@ export default function CompareTab({ compareData, loading, error, baseSpending, 
       {/* ── 4 metric cards ── */}
       <div style={{ display: "flex", gap: 16, marginBottom: 20, flexWrap: "wrap" }}>
         {card(
-          "RSA Go-Go Spending",
+          isGoGoPast ? "RSA Go-Go Spending (Past)" : "RSA Go-Go Spending",
           fmtFull(goGoSpending),
           fmtCompact(goGoSpending / 12) + "/mo",
-          C.goGo
+          C.goGo,
+          isGoGoPast ? 0.4 : 1
         )}
         {card(
           "4% Rule Spending",
@@ -137,8 +146,8 @@ export default function CompareTab({ compareData, loading, error, baseSpending, 
           <div style={{ display: "flex", gap: 6, marginBottom: 18, fontSize: 12 }}>
             {goGoSpending > 0 && (
               <div style={{ flex: goGoYears || 1, background: "#fef3c7", border: "1px solid #fcd34d",
-                borderRadius: 6, padding: "6px 10px", textAlign: "center" }}>
-                <div style={{ fontWeight: 700, color: C.goGo }}>Go-Go</div>
+                borderRadius: 6, padding: "6px 10px", textAlign: "center", opacity: isGoGoPast ? 0.4 : 1, transition: "opacity 0.2s" }}>
+                <div style={{ fontWeight: 700, color: C.goGo }}>Go-Go{isGoGoPast ? " (Past)" : ""}</div>
                 <div style={{ color: C.navy, fontFamily: FONT_MONO, fontSize: 11 }}>{fmtCompact(goGoSpending)}</div>
               </div>
             )}
@@ -160,13 +169,13 @@ export default function CompareTab({ compareData, loading, error, baseSpending, 
 
           {/* RSA spending rows */}
           {[
-            { label: "Go-Go (active years)",    val: goGoSpending,   color: C.goGo },
-            { label: "Slow-Go (winding down)",  val: slowGoSpending, color: C.slowGo },
-            { label: "No-Go (quiet years)",     val: noGoSpending,   color: C.noGo },
+            { label: "Go-Go (active years)",    val: goGoSpending,   color: C.goGo, isPast: isGoGoPast },
+            { label: "Slow-Go (winding down)",  val: slowGoSpending, color: C.slowGo, isPast: false },
+            { label: "No-Go (quiet years)",     val: noGoSpending,   color: C.noGo, isPast: false },
           ].filter(r => r.val > 0).map(r => (
             <div key={r.label} style={{ display: "flex", justifyContent: "space-between",
-              alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${C.border}` }}>
-              <span style={{ fontSize: 15, color: C.slate }}>{r.label}</span>
+              alignItems: "center", padding: "10px 0", borderBottom: `1px solid ${C.border}`, opacity: r.isPast ? 0.4 : 1, transition: "opacity 0.2s" }}>
+              <span style={{ fontSize: 15, color: C.slate }}>{r.label}{r.isPast ? " (Past)" : ""}</span>
               <span style={{ fontSize: 15, fontWeight: 700, fontFamily: FONT_MONO, color: r.color }}>
                 {fmtFull(r.val)}/yr
               </span>
