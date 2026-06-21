@@ -74,6 +74,22 @@ export default function SpendingPhasesTab({
   const numReturnOverrides = Object.keys(marketReturns).length;
   const numSpendingOverrides = Object.keys(spendingOverrides).length;
 
+  const goGoEndAge = phases[1] ? phases[1].startAge - 1 : lifeExpectancy;
+  const isGoGoPast = currentAge > goGoEndAge && currentAge >= retirementAge;
+  const sortedPhases = [...phases].sort((a, b) => a.startAge - b.startAge);
+  if (sortedPhases.length > 0) {
+    sortedPhases[0] = { ...sortedPhases[0], startAge: retirementAge };
+  }
+  let activePhaseName = "";
+  if (currentAge >= retirementAge) {
+    for (let i = sortedPhases.length - 1; i >= 0; i--) {
+      if (currentAge >= sortedPhases[i].startAge) {
+        activePhaseName = sortedPhases[i].name;
+        break;
+      }
+    }
+  }
+
   const spendingLabels = [];
   const spendDenom = Math.max(lifeExpectancy - retirementAge, 1);
   for (let age = retirementAge; age <= lifeExpectancy; age++) {
@@ -225,24 +241,63 @@ export default function SpendingPhasesTab({
       {/* ===== RESULTS BANNER ===== */}
       <div className="print-banner" style={{ background: "linear-gradient(135deg, #1c3829 0%, #2d5a47 40%, #1c3829 100%)", borderRadius: 16, padding: "28px 36px", marginBottom: 20, color: "#fff", position: "relative", overflow: "hidden", borderBottom: "2px solid #b8860b" }}>
         <div style={{ position: "absolute", top: -40, right: -40, width: 250, height: 250, background: "radial-gradient(circle,rgba(184,134,11,0.15) 0%,transparent 70%)", pointerEvents: "none" }} />
-        <div style={{ fontSize: 11, color: "rgba(247,243,234,0.5)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 6 }}>Go-Go Phase Base Spending (Today's Dollars)</div>
-        <div style={{ fontSize: 48, fontWeight: 800, fontFamily: FONT_MONO, color: C.goGo, lineHeight: 1, marginBottom: 2 }}>
-          {fmtFull(le.baseSpending)}<span style={{ fontSize: 18, color: "#64748b", fontWeight: 400, marginLeft: 8 }}>/year</span>
+        <div style={{ fontSize: 11, color: "rgba(247,243,234,0.5)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 6 }}>
+          {isGoGoPast
+            ? `Current Allowed Spending (Age ${currentAge} — ${activePhaseName || "Retired"})`
+            : "Go-Go Phase Base Spending (Today's Dollars)"}
+        </div>
+        <div style={{
+          fontSize: 48,
+          fontWeight: 800,
+          fontFamily: FONT_MONO,
+          color: isGoGoPast
+            ? (C[phases.find((p) => p.name === activePhaseName)?.color] || C.goGo)
+            : C.goGo,
+          lineHeight: 1,
+          marginBottom: 2
+        }}>
+          {fmtFull(isGoGoPast && le.years[0] ? le.years[0].annualSpending : le.baseSpending)}
+          <span style={{ fontSize: 18, color: "rgba(247,243,234,0.5)", fontWeight: 400, marginLeft: 8 }}>/year</span>
         </div>
         <div style={{ fontSize: 16, color: "rgba(247,243,234,0.65)", marginBottom: 20 }}>
-          {fmtFull(Math.floor(le.baseSpending / 12))} / month in active years (in today's purchasing power)
+          {isGoGoPast && le.years[0] ? (
+            <>
+              {fmtFull(Math.floor(le.years[0].annualSpending / 12))} / month (based on Go-Go base of {fmtFull(Math.floor(le.baseSpending / 12))}/mo)
+            </>
+          ) : (
+            <>
+              {fmtFull(Math.floor(le.baseSpending / 12))} / month in active years (in today's purchasing power)
+            </>
+          )}
         </div>
 
         {/* Phase summary cards */}
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
           {phases.map((ph, idx) => {
             const spending = Math.round(le.baseSpending * ph.pct / 100);
+            const pStartAge = idx === 0 ? retirementAge : ph.startAge;
             const endAge = phases[idx + 1] ? phases[idx + 1].startAge - 1 : lifeExpectancy;
+
+            const isPast = currentAge > endAge && currentAge >= retirementAge;
+            const isActive = currentAge >= pStartAge && currentAge <= endAge && currentAge >= retirementAge;
+
             return (
-              <div key={idx} style={{ background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: "14px 20px", border: "1px solid rgba(255,255,255,0.08)", minWidth: 160 }}>
+              <div key={idx} style={{
+                background: isActive ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)",
+                borderRadius: 12,
+                padding: "14px 20px",
+                border: isActive
+                  ? `1.5px solid ${C[ph.color]}`
+                  : "1px solid rgba(255,255,255,0.08)",
+                minWidth: 160,
+                opacity: isPast ? 0.4 : 1,
+                transition: "opacity 0.2s, border-color 0.2s"
+              }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                   <div style={{ width: 10, height: 10, borderRadius: "50%", background: C[ph.color] }} />
-                  <span style={{ fontSize: 12, fontWeight: 700, color: C[ph.color] }}>{ph.name}</span>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: C[ph.color] }}>
+                    {ph.name} {isActive ? " (Active)" : ""}
+                  </span>
                   <span style={{ fontSize: 10, color: "rgba(247,243,234,0.4)" }}>Ages {idx === 0 ? retirementAge : ph.startAge}–{endAge}</span>
                 </div>
                 <div style={{ fontSize: 22, fontWeight: 700, fontFamily: FONT_MONO }}>{fmtFull(spending)}<span style={{ fontSize: 11, color: "rgba(247,243,234,0.4)" }}>/yr</span></div>
@@ -310,43 +365,65 @@ export default function SpendingPhasesTab({
 
         {/* Phase cards */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-          {phases.map((ph, idx) => (
-            <div key={idx} style={{ background: PHASE_BG_COLORS[ph.name], borderRadius: 10, padding: 16, border: `2px solid ${PHASE_COLORS[ph.name] || C.border}` }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
-                <div style={{ width: 12, height: 12, borderRadius: "50%", background: PHASE_COLORS[ph.name] }} />
-                <span style={{ fontSize: 14, fontWeight: 700, color: C.navy }}>{ph.name}</span>
-              </div>
-              <div style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>Starts at Age</div>
-                {idx === 0 ? (
-                  <div style={{ fontFamily: FONT_MONO, fontSize: 13, color: C.navy, fontWeight: 600, padding: "6px 0" }}>
-                    {retirementAge} <span style={{ fontSize: 10, color: C.ltGray }}>(retirement)</span>
+          {phases.map((ph, idx) => {
+            const pStartAge = idx === 0 ? retirementAge : ph.startAge;
+            const pEndAge = phases[idx + 1] ? phases[idx + 1].startAge - 1 : lifeExpectancy;
+            const isPast = currentAge > pEndAge && currentAge >= retirementAge;
+            const isActive = currentAge >= pStartAge && currentAge <= pEndAge && currentAge >= retirementAge;
+
+            return (
+              <div key={idx} style={{
+                background: PHASE_BG_COLORS[ph.name],
+                borderRadius: 10,
+                padding: 16,
+                border: isActive
+                  ? `2px solid ${PHASE_COLORS[ph.name]}`
+                  : `2px solid ${isPast ? C.border : PHASE_COLORS[ph.name]}`,
+                opacity: isPast ? 0.5 : 1,
+                transition: "opacity 0.2s, border-color 0.2s"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
+                  <div style={{ width: 12, height: 12, borderRadius: "50%", background: isPast ? C.gray : PHASE_COLORS[ph.name] }} />
+                  <span style={{ fontSize: 14, fontWeight: 700, color: C.navy }}>
+                    {ph.name}
+                    {isPast && <span style={{ fontSize: 10, color: C.gray, fontWeight: 400, marginLeft: 4 }}>(Past)</span>}
+                    {isActive && <span style={{ fontSize: 10, color: PHASE_COLORS[ph.name], fontWeight: 700, marginLeft: 4 }}>(Active)</span>}
+                  </span>
+                </div>
+                <div style={{ marginBottom: 10 }}>
+                  <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>Starts at Age</div>
+                  {idx === 0 ? (
+                    <div style={{ fontFamily: FONT_MONO, fontSize: 13, color: C.navy, fontWeight: 600, padding: "6px 0" }}>
+                      {retirementAge} <span style={{ fontSize: 10, color: C.ltGray }}>(retirement)</span>
+                    </div>
+                  ) : (
+                    <input type="number" value={ph.startAge} min={retirementAge + 1} max={lifeExpectancy - 1}
+                      disabled={isPast}
+                      onChange={(e) => { const v = parseInt(e.target.value); if (!isNaN(v)) updatePhase(idx, "startAge", v); }}
+                      style={{ fontFamily: FONT_MONO, fontSize: 13, padding: "6px 10px", border: `1px solid ${C.border}`, borderRadius: 6, width: 70, background: isPast ? "#f3f4f6" : "#fff" }}
+                    />
+                  )}
+                </div>
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                    <span style={{ fontSize: 11, color: C.gray }}>Spending Level</span>
+                    <span style={{ fontSize: 13, fontFamily: FONT_MONO, fontWeight: 700, color: isPast ? C.gray : PHASE_COLORS[ph.name] }}>{ph.pct}%</span>
                   </div>
-                ) : (
-                  <input type="number" value={ph.startAge} min={retirementAge + 1} max={lifeExpectancy - 1}
-                    onChange={(e) => { const v = parseInt(e.target.value); if (!isNaN(v)) updatePhase(idx, "startAge", v); }}
-                    style={{ fontFamily: FONT_MONO, fontSize: 13, padding: "6px 10px", border: `1px solid ${C.border}`, borderRadius: 6, width: 70, background: "#fff" }}
+                  <input type="range" min={20} max={120} value={ph.pct}
+                    disabled={isPast}
+                    onChange={(e) => updatePhase(idx, "pct", parseInt(e.target.value))}
+                    style={{ width: "100%", accentColor: isPast ? C.gray : PHASE_COLORS[ph.name] }}
                   />
-                )}
-              </div>
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                  <span style={{ fontSize: 11, color: C.gray }}>Spending Level</span>
-                  <span style={{ fontSize: 13, fontFamily: FONT_MONO, fontWeight: 700, color: PHASE_COLORS[ph.name] }}>{ph.pct}%</span>
-                </div>
-                <input type="range" min={20} max={120} value={ph.pct}
-                  onChange={(e) => updatePhase(idx, "pct", parseInt(e.target.value))}
-                  style={{ width: "100%", accentColor: PHASE_COLORS[ph.name] }}
-                />
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: C.ltGray }}>
-                  <span>20%</span><span>120%</span>
-                </div>
-                <div style={{ marginTop: 6, fontSize: 12, fontFamily: FONT_MONO, fontWeight: 600, color: C.navy }}>
-                  {fmtFull(Math.round(le.baseSpending * ph.pct / 100))}/yr
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: C.ltGray }}>
+                    <span>20%</span><span>120%</span>
+                  </div>
+                  <div style={{ marginTop: 6, fontSize: 12, fontFamily: FONT_MONO, fontWeight: 600, color: C.navy }}>
+                    {fmtFull(Math.round(le.baseSpending * ph.pct / 100))}/yr
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
        {/* ===== CHARTS ===== */}
