@@ -307,23 +307,6 @@ export default function SpendingPhasesTab({
           </div>
         </div>
 
-        {/* Phase bar */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ display: "flex", borderRadius: 10, overflow: "hidden", height: 48, border: `1px solid ${C.border}` }}>
-            {phases.map((ph, idx) => {
-              const start = idx === 0 ? retirementAge : ph.startAge;
-              const end = phases[idx + 1] ? phases[idx + 1].startAge : lifeExpectancy + 1;
-              const total = lifeExpectancy - retirementAge + 1;
-              const pct = ((end - start) / total) * 100;
-              return (
-                <div key={idx} style={{ width: `${pct}%`, background: PHASE_BG_COLORS[ph.name] || "#f8fafc", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", borderRight: idx < phases.length - 1 ? `2px solid ${C.border}` : "none", transition: "width 0.3s" }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: PHASE_COLORS[ph.name] || C.navy }}>{ph.name}</span>
-                  <span style={{ fontSize: 10, color: C.gray }}>{start}–{end - 1} · {ph.pct}%</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
 
         {/* Phase cards */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
@@ -366,101 +349,61 @@ export default function SpendingPhasesTab({
           ))}
         </div>
       </div>
-
-      {/* ===== CHARTS ===== */}
+       {/* ===== CHARTS ===== */}
       <div className="print-card" style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: "20px 24px", marginBottom: 20 }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: C.navy, marginBottom: 12 }}>Spending & Portfolio Over Time</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          {/* Spending chart */}
-          <div>
-            <div style={{ fontSize: 11, color: C.gray, marginBottom: 6, fontWeight: 600 }}>Annual Spending by Age</div>
-            <svg viewBox="0 0 440 160" style={{ width: "100%", height: 160 }}>
-              {phases.map((ph, idx) => {
-                const start = idx === 0 ? retirementAge : ph.startAge;
-                const end = phases[idx + 1] ? phases[idx + 1].startAge : lifeExpectancy + 1;
-                const total = lifeExpectancy - retirementAge + 1;
-                const x = ((start - retirementAge) / total) * 420 + 10;
-                const w = ((end - start) / total) * 420;
-                return <rect key={idx} x={x} y={5} width={w} height={150} fill={PHASE_BG_COLORS[ph.name]} opacity={0.7} />;
-              })}
-              {retiredYears.length > 1 && (
+        <div style={{ fontSize: 15, fontWeight: 700, color: C.navy, marginBottom: 12 }}>Portfolio Balance Over Time</div>
+        <div style={{ maxWidth: 700, margin: "0 auto" }}>
+          <div style={{ fontSize: 11, color: C.gray, marginBottom: 6, fontWeight: 600 }}>Portfolio Balance</div>
+          <svg viewBox="0 0 440 160" style={{ width: "100%", height: 160 }}>
+            {le.years.length > 1 && (
+              <>
+                <polygon
+                  points={le.years.map((y, i) => {
+                    const x = (i / (le.years.length - 1)) * 420 + 10;
+                    const yPos = 155 - (y.totalEnd / maxBalance) * 140;
+                    return `${x},${yPos}`;
+                  }).join(" ") + " 430,155 10,155"}
+                  fill={C.accent} opacity={0.06}
+                />
                 <polyline
-                  points={retiredYears.map((y, i) => {
-                    const x = (i / (retiredYears.length - 1)) * 420 + 10;
-                    const yPos = 155 - (y.annualSpending / maxSpend) * 140;
+                  points={le.years.map((y, i) => {
+                    const x = (i / (le.years.length - 1)) * 420 + 10;
+                    const yPos = 155 - (y.totalEnd / maxBalance) * 140;
                     return `${x},${yPos}`;
                   }).join(" ")}
-                  fill="none" stroke={C.goGo} strokeWidth={2.5}
+                  fill="none" stroke={C.accent} strokeWidth={2}
                 />
-              )}
-              {spendingLabels.map((lbl) => (
-                <text
-                  key={lbl.age}
-                  x={lbl.x}
-                  y={154}
-                  fontSize="8"
-                  fill={C.gray}
-                  textAnchor={lbl.age === retirementAge ? "start" : lbl.age === lifeExpectancy ? "end" : "middle"}
-                >
-                  {lbl.age}
-                </text>
-              ))}
-            </svg>
-          </div>
-          {/* Portfolio chart */}
-          <div>
-            <div style={{ fontSize: 11, color: C.gray, marginBottom: 6, fontWeight: 600 }}>Portfolio Balance</div>
-            <svg viewBox="0 0 440 160" style={{ width: "100%", height: 160 }}>
-              {le.years.length > 1 && (
-                <>
-                  <polygon
-                    points={le.years.map((y, i) => {
-                      const x = (i / (le.years.length - 1)) * 420 + 10;
-                      const yPos = 155 - (y.totalEnd / maxBalance) * 140;
-                      return `${x},${yPos}`;
-                    }).join(" ") + " 430,155 10,155"}
-                    fill={C.accent} opacity={0.06}
-                  />
-                  <polyline
-                    points={le.years.map((y, i) => {
-                      const x = (i / (le.years.length - 1)) * 420 + 10;
-                      const yPos = 155 - (y.totalEnd / maxBalance) * 140;
-                      return `${x},${yPos}`;
-                    }).join(" ")}
-                    fill="none" stroke={C.accent} strokeWidth={2}
-                  />
-                  {/* Return override dots — red = crash, green = boom */}
-                  {le.years.map((y, i) => {
-                    if (marketReturns[y.year] == null) return null;
-                    const x    = (i / (le.years.length - 1)) * 420 + 10;
-                    const yPos = 155 - (y.totalEnd / maxBalance) * 140;
-                    const isCrash = y.returnPct < defaultReturn;
-                    return (
-                      <g key={y.year}>
-                        <circle
-                          cx={x} cy={yPos} r={5}
-                          fill={isCrash ? C.red : C.green}
-                          stroke="#fff" strokeWidth={1.5}
-                        />
-                      </g>
-                    );
-                  })}
-                </>
-              )}
-              {portfolioLabels.map((lbl) => (
-                <text
-                  key={lbl.age}
-                  x={lbl.x}
-                  y={154}
-                  fontSize="8"
-                  fill={C.gray}
-                  textAnchor={lbl.age === currentAge ? "start" : lbl.age === lifeExpectancy ? "end" : "middle"}
-                >
-                  {lbl.age}
-                </text>
-              ))}
-            </svg>
-          </div>
+                {/* Return override dots — red = crash, green = boom */}
+                {le.years.map((y, i) => {
+                  if (marketReturns[y.year] == null) return null;
+                  const x    = (i / (le.years.length - 1)) * 420 + 10;
+                  const yPos = 155 - (y.totalEnd / maxBalance) * 140;
+                  const isCrash = y.returnPct < defaultReturn;
+                  return (
+                    <g key={y.year}>
+                      <circle
+                        cx={x} cy={yPos} r={5}
+                        fill={isCrash ? C.red : C.green}
+                        stroke="#fff" strokeWidth={1.5}
+                      />
+                    </g>
+                  );
+                })}
+              </>
+            )}
+            {portfolioLabels.map((lbl) => (
+              <text
+                key={lbl.age}
+                x={lbl.x}
+                y={154}
+                fontSize="8"
+                fill={C.gray}
+                textAnchor={lbl.age === currentAge ? "start" : lbl.age === lifeExpectancy ? "end" : "middle"}
+              >
+                {lbl.age}
+              </text>
+            ))}
+          </svg>
         </div>
       </div>
 
