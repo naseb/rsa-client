@@ -376,7 +376,7 @@ export default function LandingPage() {
         <section className="lp-hero">
           <div className="lp-eyebrow-pill">Retirement Income & Tax Optimization Calculator</div>
           <h1 className="lp-hero-title">
-            "Stop Guessing How Much You Can Spend in Retirement. Know Exactly What Your Accounts Can Pay You with our Smarter Retirement Income Calculator."
+            "Stop Guessing How Much You Can Spend in Retirement.  Run the Math Yourself, And Know Exactly What Your Accounts Can Pay You."
           </h1>
           <p className="lp-hero-sub">
             You spent decades building your retirement savings. Now you need a
