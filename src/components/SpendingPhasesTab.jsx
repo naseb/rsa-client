@@ -2,10 +2,11 @@
  * SpendingPhasesTab.jsx — Spending Phases & Projection
  * ======================================================
  * The main results tab. Shows:
- * - Go-Go spending banner with phase breakdowns
- * - Phase controls (start ages, spending %, smooth transitions)
+ * - Go-Go spending banner with phase breakdowns (click a phase card to
+ *   edit its start age / spending %)
  * - Spending & Portfolio charts
- * - Year-by-year projection table with expandable detail rows
+ * - Year-by-year projection table with expandable detail rows (smooth
+ *   transitions toggle lives in this panel's header)
  *
  * This component receives solver results from the API (via props)
  * and renders them. It contains NO solver logic.
@@ -79,6 +80,7 @@ export default function SpendingPhasesTab({
   const navigate = useNavigate();
   const [expandedRows, setExpandedRows] = useState({});
   const [expandedWds, setExpandedWds] = useState({});
+  const [editingPhase, setEditingPhase] = useState(null);
 
   const { isTrialing } = useSubscription();
 
@@ -330,7 +332,7 @@ export default function SpendingPhasesTab({
           <span style={{ fontSize: 15, color: "rgba(247,243,234,0.5)", fontWeight: 400, marginLeft: 8 }}>/year</span>
         </div>
 
-        {/* Phase summary cards */}
+        {/* Phase summary cards — click to edit start age / spending % */}
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
           {phases.map((ph, idx) => {
             const spending = Math.round(le.baseSpending * ph.pct / 100);
@@ -339,28 +341,69 @@ export default function SpendingPhasesTab({
 
             const isPast = currentAge > endAge && currentAge >= retirementAge;
             const isActive = currentAge >= pStartAge && currentAge <= endAge && currentAge >= retirementAge;
+            const isEditing = editingPhase === idx;
 
             return (
-              <div key={idx} style={{
-                background: isActive ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)",
-                borderRadius: 12,
-                padding: "14px 20px",
-                border: isActive
-                  ? `1.5px solid ${C[ph.color]}`
-                  : "1px solid rgba(255,255,255,0.08)",
-                minWidth: 160,
-                opacity: isPast ? 0.4 : 1,
-                transition: "opacity 0.2s, border-color 0.2s"
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: C[ph.color] }} />
-                  <span style={{ fontSize: 12, fontWeight: 700, color: C[ph.color] }}>
-                    {ph.name} {isActive ? " (Active)" : ""}
-                  </span>
-                  <span style={{ fontSize: 10, color: "rgba(247,243,234,0.4)" }}>Ages {idx === 0 ? retirementAge : ph.startAge}–{endAge}</span>
+              <div key={idx}
+                className="no-print"
+                onClick={() => !isPast && setEditingPhase(isEditing ? null : idx)}
+                style={{
+                  background: isActive ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)",
+                  borderRadius: 12,
+                  padding: "14px 20px",
+                  border: isActive
+                    ? `1.5px solid ${C[ph.color]}`
+                    : "1px solid rgba(255,255,255,0.08)",
+                  minWidth: 160,
+                  opacity: isPast ? 0.4 : 1,
+                  cursor: isPast ? "default" : "pointer",
+                  transition: "opacity 0.2s, border-color 0.2s"
+                }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: C[ph.color] }} />
+                    <span style={{ fontSize: 12, fontWeight: 700, color: C[ph.color] }}>
+                      {ph.name} {isActive ? " (Active)" : ""}
+                    </span>
+                    <span style={{ fontSize: 10, color: "rgba(247,243,234,0.4)" }}>Ages {idx === 0 ? retirementAge : ph.startAge}–{endAge}</span>
+                  </div>
+                  {!isPast && (
+                    <span style={{ fontSize: 10, color: "rgba(247,243,234,0.45)" }}>{isEditing ? "▾" : "✎"}</span>
+                  )}
                 </div>
                 <div style={{ fontSize: 22, fontWeight: 700, fontFamily: FONT_MONO }}>{fmtFull(spending)}<span style={{ fontSize: 11, color: "rgba(247,243,234,0.4)" }}>/yr</span></div>
                 <div style={{ fontSize: 11, color: "rgba(247,243,234,0.5)" }}>{fmtFull(Math.floor(spending / 12))}/mo · {ph.pct}% of base</div>
+
+                {isEditing && (
+                  <div onClick={(e) => e.stopPropagation()} style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.15)" }}>
+                    <div style={{ marginBottom: 10 }}>
+                      <div style={{ fontSize: 10, color: "rgba(247,243,234,0.5)", marginBottom: 4 }}>Starts at Age</div>
+                      {idx === 0 ? (
+                        <div style={{ fontFamily: FONT_MONO, fontSize: 12, color: "#fff" }}>
+                          {retirementAge} <span style={{ color: "rgba(247,243,234,0.4)" }}>(retirement)</span>
+                        </div>
+                      ) : (
+                        <input type="number" value={ph.startAge} min={retirementAge + 1} max={lifeExpectancy - 1}
+                          onChange={(e) => { const v = parseInt(e.target.value); if (!isNaN(v)) updatePhase(idx, "startAge", v); }}
+                          style={{ fontFamily: FONT_MONO, fontSize: 13, padding: "5px 8px", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 6, width: 64, background: "rgba(255,255,255,0.1)", color: "#fff" }}
+                        />
+                      )}
+                    </div>
+                    <div>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                        <span style={{ fontSize: 10, color: "rgba(247,243,234,0.5)" }}>Spending Level</span>
+                        <span style={{ fontSize: 12, fontFamily: FONT_MONO, fontWeight: 700, color: C[ph.color] }}>{ph.pct}%</span>
+                      </div>
+                      <input type="range" min={20} max={120} value={ph.pct}
+                        onChange={(e) => updatePhase(idx, "pct", parseInt(e.target.value))}
+                        style={{ width: "100%", accentColor: C[ph.color] }}
+                      />
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "rgba(247,243,234,0.35)" }}>
+                        <span>20%</span><span>120%</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -399,94 +442,6 @@ export default function SpendingPhasesTab({
         )}
       </div>
 
-      {/* ===== PHASE CONTROLS ===== */}
-      <div className="no-print" style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, padding: "20px 24px", marginBottom: 20 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: C.navy }}>Spending Phases</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <label style={{ fontSize: 12, color: C.gray, display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}>
-              <input type="checkbox" checked={smoothTransition} onChange={(e) => setField("smoothTransition", e.target.checked)} style={{ accentColor: C.accent }} />
-              Smooth transitions
-            </label>
-            {smoothTransition && (
-              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <span style={{ fontSize: 11, color: C.gray }}>over</span>
-                <input type="number" value={transitionYears} min={1} max={10}
-                  onChange={(e) => { const v = parseInt(e.target.value); if (!isNaN(v) && v >= 1 && v <= 10) setField("transitionYears", v); }}
-                  style={{ width: 40, textAlign: "center", fontFamily: FONT_MONO, fontSize: 12, padding: "4px", border: `1px solid ${C.border}`, borderRadius: 6 }}
-                />
-                <span style={{ fontSize: 11, color: C.gray }}>years</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-
-        {/* Phase cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-          {phases.map((ph, idx) => {
-            const pStartAge = idx === 0 ? retirementAge : ph.startAge;
-            const pEndAge = phases[idx + 1] ? phases[idx + 1].startAge - 1 : lifeExpectancy;
-            const isPast = currentAge > pEndAge && currentAge >= retirementAge;
-            const isActive = currentAge >= pStartAge && currentAge <= pEndAge && currentAge >= retirementAge;
-
-            return (
-              <div key={idx} style={{
-                background: PHASE_BG_COLORS[ph.name],
-                borderRadius: 10,
-                padding: 16,
-                border: isActive
-                  ? `2px solid ${PHASE_COLORS[ph.name]}`
-                  : `2px solid ${isPast ? C.border : PHASE_COLORS[ph.name]}`,
-                opacity: isPast ? 0.5 : 1,
-                transition: "opacity 0.2s, border-color 0.2s"
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
-                  <div style={{ width: 12, height: 12, borderRadius: "50%", background: isPast ? C.gray : PHASE_COLORS[ph.name] }} />
-                  <span style={{ fontSize: 14, fontWeight: 700, color: C.navy }}>
-                    {ph.name}
-                    {isPast && <span style={{ fontSize: 10, color: C.gray, fontWeight: 400, marginLeft: 4 }}>(Past)</span>}
-                    {isActive && <span style={{ fontSize: 10, color: PHASE_COLORS[ph.name], fontWeight: 700, marginLeft: 4 }}>(Active)</span>}
-                  </span>
-                </div>
-                <div style={{ marginBottom: 10 }}>
-                  <div style={{ fontSize: 11, color: C.gray, marginBottom: 4 }}>Starts at Age</div>
-                  {idx === 0 ? (
-                    <div style={{ fontFamily: FONT_MONO, fontSize: 13, color: C.navy, fontWeight: 600, padding: "6px 0" }}>
-                      {retirementAge} <span style={{ fontSize: 10, color: C.ltGray }}>(retirement)</span>
-                    </div>
-                  ) : (
-                    <input type="number" value={ph.startAge} min={retirementAge + 1} max={lifeExpectancy - 1}
-                      disabled={isPast}
-                      onChange={(e) => { const v = parseInt(e.target.value); if (!isNaN(v)) updatePhase(idx, "startAge", v); }}
-                      style={{ fontFamily: FONT_MONO, fontSize: 13, padding: "6px 10px", border: `1px solid ${C.border}`, borderRadius: 6, width: 70, background: isPast ? "#f3f4f6" : "#fff" }}
-                    />
-                  )}
-                </div>
-                <div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-                    <span style={{ fontSize: 11, color: C.gray }}>Spending Level</span>
-                    <span style={{ fontSize: 13, fontFamily: FONT_MONO, fontWeight: 700, color: isPast ? C.gray : PHASE_COLORS[ph.name] }}>{ph.pct}%</span>
-                  </div>
-                  <input type="range" min={20} max={120} value={ph.pct}
-                    disabled={isPast}
-                    onChange={(e) => updatePhase(idx, "pct", parseInt(e.target.value))}
-                    style={{ width: "100%", accentColor: isPast ? C.gray : PHASE_COLORS[ph.name] }}
-                  />
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: C.ltGray }}>
-                    <span>20%</span><span>120%</span>
-                  </div>
-                  <div style={{ marginTop: 6, fontSize: 12, fontFamily: FONT_MONO, fontWeight: 600, color: C.navy }}>
-                    {fmtFull(Math.round(le.baseSpending * ph.pct / 100))}/yr
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-
       {/* ===== PROJECTION TABLE ===== */}
       <div className="print-card" style={{ background: C.cardBg, border: `1px solid ${C.border}`, borderRadius: 12, overflow: "hidden" }}>
         <div style={{ padding: "14px 20px", borderBottom: `1px solid ${C.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -496,7 +451,22 @@ export default function SpendingPhasesTab({
               Override returns to model crashes/booms. Spending column shows inflated future dollars to maintain purchasing power. Click rows to expand.
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <label className="no-print" style={{ fontSize: 12, color: C.gray, display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}>
+              <input type="checkbox" checked={smoothTransition} onChange={(e) => setField("smoothTransition", e.target.checked)} style={{ accentColor: C.accent }} />
+              Smooth transitions
+            </label>
+            {smoothTransition && (
+              <div className="no-print" style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ fontSize: 11, color: C.gray }}>over</span>
+                <input type="number" value={transitionYears} min={1} max={10}
+                  onChange={(e) => { const v = parseInt(e.target.value); if (!isNaN(v) && v >= 1 && v <= 10) setField("transitionYears", v); }}
+                  style={{ width: 40, textAlign: "center", fontFamily: FONT_MONO, fontSize: 12, padding: "4px", border: `1px solid ${C.border}`, borderRadius: 6 }}
+                />
+                <span style={{ fontSize: 11, color: C.gray }}>years</span>
+              </div>
+            )}
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             {isTrialing ? (
               <button
                 onClick={() => navigate("/pricing")}
@@ -545,6 +515,7 @@ export default function SpendingPhasesTab({
                 Clear Portfolio ({Object.keys(portfolioOverrides).length})
               </button>
             )}
+            </div>
           </div>
         </div>
 
