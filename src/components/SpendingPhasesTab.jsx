@@ -21,12 +21,60 @@ import {
   fmtCompact, fmtFull, ssClaimingMultiplier, rmdStartAge,
   PHASE_COLORS, PHASE_BG_COLORS,
 } from "../utils/theme";
+import { derivePlanStatus } from "../utils/planStatus";
+import StatCard from "./dashboard/StatCard";
+import ResultCard from "./dashboard/ResultCard";
+import GrowthChart from "./dashboard/GrowthChart";
+import WealthAllocationDonut from "./dashboard/WealthAllocationDonut";
+import CoachSuggestions from "./dashboard/CoachSuggestions";
+
+function buildCoachSuggestions(le, rmdAge) {
+  const suggestions = [];
+  const retired = le.years.filter((y) => y.isRetired);
+
+  const rmdRow = le.years.find((y) => y.age === rmdAge);
+  if (rmdRow && rmdRow.rmd > 0) {
+    suggestions.push({
+      title: `RMDs begin at age ${rmdAge}`,
+      detail: `Required withdrawals of ~${fmtCompact(rmdRow.rmd)}/yr will add to taxable income starting age ${rmdAge}.`,
+      severity: "info",
+    });
+  }
+
+  const irmaaYears = retired.filter((y) => y.irmaa > 0);
+  if (irmaaYears.length > 0) {
+    const totalIrmaa = irmaaYears.reduce((s, y) => s + y.irmaa, 0);
+    suggestions.push({
+      title: `IRMAA surcharge triggered at age ${irmaaYears[0].age}`,
+      detail: `Medicare premium surcharges begin around age ${irmaaYears[0].age}, adding ~${fmtCompact(totalIrmaa)} over your plan.`,
+      severity: "warning",
+    });
+  }
+
+  const preRmd = retired.filter((y) => y.age < rmdAge);
+  const postRmd = retired.filter((y) => y.age >= rmdAge);
+  if (preRmd.length >= 2 && postRmd.length > 0) {
+    const avg = (arr) => arr.reduce((s, y) => s + y.effectiveRate, 0) / arr.length;
+    const preAvg = avg(preRmd);
+    const postAvg = avg(postRmd);
+    if (postAvg > 0 && preAvg < postAvg * 0.8) {
+      suggestions.push({
+        title: `Potential Roth conversion window: ages ${preRmd[0].age}–${preRmd[preRmd.length - 1].age}`,
+        detail: `Your tax rate is lower before RMDs begin — see Tax Optimization Pro for conversion amounts.`,
+        severity: "info",
+      });
+    }
+  }
+
+  return suggestions.slice(0, 3);
+}
 
 export default function SpendingPhasesTab({
   inputs, setField, solverData, loading, error,
   marketReturns, setMarketReturns,
   spendingOverrides, setSpendingOverrides,
   portfolioOverrides, setPortfolioOverrides,
+  compareData, compareLoading, onViewComparison,
 }) {
   const navigate = useNavigate();
   const [expandedRows, setExpandedRows] = useState({});
@@ -65,9 +113,6 @@ export default function SpendingPhasesTab({
   const le = solverData;
   const retiredYears = le.years.filter((y) => y.isRetired);
 
-  const maxSpend = retiredYears.length > 0
-    ? Math.max(...retiredYears.map((y) => y.annualSpending), le.baseSpending * 1.2)
-    : le.baseSpending * 1.2;
   const ssMult = ssClaimingMultiplier(ssStartAge);
   const ssMonthly = Math.round(ss67 * ssMult);
   const rmdAge = rmdStartAge(currentAge);
@@ -90,19 +135,13 @@ export default function SpendingPhasesTab({
     }
   }
 
-  const spendingLabels = [];
-  const spendDenom = Math.max(lifeExpectancy - retirementAge, 1);
-  for (let age = retirementAge; age <= lifeExpectancy; age++) {
-    if (age === retirementAge || age === lifeExpectancy || age % 5 === 0) {
-      if (spendingLabels.some((l) => Math.abs(l.age - age) < 2)) continue;
-      spendingLabels.push({
-        age,
-        x: ((age - retirementAge) / spendDenom) * 420 + 10,
-      });
-    }
-  }
-
-
+  // ===== New dashboard summary derivations =====
+  const currentYearRow = le.years[0];
+  const totalSavings = accounts.reduce((s, a) => s + a.balance, 0);
+  const currentAnnualSpending = isGoGoPast && le.years[0] ? le.years[0].annualSpending : le.baseSpending;
+  const { status: planStatus, statusDetail: planStatusDetail } = derivePlanStatus(le, lifeExpectancy);
+  const vsFourPct = compareData?.comparison?.diffPct ?? null;
+  const coachSuggestions = buildCoachSuggestions(le, rmdAge);
 
   // Find the most recent checkpoint that applies to a given year.
   // Returns the checkpoint year, or null if no checkpoint applies yet.
@@ -228,7 +267,46 @@ export default function SpendingPhasesTab({
         </div>
       </div>
 
-      {/* ===== RESULTS BANNER ===== */}
+      {/* ===== STAT TILE ROW ===== */}
+      <div className="print-card" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 20 }}>
+        <StatCard label="Savings" value={fmtCompact(totalSavings)} sublabel="Current total balance" />
+        <StatCard label={`Projected at ${lifeExpectancy}`} value={fmtCompact(le.finalBalance)} sublabel={`Target: ${fmtCompact(targetEndBalance)}`} />
+        <StatCard label="Annual Spending" value={fmtCompact(currentAnnualSpending)} sublabel={`${fmtCompact(Math.floor(currentAnnualSpending / 12))}/mo`} accentColor={C.accent} />
+        <StatCard
+          label="Taxes"
+          value={fmtCompact(currentYearRow?.totalTax || 0)}
+          sublabel={currentYearRow ? `${(currentYearRow.effectiveRate * 100).toFixed(1)}% effective` : ""}
+          accentColor={C.red}
+        />
+        <StatCard
+          label="Result"
+          value={planStatus === "on-track" ? "On Track" : "Needs Adj."}
+          sublabel={vsFourPct != null ? `${vsFourPct >= 0 ? "+" : ""}${vsFourPct.toFixed(0)}% vs 4% Rule` : "vs 4% Rule: —"}
+          accentColor={planStatus === "on-track" ? C.green : C.red}
+        />
+      </div>
+
+      {/* ===== RESULT CARD ===== */}
+      <ResultCard
+        status={planStatus}
+        statusDetail={planStatusDetail}
+        vsFourPct={vsFourPct}
+        vsFourPctLoading={compareLoading}
+        onViewComparison={onViewComparison}
+      />
+
+      {/* ===== GROWTH CHART + WEALTH ALLOCATION ===== */}
+      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16, marginBottom: 20 }}>
+        <GrowthChart years={le.years} currentAge={currentAge} retirementAge={retirementAge} />
+        <WealthAllocationDonut accounts={accounts} />
+      </div>
+
+      {/* ===== COACH SUGGESTIONS ===== */}
+      <div style={{ marginBottom: 20 }}>
+        <CoachSuggestions suggestions={coachSuggestions} />
+      </div>
+
+      {/* ===== PHASE BREAKDOWN (secondary detail strip) ===== */}
       <div className="print-banner" style={{ background: "linear-gradient(135deg, #1c3829 0%, #2d5a47 40%, #1c3829 100%)", borderRadius: 16, padding: "28px 36px", marginBottom: 20, color: "#fff", position: "relative", overflow: "hidden", borderBottom: "2px solid #b8860b" }}>
         <div style={{ position: "absolute", top: -40, right: -40, width: 250, height: 250, background: "radial-gradient(circle,rgba(184,134,11,0.15) 0%,transparent 70%)", pointerEvents: "none" }} />
         <div style={{ fontSize: 11, color: "rgba(247,243,234,0.5)", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 6 }}>
@@ -237,28 +315,17 @@ export default function SpendingPhasesTab({
             : "Go-Go Phase Base Spending (Today's Dollars)"}
         </div>
         <div style={{
-          fontSize: 48,
+          fontSize: 32,
           fontWeight: 800,
           fontFamily: FONT_MONO,
           color: isGoGoPast
             ? (C[phases.find((p) => p.name === activePhaseName)?.color] || C.goGo)
             : C.goGo,
           lineHeight: 1,
-          marginBottom: 2
+          marginBottom: 16
         }}>
-          {fmtFull(isGoGoPast && le.years[0] ? le.years[0].annualSpending : le.baseSpending)}
-          <span style={{ fontSize: 18, color: "rgba(247,243,234,0.5)", fontWeight: 400, marginLeft: 8 }}>/year</span>
-        </div>
-        <div style={{ fontSize: 16, color: "rgba(247,243,234,0.65)", marginBottom: 20 }}>
-          {isGoGoPast && le.years[0] ? (
-            <>
-              {fmtFull(Math.floor(le.years[0].annualSpending / 12))} / month (based on Go-Go base of {fmtFull(Math.floor(le.baseSpending / 12))}/mo)
-            </>
-          ) : (
-            <>
-              {fmtFull(Math.floor(le.baseSpending / 12))} / month in active years (in today's purchasing power)
-            </>
-          )}
+          {fmtFull(currentAnnualSpending)}
+          <span style={{ fontSize: 15, color: "rgba(247,243,234,0.5)", fontWeight: 400, marginLeft: 8 }}>/year</span>
         </div>
 
         {/* Phase summary cards */}

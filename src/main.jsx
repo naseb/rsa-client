@@ -47,7 +47,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/blog" element={<BlogListPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
-          
+
           <Route path="/success" element={
             <SubscriptionProvider>
               <SuccessPage />

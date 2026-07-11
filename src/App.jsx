@@ -112,7 +112,7 @@ export default function App() {
 
   // ── API hooks ───────────────────────────────────────────────────────────────
   const { data: solverData,  loading: solverLoading,  error: solverError  } = useSolverAPI(inputs);
-  const { data: compareData, loading: compareLoading, error: compareError } = useCompareAPI(inputs, activeTab === "compare");
+  const { data: compareData, loading: compareLoading, error: compareError } = useCompareAPI(inputs, activeTab === "compare" || activeTab === "phases");
 
   // ── Field setter ────────────────────────────────────────────────────────────
   const setField = (key, value) => {
@@ -474,6 +474,9 @@ export default function App() {
               setSpendingOverrides={setSpendingOverrides}
               portfolioOverrides={portfolioOverrides}
               setPortfolioOverrides={setPortfolioOverrides}
+              compareData={compareData}
+              compareLoading={compareLoading}
+              onViewComparison={() => setActiveTab("compare")}
             />
           )}
 
