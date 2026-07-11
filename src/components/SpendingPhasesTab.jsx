@@ -92,6 +92,7 @@ export default function SpendingPhasesTab({
     ss67 = 0, ssStartAge = 67, pensionAmount = 0, pensionStartAge = 65, pensionHasCola = false,
     phases = [], transitionYears = 3, smoothTransition = true,
     defaultReturn = 7, targetEndBalance = 0, accounts = [], filingStatus = 2, inflationRate = 3,
+    state = null,
   } = inputs || {};
 
   // If no solver data yet, show loading
@@ -261,6 +262,7 @@ export default function SpendingPhasesTab({
           <div><strong>Target End Balance:</strong> {fmtFull(targetEndBalance)}</div>
           <div><strong>Default Return Rate:</strong> {defaultReturn.toFixed(1)}% / year</div>
           <div><strong>Filing Status:</strong> {filingStatus}</div>
+          <div><strong>State:</strong> {state || "Not selected"}</div>
           <div><strong>Social Security (FRA):</strong> {fmtFull(ss67)}/mo at {ssStartAge}</div>
           <div><strong>Pension:</strong> {pensionAmount > 0 ? `${fmtFull(pensionAmount)}/mo at ${pensionStartAge} (${pensionHasCola ? "COLA" : "Fixed"})` : "None"}</div>
           <div><strong>Inflation rate (COLA):</strong> {inflationRate.toFixed(1)}%</div>
@@ -757,6 +759,11 @@ export default function SpendingPhasesTab({
                               <div style={{ fontSize: 9, color: C.gray, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6, fontWeight: 700 }}>Tax Impact</div>
                               <div style={{ lineHeight: 1.8 }}>
                                 <div>Federal: <strong style={{ fontFamily: FONT_MONO, color: C.red }}>{fmtCompact(d.tax)}</strong></div>
+                                {d.stateTaxStatus === 'unsupported' ? (
+                                  <div style={{ color: C.gray, fontStyle: "italic" }}>State: Not yet supported for {d.stateTaxLabel || "this state"}</div>
+                                ) : d.stateTaxStatus && d.stateTaxStatus !== 'none' ? (
+                                  <div>State: <strong style={{ fontFamily: FONT_MONO, color: C.red }}>{fmtCompact(d.stateTax)}</strong></div>
+                                ) : null}
                                 <div>IRMAA: <strong style={{ fontFamily: FONT_MONO }}>{fmtCompact(d.irmaa)}</strong></div>
                                 <div>Bracket: <strong>{d.bracket}</strong> | Eff: <strong>{(d.effectiveRate * 100).toFixed(1)}%</strong></div>
                               </div>

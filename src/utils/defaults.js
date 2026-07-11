@@ -10,6 +10,7 @@ export const DEFAULTS = {
   retirementAge: 65,
   lifeExpectancy: 95,
   filingStatus: 2, // 1 = Single, 2 = MFJ
+  state: null,     // USPS state code, or null = no state selected → $0 state tax
   ss67: 0,         // Monthly SS benefit at FRA (67)
   ssStartAge: 67,
   pensionAmount: 0, // Monthly pension benefit

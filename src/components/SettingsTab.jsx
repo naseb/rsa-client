@@ -12,6 +12,7 @@ import { useState } from "react";
 import NumericInput from "./NumericInput";
 import { C, FONT_BODY, FONT_MONO, fmtCompact, ssClaimingMultiplier, rmdStartAge } from "../utils/theme";
 import { DEFAULTS } from "../utils/defaults";
+import { US_STATES } from "../utils/states";
 import InstructionsTab from "./InstructionsTab";
 import ExamplesTab from "./ExamplesTab";
 
@@ -20,7 +21,7 @@ export default function SettingsTab({
 }) {
   const [subView, setSubView] = useState("settings");
   const {
-    currentAge, retirementAge, lifeExpectancy, filingStatus,
+    currentAge, retirementAge, lifeExpectancy, filingStatus, state,
     ss67, ssStartAge, pensionAmount, pensionStartAge, pensionHasCola, cola, defaultReturn,
     inflationRate, targetEndBalance,
   } = inputs;
@@ -209,6 +210,22 @@ export default function SettingsTab({
             >
               <option value={2}>Married Filing Jointly</option>
               <option value={1}>Single</option>
+            </select>
+          </div>
+          <div>
+            <div style={labelStyle}>State of Residence</div>
+            <select
+              value={state ?? ""}
+              onChange={(e) => setField("state", e.target.value || null)}
+              style={{
+                padding: "8px 12px", border: `1px solid ${C.border}`, borderRadius: 6,
+                fontSize: 14, fontFamily: FONT_BODY, background: "#fff", color: C.navy,
+              }}
+            >
+              <option value="">Select a state (optional)</option>
+              {US_STATES.map((s) => (
+                <option key={s.code} value={s.code}>{s.name}</option>
+              ))}
             </select>
           </div>
         </div>

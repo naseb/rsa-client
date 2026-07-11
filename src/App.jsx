@@ -37,6 +37,7 @@ export default function App() {
   const [retirementAge,    setRetirementAge]    = useState(DEFAULTS.retirementAge);
   const [lifeExpectancy,   setLifeExpectancy]   = useState(DEFAULTS.lifeExpectancy);
   const [filingStatus,     setFilingStatus]     = useState(DEFAULTS.filingStatus);
+  const [state,            setState]            = useState(DEFAULTS.state);
   const [ss67,             setSs67]             = useState(DEFAULTS.ss67);
   const [ssStartAge,       setSsStartAge]       = useState(DEFAULTS.ssStartAge);
   const [pensionAmount,    setPensionAmount]    = useState(DEFAULTS.pensionAmount);
@@ -63,6 +64,7 @@ export default function App() {
         const setters = {
           currentAge: setCurrentAge, retirementAge: setRetirementAge,
           lifeExpectancy: setLifeExpectancy, filingStatus: setFilingStatus,
+          state: setState,
           ss67: setSs67, ssStartAge: setSsStartAge,
           pensionAmount: setPensionAmount, pensionStartAge: setPensionStartAge,
           pensionHasCola: setPensionHasCola, cola: setCola,
@@ -84,7 +86,7 @@ export default function App() {
 
   // ── Inputs object sent to the API ──────────────────────────────────────────
   const inputs = {
-    currentAge, retirementAge, lifeExpectancy, filingStatus,
+    currentAge, retirementAge, lifeExpectancy, filingStatus, state,
     ss67, ssStartAge, pensionAmount, pensionStartAge, pensionHasCola, cola, defaultReturn, inflationRate, targetEndBalance,
     phases, transitionYears, smoothTransition,
     marketReturns, spendingOverrides, portfolioOverrides, accounts,
@@ -104,7 +106,7 @@ export default function App() {
     }, 500);
     return () => clearTimeout(saveTimer.current);
   }, [
-    currentAge, retirementAge, lifeExpectancy, filingStatus,
+    currentAge, retirementAge, lifeExpectancy, filingStatus, state,
     ss67, ssStartAge, pensionAmount, pensionStartAge, pensionHasCola, cola, defaultReturn, inflationRate, targetEndBalance,
     phases, transitionYears, smoothTransition,
     marketReturns, spendingOverrides, accounts, portfolioOverrides, loadedScenario,
@@ -119,6 +121,7 @@ export default function App() {
     const setters = {
       currentAge: setCurrentAge, retirementAge: setRetirementAge,
       lifeExpectancy: setLifeExpectancy, filingStatus: setFilingStatus,
+      state: setState,
       ss67: setSs67, ssStartAge: setSsStartAge,
       pensionAmount: setPensionAmount, pensionStartAge: setPensionStartAge,
       pensionHasCola: setPensionHasCola, cola: setCola,
@@ -152,6 +155,7 @@ export default function App() {
     setRetirementAge(scenarioData.retirementAge);
     setLifeExpectancy(scenarioData.lifeExpectancy);
     setFilingStatus(scenarioData.filingStatus);
+    setState(scenarioData.state ?? null);
     setSs67(scenarioData.ss67);
     setSsStartAge(scenarioData.ssStartAge);
     setPensionAmount(scenarioData.pensionAmount ?? 0);
@@ -204,6 +208,7 @@ export default function App() {
           const setters = {
             currentAge: setCurrentAge, retirementAge: setRetirementAge,
             lifeExpectancy: setLifeExpectancy, filingStatus: setFilingStatus,
+            state: setState,
             ss67: setSs67, ssStartAge: setSsStartAge, cola: setCola,
             defaultReturn: setDefaultReturn, inflationRate: setInflationRate,
             targetEndBalance: setTargetEndBalance, phases: setPhases,
@@ -233,6 +238,7 @@ export default function App() {
         const setters = {
           currentAge: setCurrentAge, retirementAge: setRetirementAge,
           lifeExpectancy: setLifeExpectancy, filingStatus: setFilingStatus,
+          state: setState,
           ss67: setSs67, ssStartAge: setSsStartAge, cola: setCola,
           defaultReturn: setDefaultReturn, inflationRate: setInflationRate,
           targetEndBalance: setTargetEndBalance, phases: setPhases,
