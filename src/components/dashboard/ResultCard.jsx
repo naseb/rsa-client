@@ -1,18 +1,23 @@
 /**
  * ResultCard.jsx — Headline "how is my plan doing" card.
  *
- * Shows a plain-English Plan Status (on-track / needs-adjustment) derived
- * from the deterministic solver, plus a "vs the 4% Rule" comparison once
- * that data loads. Deliberately NOT a probability-of-success number —
- * there's no Monte Carlo simulation behind this app yet, and a fabricated
- * percentage would overstate the confidence this tool can actually offer.
+ * Shows a plain-English Plan Status (on-track / caution / at-risk, see
+ * ../../utils/planStatus.js) derived from the deterministic solver, plus
+ * a "vs the 4% Rule" comparison once that data loads. Deliberately NOT a
+ * probability-of-success number — there's no Monte Carlo simulation
+ * behind this app yet, and a fabricated percentage would overstate the
+ * confidence this tool can actually offer.
  */
 import { C, FONT_MONO } from "../../utils/theme";
 
+const STATUS_META = {
+  "on-track": { color: "#4ade80", label: "On Track" },
+  "caution": { color: "#fbbf24", label: "Caution" },
+  "at-risk": { color: "#f87171", label: "At Risk" },
+};
+
 export default function ResultCard({ status, statusDetail, vsFourPct, vsFourPctLoading, onViewComparison }) {
-  const isOnTrack = status === "on-track";
-  const statusColor = isOnTrack ? "#4ade80" : "#f87171";
-  const statusLabel = isOnTrack ? "On Track" : "Needs Adjustment";
+  const { color: statusColor, label: statusLabel } = STATUS_META[status] || STATUS_META["on-track"];
 
   return (
     <div className="print-banner" style={{

@@ -29,8 +29,23 @@ import GrowthChart from "./dashboard/GrowthChart";
 import WealthAllocationDonut from "./dashboard/WealthAllocationDonut";
 import CoachSuggestions from "./dashboard/CoachSuggestions";
 
-function buildCoachSuggestions(le, rmdAge) {
+function buildCoachSuggestions(le, rmdAge, planStatus, lifeExpectancy) {
   const suggestions = [];
+
+  if (planStatus === "at-risk") {
+    suggestions.push({
+      title: `Portfolio may not last through age ${lifeExpectancy}`,
+      detail: `At current spending, the plan runs out before life expectancy. Try lowering Go-Go spending %, delaying retirement, or reducing your target end balance in Settings.`,
+      severity: "alert",
+    });
+  } else if (planStatus === "caution" && le.resetSpending != null) {
+    suggestions.push({
+      title: `Spending was cut after a modeled downturn`,
+      detail: `A market event you entered reduced sustainable spending from ${fmtFull(le.baseSpending)}/yr to ${fmtFull(le.resetSpending)}/yr at age ${le.effectiveResetAge}. Consider whether that lower spending level still works for you.`,
+      severity: "warning",
+    });
+  }
+
   const retired = le.years.filter((y) => y.isRetired);
 
   const rmdRow = le.years.find((y) => y.age === rmdAge);
@@ -143,8 +158,14 @@ export default function SpendingPhasesTab({
   const totalSavings = accounts.reduce((s, a) => s + a.balance, 0);
   const currentAnnualSpending = isGoGoPast && le.years[0] ? le.years[0].annualSpending : le.baseSpending;
   const { status: planStatus, statusDetail: planStatusDetail } = derivePlanStatus(le, lifeExpectancy);
+  const RESULT_TILE_META = {
+    "on-track": { value: "On Track", color: C.green },
+    "caution": { value: "Caution", color: C.orange },
+    "at-risk": { value: "At Risk", color: C.red },
+  };
+  const resultTile = RESULT_TILE_META[planStatus] || RESULT_TILE_META["on-track"];
   const vsFourPct = compareData?.comparison?.diffPct ?? null;
-  const coachSuggestions = buildCoachSuggestions(le, rmdAge);
+  const coachSuggestions = buildCoachSuggestions(le, rmdAge, planStatus, lifeExpectancy);
 
   // Find the most recent checkpoint that applies to a given year.
   // Returns the checkpoint year, or null if no checkpoint applies yet.
@@ -284,9 +305,9 @@ export default function SpendingPhasesTab({
         />
         <StatCard
           label="Result"
-          value={planStatus === "on-track" ? "On Track" : "Needs Adj."}
+          value={resultTile.value}
           sublabel={vsFourPct != null ? `${vsFourPct >= 0 ? "+" : ""}${vsFourPct.toFixed(0)}% vs 4% Rule` : "vs 4% Rule: —"}
-          accentColor={planStatus === "on-track" ? C.green : C.red}
+          accentColor={resultTile.color}
         />
       </div>
 
