@@ -36,14 +36,14 @@ export function derivePlanStatus(solverData, lifeExpectancy) {
   if (isAtRisk) {
     return {
       status: "at-risk",
-      statusDetail: `Your portfolio is projected to run out before age ${lifeExpectancy} at current spending — consider reducing Go-Go spending or adjusting phases below.`,
+      statusDetail: `Your portfolio is projected to run out before age ${lifeExpectancy} at current spending. You need to act — lower Go-Go spending, delay retirement, or adjust phases below — or this plan will not meet your goal.`,
     };
   }
 
   if (solverData.resetSpending != null) {
     return {
       status: "caution",
-      statusDetail: `A market event cut sustainable spending from ${fmtFull(solverData.baseSpending)}/yr to ${fmtFull(solverData.resetSpending)}/yr at age ${solverData.effectiveResetAge} — the plan still holds, but review the change below.`,
+      statusDetail: `A market event you modeled reduced sustainable spending from ${fmtFull(solverData.baseSpending)}/yr to ${fmtFull(solverData.resetSpending)}/yr starting age ${solverData.effectiveResetAge}. Sticking to this lower amount keeps your plan on track through age ${lifeExpectancy}.`,
     };
   }
 

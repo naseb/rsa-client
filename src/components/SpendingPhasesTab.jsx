@@ -34,14 +34,14 @@ function buildCoachSuggestions(le, rmdAge, planStatus, lifeExpectancy) {
 
   if (planStatus === "at-risk") {
     suggestions.push({
-      title: `Portfolio may not last through age ${lifeExpectancy}`,
-      detail: `At current spending, the plan runs out before life expectancy. Try lowering Go-Go spending %, delaying retirement, or reducing your target end balance in Settings.`,
+      title: `Action required: this plan will not last`,
+      detail: `At current spending, the portfolio runs out before age ${lifeExpectancy}. You must lower Go-Go spending %, delay retirement, or reduce your target end balance in Settings to fix this.`,
       severity: "alert",
     });
   } else if (planStatus === "caution" && le.resetSpending != null) {
     suggestions.push({
-      title: `Spending was cut after a modeled downturn`,
-      detail: `A market event you entered reduced sustainable spending from ${fmtFull(le.baseSpending)}/yr to ${fmtFull(le.resetSpending)}/yr at age ${le.effectiveResetAge}. Consider whether that lower spending level still works for you.`,
+      title: `Spending was cut after a modeled downturn — and it still works`,
+      detail: `A market event you entered reduced sustainable spending from ${fmtFull(le.baseSpending)}/yr to ${fmtFull(le.resetSpending)}/yr at age ${le.effectiveResetAge}. As long as you stick to this new amount, your plan stays on track through age ${lifeExpectancy}.`,
       severity: "warning",
     });
   }
