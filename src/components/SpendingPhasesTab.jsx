@@ -26,63 +26,6 @@ import { derivePlanStatus } from "../utils/planStatus";
 import ResultCard from "./dashboard/ResultCard";
 import GrowthChart from "./dashboard/GrowthChart";
 import WealthAllocationDonut from "./dashboard/WealthAllocationDonut";
-import CoachSuggestions from "./dashboard/CoachSuggestions";
-
-function buildCoachSuggestions(le, rmdAge, planStatus, lifeExpectancy) {
-  const suggestions = [];
-
-  if (planStatus === "at-risk") {
-    suggestions.push({
-      title: `Action required: this plan will not last`,
-      detail: `At current spending, the portfolio runs out before age ${lifeExpectancy}. You must lower Go-Go spending %, delay retirement, or reduce your target end balance in Settings to fix this.`,
-      severity: "alert",
-    });
-  } else if (planStatus === "caution" && le.resetSpending != null) {
-    suggestions.push({
-      title: `Spending was cut after a modeled downturn — and it still works`,
-      detail: `A market event you entered reduced sustainable spending from ${fmtFull(le.baseSpending)}/yr to ${fmtFull(le.resetSpending)}/yr at age ${le.effectiveResetAge}. As long as you stick to this new amount, your plan stays on track through age ${lifeExpectancy}.`,
-      severity: "warning",
-    });
-  }
-
-  const retired = le.years.filter((y) => y.isRetired);
-
-  const rmdRow = le.years.find((y) => y.age === rmdAge);
-  if (rmdRow && rmdRow.rmd > 0) {
-    suggestions.push({
-      title: `RMDs begin at age ${rmdAge}`,
-      detail: `Required withdrawals of ~${fmtCompact(rmdRow.rmd)}/yr will add to taxable income starting age ${rmdAge}.`,
-      severity: "info",
-    });
-  }
-
-  const irmaaYears = retired.filter((y) => y.irmaa > 0);
-  if (irmaaYears.length > 0) {
-    const totalIrmaa = irmaaYears.reduce((s, y) => s + y.irmaa, 0);
-    suggestions.push({
-      title: `IRMAA surcharge triggered at age ${irmaaYears[0].age}`,
-      detail: `Medicare premium surcharges begin around age ${irmaaYears[0].age}, adding ~${fmtCompact(totalIrmaa)} over your plan.`,
-      severity: "warning",
-    });
-  }
-
-  const preRmd = retired.filter((y) => y.age < rmdAge);
-  const postRmd = retired.filter((y) => y.age >= rmdAge);
-  if (preRmd.length >= 2 && postRmd.length > 0) {
-    const avg = (arr) => arr.reduce((s, y) => s + y.effectiveRate, 0) / arr.length;
-    const preAvg = avg(preRmd);
-    const postAvg = avg(postRmd);
-    if (postAvg > 0 && preAvg < postAvg * 0.8) {
-      suggestions.push({
-        title: `Potential Roth conversion window: ages ${preRmd[0].age}–${preRmd[preRmd.length - 1].age}`,
-        detail: `Your tax rate is lower before RMDs begin — see Tax Optimization Pro for conversion amounts.`,
-        severity: "info",
-      });
-    }
-  }
-
-  return suggestions.slice(0, 3);
-}
 
 export default function SpendingPhasesTab({
   inputs, setField, solverData, loading, error,
@@ -156,7 +99,6 @@ export default function SpendingPhasesTab({
   const currentAnnualSpending = isGoGoPast && le.years[0] ? le.years[0].annualSpending : le.baseSpending;
   const { status: planStatus, statusDetail: planStatusDetail } = derivePlanStatus(le, lifeExpectancy);
   const vsFourPct = compareData?.comparison?.diffPct ?? null;
-  const coachSuggestions = buildCoachSuggestions(le, rmdAge, planStatus, lifeExpectancy);
 
   // Find the most recent checkpoint that applies to a given year.
   // Returns the checkpoint year, or null if no checkpoint applies yet.
@@ -297,11 +239,6 @@ export default function SpendingPhasesTab({
       <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16, marginBottom: 20 }}>
         <GrowthChart years={le.years} currentAge={currentAge} retirementAge={retirementAge} />
         <WealthAllocationDonut accounts={accounts} />
-      </div>
-
-      {/* ===== COACH SUGGESTIONS ===== */}
-      <div style={{ marginBottom: 20 }}>
-        <CoachSuggestions suggestions={coachSuggestions} />
       </div>
 
       {/* ===== PHASE BREAKDOWN (secondary detail strip) ===== */}

@@ -36,18 +36,20 @@ export default function ResultCard({ status, statusDetail, annualSpending, vsFou
         Plan Status
       </div>
 
-      <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 6, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 10 }}>
         <div style={{ fontSize: 44, fontWeight: 800, fontFamily: FONT_MONO, color: statusColor, lineHeight: 1 }}>
           {statusLabel}
         </div>
-        {annualSpending != null && (
-          <div style={{ fontSize: 16, color: "rgba(247,243,234,0.85)" }}>
-            You can spend{" "}
-            <strong style={{ fontFamily: FONT_MONO, color: "#fff", fontSize: 18 }}>{fmtFull(annualSpending)}</strong>/yr
-            <span style={{ color: "rgba(247,243,234,0.5)" }}> ({fmtCompact(Math.floor(annualSpending / 12))}/mo)</span>
-          </div>
-        )}
       </div>
+
+      {annualSpending != null && (
+        <div style={{ fontSize: 15, color: "rgba(247,243,234,0.85)", marginBottom: 14, lineHeight: 1.5 }}>
+          You can safely spend{" "}
+          <strong style={{ fontFamily: FONT_MONO, color: "#fff" }}>{fmtFull(annualSpending)}</strong>/yr
+          <span style={{ color: "rgba(247,243,234,0.5)" }}> ({fmtCompact(Math.floor(annualSpending / 12))}/mo)</span>{" "}
+          this year. Use the modeling tool below to see how market performance impacts your future spending limits.
+        </div>
+      )}
 
       {statusDetail && (
         <div style={{ fontSize: 15, color: "rgba(247,243,234,0.75)", marginBottom: 18 }}>
