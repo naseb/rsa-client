@@ -157,6 +157,12 @@ export default function SpendingPhasesTab({
   const currentYearRow = le.years[0];
   const totalSavings = accounts.reduce((s, a) => s + a.balance, 0);
   const currentAnnualSpending = isGoGoPast && le.years[0] ? le.years[0].annualSpending : le.baseSpending;
+  // Taxes tile must reflect the same year as the Annual Spending tile above —
+  // before retirement, le.years[0] has no withdrawals yet (real $0 tax), which
+  // would misleadingly pair with the projected baseSpending figure.
+  const taxYearRow = isGoGoPast && currentYearRow
+    ? currentYearRow
+    : (le.years.find((y) => y.age === retirementAge) || le.years.find((y) => y.isRetired) || currentYearRow);
   const { status: planStatus, statusDetail: planStatusDetail } = derivePlanStatus(le, lifeExpectancy);
   const RESULT_TILE_META = {
     "on-track": { value: "On Track", color: C.green },
@@ -299,8 +305,8 @@ export default function SpendingPhasesTab({
         <StatCard label="Annual Spending" value={fmtCompact(currentAnnualSpending)} sublabel={`${fmtCompact(Math.floor(currentAnnualSpending / 12))}/mo`} accentColor={C.accent} />
         <StatCard
           label="Taxes"
-          value={fmtCompact(currentYearRow?.totalTax || 0)}
-          sublabel={currentYearRow ? `${(currentYearRow.effectiveRate * 100).toFixed(1)}% effective` : ""}
+          value={fmtCompact(taxYearRow?.totalTax || 0)}
+          sublabel={taxYearRow ? `${(taxYearRow.effectiveRate * 100).toFixed(1)}% effective${isGoGoPast ? "" : " (at retirement)"}` : ""}
           accentColor={C.red}
         />
         <StatCard
