@@ -230,6 +230,7 @@ export default function SpendingPhasesTab({
         status={planStatus}
         statusDetail={planStatusDetail}
         annualSpending={currentAnnualSpending}
+        lifeExpectancy={lifeExpectancy}
         vsFourPct={vsFourPct}
         vsFourPctLoading={compareLoading}
         onViewComparison={onViewComparison}

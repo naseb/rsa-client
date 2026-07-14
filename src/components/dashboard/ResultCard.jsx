@@ -16,7 +16,7 @@ const STATUS_META = {
   "at-risk": { color: "#f87171", label: "At Risk" },
 };
 
-export default function ResultCard({ status, statusDetail, annualSpending, vsFourPct, vsFourPctLoading, onViewComparison }) {
+export default function ResultCard({ status, statusDetail, annualSpending, lifeExpectancy, vsFourPct, vsFourPctLoading, onViewComparison }) {
   const { color: statusColor, label: statusLabel } = STATUS_META[status] || STATUS_META["on-track"];
 
   return (
@@ -44,10 +44,21 @@ export default function ResultCard({ status, statusDetail, annualSpending, vsFou
 
       {annualSpending != null && (
         <div style={{ fontSize: 15, color: "rgba(247,243,234,0.85)", marginBottom: 14, lineHeight: 1.5 }}>
-          You can safely spend{" "}
-          <strong style={{ fontFamily: FONT_MONO, color: "#fff" }}>{fmtFull(annualSpending)}</strong>/yr
-          <span style={{ color: "rgba(247,243,234,0.5)" }}> ({fmtCompact(Math.floor(annualSpending / 12))}/mo)</span>{" "}
-          this year. Use the modeling tool below to see how market performance impacts your future spending limits.
+          {status === "at-risk" ? (
+            <>
+              You're currently spending{" "}
+              <strong style={{ fontFamily: FONT_MONO, color: "#fff" }}>{fmtFull(annualSpending)}</strong>/yr
+              <span style={{ color: "rgba(247,243,234,0.5)" }}> ({fmtCompact(Math.floor(annualSpending / 12))}/mo)</span>
+              {" "}— a pace this plan can't sustain{lifeExpectancy ? ` through age ${lifeExpectancy}` : ""}.
+            </>
+          ) : (
+            <>
+              You can safely spend{" "}
+              <strong style={{ fontFamily: FONT_MONO, color: "#fff" }}>{fmtFull(annualSpending)}</strong>/yr
+              <span style={{ color: "rgba(247,243,234,0.5)" }}> ({fmtCompact(Math.floor(annualSpending / 12))}/mo)</span>{" "}
+              this year. Use the modeling tool below to see how market performance impacts your future spending limits.
+            </>
+          )}
         </div>
       )}
 
