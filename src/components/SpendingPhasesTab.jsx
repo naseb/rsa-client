@@ -545,7 +545,9 @@ export default function SpendingPhasesTab({
             <thead>
               <tr style={{ background: C.pageBg }}>
                 {["Year", "Age", "Phase", "Return", "Portfolio", "Growth", "Spending", "+/-", "SS", "Pension"].map((h) => (
-                  <th key={h} style={{ padding: "8px 8px", textAlign: h === "Return" || h === "+/-" ? "center" : "right", fontWeight: 700, fontSize: 11, color: C.gray, borderBottom: `2px solid ${C.border}`, position: "sticky", top: 0, background: C.pageBg, zIndex: 1, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>{h}</th>
+                  <th key={h} style={{ padding: "8px 8px", textAlign: h === "Return" || h === "+/-" || h === "Age" || h === "Phase" ? "center" : "right", fontWeight: 700, fontSize: 11, color: C.gray, borderBottom: `2px solid ${C.border}`, position: "sticky", top: 0, background: C.pageBg, zIndex: 1, textTransform: "uppercase", letterSpacing: "0.04em", whiteSpace: "nowrap" }}>
+                    {h === "Spending" ? <>Spending<br />(COLA)</> : h}
+                  </th>
                 ))}
               </tr>
             </thead>
