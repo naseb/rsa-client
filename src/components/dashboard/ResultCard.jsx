@@ -8,7 +8,7 @@
  * behind this app yet, and a fabricated percentage would overstate the
  * confidence this tool can actually offer.
  */
-import { C, FONT_MONO } from "../../utils/theme";
+import { C, FONT_MONO, fmtFull, fmtCompact } from "../../utils/theme";
 
 const STATUS_META = {
   "on-track": { color: "#4ade80", label: "On Track" },
@@ -16,7 +16,7 @@ const STATUS_META = {
   "at-risk": { color: "#f87171", label: "At Risk" },
 };
 
-export default function ResultCard({ status, statusDetail, vsFourPct, vsFourPctLoading, onViewComparison }) {
+export default function ResultCard({ status, statusDetail, annualSpending, vsFourPct, vsFourPctLoading, onViewComparison }) {
   const { color: statusColor, label: statusLabel } = STATUS_META[status] || STATUS_META["on-track"];
 
   return (
@@ -36,10 +36,17 @@ export default function ResultCard({ status, statusDetail, vsFourPct, vsFourPctL
         Plan Status
       </div>
 
-      <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 6 }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 6, flexWrap: "wrap" }}>
         <div style={{ fontSize: 44, fontWeight: 800, fontFamily: FONT_MONO, color: statusColor, lineHeight: 1 }}>
           {statusLabel}
         </div>
+        {annualSpending != null && (
+          <div style={{ fontSize: 16, color: "rgba(247,243,234,0.85)" }}>
+            You can spend{" "}
+            <strong style={{ fontFamily: FONT_MONO, color: "#fff", fontSize: 18 }}>{fmtFull(annualSpending)}</strong>/yr
+            <span style={{ color: "rgba(247,243,234,0.5)" }}> ({fmtCompact(Math.floor(annualSpending / 12))}/mo)</span>
+          </div>
+        )}
       </div>
 
       {statusDetail && (

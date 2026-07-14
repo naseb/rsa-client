@@ -23,7 +23,6 @@ import {
   PHASE_COLORS, PHASE_BG_COLORS,
 } from "../utils/theme";
 import { derivePlanStatus } from "../utils/planStatus";
-import StatCard from "./dashboard/StatCard";
 import ResultCard from "./dashboard/ResultCard";
 import GrowthChart from "./dashboard/GrowthChart";
 import WealthAllocationDonut from "./dashboard/WealthAllocationDonut";
@@ -154,22 +153,8 @@ export default function SpendingPhasesTab({
   }
 
   // ===== New dashboard summary derivations =====
-  const currentYearRow = le.years[0];
-  const totalSavings = accounts.reduce((s, a) => s + a.balance, 0);
   const currentAnnualSpending = isGoGoPast && le.years[0] ? le.years[0].annualSpending : le.baseSpending;
-  // Taxes tile must reflect the same year as the Annual Spending tile above —
-  // before retirement, le.years[0] has no withdrawals yet (real $0 tax), which
-  // would misleadingly pair with the projected baseSpending figure.
-  const taxYearRow = isGoGoPast && currentYearRow
-    ? currentYearRow
-    : (le.years.find((y) => y.age === retirementAge) || le.years.find((y) => y.isRetired) || currentYearRow);
   const { status: planStatus, statusDetail: planStatusDetail } = derivePlanStatus(le, lifeExpectancy);
-  const RESULT_TILE_META = {
-    "on-track": { value: "On Track", color: C.green },
-    "caution": { value: "Caution", color: C.orange },
-    "at-risk": { value: "At Risk", color: C.red },
-  };
-  const resultTile = RESULT_TILE_META[planStatus] || RESULT_TILE_META["on-track"];
   const vsFourPct = compareData?.comparison?.diffPct ?? null;
   const coachSuggestions = buildCoachSuggestions(le, rmdAge, planStatus, lifeExpectancy);
 
@@ -298,29 +283,11 @@ export default function SpendingPhasesTab({
         </div>
       </div>
 
-      {/* ===== STAT TILE ROW ===== */}
-      <div className="print-card" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 20 }}>
-        <StatCard label="Savings" value={fmtCompact(totalSavings)} sublabel="Current total balance" />
-        <StatCard label={`Projected at ${lifeExpectancy}`} value={fmtCompact(le.finalBalance)} sublabel={`Target: ${fmtCompact(targetEndBalance)}`} />
-        <StatCard label="Annual Spending" value={fmtCompact(currentAnnualSpending)} sublabel={`${fmtCompact(Math.floor(currentAnnualSpending / 12))}/mo`} accentColor={C.accent} />
-        <StatCard
-          label="Taxes"
-          value={fmtCompact(taxYearRow?.totalTax || 0)}
-          sublabel={taxYearRow ? `${(taxYearRow.effectiveRate * 100).toFixed(1)}% effective${isGoGoPast ? "" : " (at retirement)"}` : ""}
-          accentColor={C.red}
-        />
-        <StatCard
-          label="Result"
-          value={resultTile.value}
-          sublabel={vsFourPct != null ? `${vsFourPct >= 0 ? "+" : ""}${vsFourPct.toFixed(0)}% vs 4% Rule` : "vs 4% Rule: —"}
-          accentColor={resultTile.color}
-        />
-      </div>
-
       {/* ===== RESULT CARD ===== */}
       <ResultCard
         status={planStatus}
         statusDetail={planStatusDetail}
+        annualSpending={currentAnnualSpending}
         vsFourPct={vsFourPct}
         vsFourPctLoading={compareLoading}
         onViewComparison={onViewComparison}
