@@ -71,7 +71,7 @@ export default function LandingPage() {
         }
         .lp-hero-title {
           font-family: 'Playfair Display', serif;
-          font-size: clamp(42px, 5.5vw, 72px);
+          font-size: clamp(38px, 5.5vw, 68px);
           font-weight: 900;
           line-height: 1.08;
           letter-spacing: -0.02em;
@@ -274,7 +274,7 @@ export default function LandingPage() {
           .lp-nav { padding: 16px 24px; }
           .lp-logo-sub { display: none; }
           .lp-hero { padding: 64px 24px 52px; }
-          .lp-hero-title { font-size: 38px; }
+          .lp-hero-title { font-size: 34px; }
           .lp-hero-sub { font-size: 18px; }
           .lp-preview-wrap { padding: 0 24px 64px; }
           .lp-mini-row { grid-template-columns: 1fr; }
@@ -376,7 +376,7 @@ export default function LandingPage() {
         <section className="lp-hero">
           <div className="lp-eyebrow-pill">Retirement Income & Tax Optimization Calculator</div>
           <h1 className="lp-hero-title">
-            "Stop Guessing How Much You Can Spend in Retirement.  Run the Math Yourself, And Know Exactly What Your Accounts Can Pay You."
+            Will Your Money Last In Retirement? Find Out in 5 Minutes.
           </h1>
           <p className="lp-hero-sub">
             You spent decades building your retirement savings. Now you need a
