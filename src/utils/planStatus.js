@@ -14,17 +14,19 @@ import { fmtFull } from "./theme";
  *     running out of money (bottomed out at $0, or the portfolio hits
  *     zero before life expectancy in some retired year).
  *   - caution: `solve()`/`solveWithOverrides()` always finds *some*
- *     sustainable spending level by construction — a simulated market
- *     downturn (a return override in the Year-by-Year table) triggers a
- *     checkpoint re-solve that quietly LOWERS spending rather than
- *     failing outright. `resetSpending` is only non-null when that
- *     re-solve genuinely reduced spending (see solver/index.js's
- *     `resetSpending: ... < baseSpending ? ... : null` guard) — a boom
- *     override never lands here. This tier is the visible flag for that
- *     silent cut.
- *   - on-track: no correction needed, spending holds as originally solved.
+ *     sustainable spending level by construction, so a modeled crash or
+ *     a one-time expense never fails outright — it quietly lowers
+ *     spending instead. `solverData.cleanBaseline` (solved with every
+ *     override type stripped) vs the actual current spending is the
+ *     honest before/after: `baseSpending` itself is NOT a clean "before"
+ *     number, since the binary search sees marketReturns/spendingOverrides
+ *     in every year it tests — comparing baseSpending to resetSpending
+ *     alone regularly understates or misses the real impact (see
+ *     solver/index.js's cleanBaseline doc comment).
+ *   - on-track: no meaningful gap between the clean baseline and the
+ *     current plan.
  */
-export function derivePlanStatus(solverData, lifeExpectancy) {
+export function derivePlanStatus(solverData, lifeExpectancy, modeledCauseLabel = "the scenario you modeled") {
   if (!solverData || !solverData.years) {
     return { status: "on-track", statusDetail: "" };
   }
@@ -40,10 +42,19 @@ export function derivePlanStatus(solverData, lifeExpectancy) {
     };
   }
 
-  if (solverData.resetSpending != null) {
+  // Current effective spending: whatever a checkpoint re-solved going
+  // forward (resetSpending), or baseSpending if no checkpoint changed it.
+  const currentSpending = solverData.resetSpending ?? solverData.baseSpending;
+  const cleanBaseline = solverData.cleanBaseline;
+  const hasMeaningfulImpact =
+    cleanBaseline != null && Math.floor(cleanBaseline) > Math.floor(currentSpending);
+
+  if (hasMeaningfulImpact) {
+    const impactPct = Math.round((1 - currentSpending / cleanBaseline) * 100);
+    const startingClause = solverData.effectiveResetAge != null ? ` starting age ${solverData.effectiveResetAge}` : "";
     return {
       status: "caution",
-      statusDetail: `A market event you modeled reduced sustainable spending from ${fmtFull(solverData.baseSpending)}/yr to ${fmtFull(solverData.resetSpending)}/yr starting age ${solverData.effectiveResetAge}. Sticking to this lower amount keeps your plan on track through age ${lifeExpectancy}.`,
+      statusDetail: `Because you're modeling ${modeledCauseLabel}, this lowers your sustainable spending by ${impactPct}% — from ${fmtFull(cleanBaseline)}/yr to ${fmtFull(currentSpending)}/yr${startingClause}. Sticking to this lower amount keeps your plan on track through age ${lifeExpectancy}.`,
     };
   }
 

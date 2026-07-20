@@ -97,7 +97,13 @@ export default function SpendingPhasesTab({
 
   // ===== New dashboard summary derivations =====
   const currentAnnualSpending = isGoGoPast && le.years[0] ? le.years[0].annualSpending : le.baseSpending;
-  const { status: planStatus, statusDetail: planStatusDetail } = derivePlanStatus(le, lifeExpectancy);
+
+  const modeledCauses = [];
+  if (numReturnOverrides > 0 || Object.keys(portfolioOverrides).length > 0) modeledCauses.push("market performance");
+  if (numSpendingOverrides > 0) modeledCauses.push("a planned expense you added");
+  const modeledCauseLabel = modeledCauses.length > 0 ? modeledCauses.join(" and ") : "the scenario you modeled";
+
+  const { status: planStatus, statusDetail: planStatusDetail } = derivePlanStatus(le, lifeExpectancy, modeledCauseLabel);
   const vsFourPct = compareData?.comparison?.diffPct ?? null;
 
   // Find the most recent checkpoint that applies to a given year.
