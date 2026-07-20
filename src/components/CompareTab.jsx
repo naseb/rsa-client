@@ -35,15 +35,22 @@ export default function CompareTab({ compareData, loading, error, baseSpending, 
 
   const { rsa, comparison: cmp } = compareData;
 
-  // ── Phase spending from RSA year data ──────────────────────────────────────
+  // ── Phase spending: current effective spending × each phase's percentage ──
+  // "Current effective spending" is resetSpending if a checkpoint fired
+  // (market crash, portfolio override, or planned expense), else baseSpending
+  // — the same number the Dashboard's Plan Status card tells the user they
+  // can spend right now. Deliberately NOT a snapshot of whichever year a
+  // phase first appears in the table: that's contaminated by whether a
+  // checkpoint happened to have already fired by that specific year, which
+  // made Go-Go/Slow-Go/No-Go inconsistent with each other and with the
+  // Dashboard whenever a crash was modeled mid-retirement.
   const retiredYears   = rsa?.years?.filter(y => y.isRetired) || [];
   const retirementAge  = retiredYears[0]?.age || 65;
-  const goGoYr         = retiredYears.find(y => y.phaseName === 'Go-Go');
-  const slowGoYr       = retiredYears.find(y => y.phaseName === 'Slow-Go');
-  const noGoYr         = retiredYears.find(y => y.phaseName === 'No-Go');
-  const goGoSpending   = goGoYr?.annualSpending   || rsa?.baseSpending || 0;
-  const slowGoSpending = slowGoYr?.annualSpending || 0;
-  const noGoSpending   = noGoYr?.annualSpending   || 0;
+  const currentSpendingBase = rsa?.resetSpending ?? rsa?.baseSpending ?? 0;
+  const sortedPhaseList = [...(inputs?.phases || [])].sort((a, b) => a.startAge - b.startAge);
+  const goGoSpending   = Math.round(currentSpendingBase * (sortedPhaseList[0]?.pct ?? 100) / 100);
+  const slowGoSpending = sortedPhaseList[1] ? Math.round(currentSpendingBase * sortedPhaseList[1].pct / 100) : 0;
+  const noGoSpending   = sortedPhaseList[2] ? Math.round(currentSpendingBase * sortedPhaseList[2].pct / 100) : 0;
 
   const goGoYears   = retiredYears.filter(y => y.phaseName === 'Go-Go').length;
   const slowGoYears = retiredYears.filter(y => y.phaseName === 'Slow-Go').length;
