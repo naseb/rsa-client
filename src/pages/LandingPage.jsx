@@ -128,29 +128,37 @@ export default function LandingPage() {
           border-radius: 6px; padding: 6px 14px;
           font-size: 13px; color: #64748b; text-align: center; font-family: monospace;
         }
-        .lp-preview-content { padding: 28px 32px; }
-        .lp-preview-header {
-          background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
-          border-radius: 12px; padding: 20px 26px; margin-bottom: 20px;
-          display: flex; justify-content: space-between; align-items: center;
+        .lp-preview-content { padding: 24px; background: #f7f3ea; }
+        .lp-topbar {
+          background: #fff; border: 1px solid #d4e8d8; border-radius: 10px;
+          padding: 12px 18px; margin-bottom: 16px;
+          font-size: 13px; font-weight: 600; color: #1a2b1a;
         }
-        .lp-ph-eyebrow { font-size: 11px; color: #64748b; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 5px; }
-        .lp-ph-title { font-family: 'Source Sans 3', sans-serif; font-weight: 700; font-size: 17px; color: #f8fafc; }
-        .lp-ph-sub { font-size: 12px; color: #94a3b8; margin-top: 4px; }
-        .lp-ph-val { font-size: 26px; font-weight: 700; color: #10b981; font-family: monospace; text-align: right; }
-        .lp-ph-lbl { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; text-align: right; }
-        .lp-mini-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 18px; }
-        .lp-mc { background: rgba(255,255,255,0.05); border: 1px solid rgba(148,163,184,0.1); border-radius: 10px; padding: 14px 16px; }
-        .lp-mc-lbl { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-        .lp-mc-val { font-size: 20px; font-weight: 700; color: #10b981; font-family: monospace; }
-        .lp-mc-sub { font-size: 12px; color: #64748b; margin-top: 3px; }
-        .lp-pt { width: 100%; border-collapse: collapse; font-size: 13px; }
-        .lp-pt th { color: #64748b; text-transform: uppercase; font-size: 11px; letter-spacing: 0.08em; padding: 8px 14px; border-bottom: 1px solid rgba(148,163,184,0.1); text-align: left; font-weight: 600; }
-        .lp-pt td { padding: 8px 14px; border-bottom: 1px solid rgba(148,163,184,0.06); color: #94a3b8; }
-        .lp-pt td:first-child { color: #f1f5f9; font-weight: 500; }
-        .lp-pt td.lp-g { color: #10b981; font-weight: 600; font-family: monospace; }
-        .lp-pb { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 4px; background: rgba(16,185,129,0.12); color: #10b981; }
-        .lp-pb.slow { background: rgba(148,163,184,0.1); color: #94a3b8; }
+        .lp-status-card {
+          background: linear-gradient(135deg, #1c3829 0%, #2d5a47 40%, #1c3829 100%);
+          border-radius: 14px; padding: 22px 26px; margin-bottom: 16px;
+          border-bottom: 2px solid #b8860b;
+        }
+        .lp-status-eyebrow { font-size: 10px; color: rgba(247,243,234,0.5); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+        .lp-status-value { font-size: 32px; font-weight: 800; font-family: monospace; color: #4ade80; line-height: 1; margin-bottom: 10px; }
+        .lp-status-line { font-size: 13px; color: rgba(247,243,234,0.85); line-height: 1.5; margin-bottom: 10px; }
+        .lp-status-cmp { font-size: 12px; color: rgba(247,243,234,0.85); }
+        .lp-grid2 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; margin-bottom: 16px; }
+        .lp-white-card { background: #fff; border: 1px solid #d4e8d8; border-radius: 12px; padding: 16px 18px; }
+        .lp-card-title { font-size: 13px; font-weight: 700; color: #1a2b1a; margin-bottom: 12px; }
+        .lp-donut-legend { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; font-size: 11px; }
+        .lp-gogo-panel {
+          background: linear-gradient(135deg, #1c3829 0%, #2d5a47 40%, #1c3829 100%);
+          border-radius: 14px; padding: 20px 24px;
+          border-bottom: 2px solid #b8860b;
+        }
+        .lp-gogo-eyebrow { font-size: 10px; color: rgba(247,243,234,0.5); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+        .lp-gogo-value { font-size: 26px; font-weight: 800; color: #f59e0b; font-family: monospace; margin-bottom: 16px; }
+        .lp-phase-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        .lp-phase-mc { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 12px; }
+        .lp-phase-mc-lbl { font-size: 9px; color: rgba(247,243,234,0.5); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+        .lp-phase-mc-val { font-size: 14px; font-weight: 700; color: #f7f3ea; font-family: monospace; }
+        .lp-phase-mc-sub { font-size: 10px; color: rgba(247,243,234,0.45); margin-top: 2px; }
 
         /* ── DIVIDER ── */
         .lp-gold-divider {
@@ -277,7 +285,8 @@ export default function LandingPage() {
           .lp-hero-title { font-size: 34px; }
           .lp-hero-sub { font-size: 18px; }
           .lp-preview-wrap { padding: 0 24px 64px; }
-          .lp-mini-row { grid-template-columns: 1fr; }
+          .lp-grid2 { grid-template-columns: 1fr; }
+          .lp-phase-row { grid-template-columns: repeat(2, 1fr); }
           .lp-features { padding: 64px 24px; }
           .lp-fg { grid-template-columns: 1fr; }
           .lp-how { padding: 64px 24px; }
@@ -406,51 +415,122 @@ export default function LandingPage() {
               <div className="lp-preview-url">howtospendyourretirement.com/app</div>
             </div>
             <div className="lp-preview-content">
-              <div className="lp-preview-header">
-                <div>
-                  <div className="lp-ph-eyebrow">Retirement Spending Analyzer</div>
-                  <div className="lp-ph-title">
-                    ◆ <span style={{ color: '#10b981' }}>Go-Go</span>{' '}
-                    · <span style={{ color: '#94a3b8' }}>Slow-Go</span>{' '}
-                    · <span style={{ color: '#475569' }}>No-Go</span>
+
+              {/* Top info bar */}
+              <div className="lp-topbar">
+                Portfolio: <span style={{ color: '#2d6a4f' }}>$1.85M</span>
+                {' '}·{' '}
+                Goal: <span style={{ color: '#b8860b' }}>$250.0K</span> at age 95
+              </div>
+
+              {/* Plan Status card */}
+              <div className="lp-status-card">
+                <div className="lp-status-eyebrow">Plan Status</div>
+                <div className="lp-status-value">On Track</div>
+                <div className="lp-status-line">
+                  You can safely spend <strong style={{ color: '#fff' }}>$132,500</strong>/yr ($11.0K/mo) this year.
+                  Use the modeling tool below to see how market performance impacts your future spending limits.
+                </div>
+                <div className="lp-status-cmp">
+                  <strong style={{ color: '#4ade80' }}>+38%</strong> higher sustainable spending than the 4% Rule
+                  {' '}<span style={{ color: '#b8860b', fontWeight: 700 }}>See full comparison →</span>
+                </div>
+              </div>
+
+              {/* Growth chart + Wealth Allocation */}
+              <div className="lp-grid2">
+                <div className="lp-white-card">
+                  <div className="lp-card-title">Portfolio Growth Over Time</div>
+                  {(() => {
+                    const points = [
+                      { age: 57, v: 1600000 }, { age: 60, v: 1750000 }, { age: 62, v: 1850000 },
+                      { age: 65, v: 1800000 }, { age: 70, v: 1600000 }, { age: 75, v: 1350000 },
+                      { age: 80, v: 1050000 }, { age: 85, v: 750000 }, { age: 90, v: 450000 }, { age: 95, v: 250000 },
+                    ];
+                    const W = 400, H = 130, PAD = 4, MAX_V = 1850000, MIN_AGE = 57, MAX_AGE = 95;
+                    const toX = (age) => PAD + ((age - MIN_AGE) / (MAX_AGE - MIN_AGE)) * (W - PAD * 2);
+                    const toY = (v) => H - PAD - (v / MAX_V) * (H - PAD * 2);
+                    const linePts = points.map((p) => `${toX(p.age)},${toY(p.v)}`).join(' ');
+                    const areaPts = `${toX(MIN_AGE)},${H} ${linePts} ${toX(MAX_AGE)},${H}`;
+                    const retireX = toX(65);
+                    return (
+                      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 130, display: 'block' }}>
+                        <polygon points={areaPts} fill="#2d6a4f" opacity="0.12" />
+                        <line x1={retireX} y1={0} x2={retireX} y2={H} stroke="#b8860b" strokeDasharray="4,3" strokeWidth="1.5" opacity="0.6" />
+                        <polyline points={linePts} fill="none" stroke="#2d6a4f" strokeWidth="2.5" />
+                      </svg>
+                    );
+                  })()}
+                </div>
+
+                <div className="lp-white-card">
+                  <div className="lp-card-title">Wealth Allocation</div>
+                  {(() => {
+                    const R = 40, CX = 52, CY = 52, STROKE = 15;
+                    const circumference = 2 * Math.PI * R;
+                    const preTaxLen = 0.78 * circumference;
+                    return (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <div style={{ position: 'relative', width: 104, height: 104, flexShrink: 0 }}>
+                          <svg viewBox="0 0 104 104" style={{ width: 104, height: 104 }}>
+                            <circle cx={CX} cy={CY} r={R} fill="none" stroke="#f59e0b" strokeWidth={STROKE} />
+                            <circle cx={CX} cy={CY} r={R} fill="none" stroke="#2d6a4f" strokeWidth={STROKE}
+                              strokeDasharray={`${preTaxLen} ${circumference}`}
+                              transform={`rotate(-90 ${CX} ${CY})`} />
+                          </svg>
+                          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+                            <div style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 800, color: '#1a2b1a' }}>$1.85M</div>
+                            <div style={{ fontSize: 8, color: '#4d6b55', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Total</div>
+                          </div>
+                        </div>
+                        <div className="lp-donut-legend">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#1a2b1a' }}>
+                            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#2d6a4f', display: 'inline-block' }} />
+                            Pre-tax <span style={{ color: '#4d6b55', fontFamily: 'monospace' }}>$1.44M (78%)</span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#1a2b1a' }}>
+                            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b', display: 'inline-block' }} />
+                            Taxable <span style={{ color: '#4d6b55', fontFamily: 'monospace' }}>$410.0K (22%)</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* Go-Go phase panel */}
+              <div className="lp-gogo-panel">
+                <div className="lp-gogo-eyebrow">Go-Go Phase Base Spending (Today's Dollars)</div>
+                <div className="lp-gogo-value">$132,500/year</div>
+                <div className="lp-phase-row">
+                  <div className="lp-phase-mc">
+                    <div className="lp-phase-mc-lbl" style={{ color: '#f59e0b' }}>Go-Go · Ages 65–74</div>
+                    <div className="lp-phase-mc-val">$132,500/yr</div>
+                    <div className="lp-phase-mc-sub">$11,042/mo · 100% of base</div>
                   </div>
-                  <div className="lp-ph-sub">Portfolio: $1,850,000 · Goal: $500,000 at age 90</div>
-                </div>
-                <div>
-                  <div className="lp-ph-val">$114,200</div>
-                  <div className="lp-ph-lbl">Annual Spending</div>
-                </div>
-              </div>
-              <div className="lp-mini-row">
-                <div className="lp-mc">
-                  <div className="lp-mc-lbl">Go-Go Spending</div>
-                  <div className="lp-mc-val">$114,200</div>
-                  <div className="lp-mc-sub">$9,517/mo · Ages 65–75</div>
-                </div>
-                <div className="lp-mc">
-                  <div className="lp-mc-lbl">Slow-Go Spending</div>
-                  <div className="lp-mc-val" style={{ color: '#94a3b8' }}>$91,360</div>
-                  <div className="lp-mc-sub">$7,613/mo · Ages 75–85</div>
-                </div>
-                <div className="lp-mc">
-                  <div className="lp-mc-lbl">No-Go Spending</div>
-                  <div className="lp-mc-val" style={{ color: '#94a3b8' }}>$68,520</div>
-                  <div className="lp-mc-sub">$5,710/mo · Ages 85–90</div>
+                  <div className="lp-phase-mc">
+                    <div className="lp-phase-mc-lbl" style={{ color: '#c4b5fd' }}>Slow-Go · Ages 75–84</div>
+                    <div className="lp-phase-mc-val">$106,000/yr</div>
+                    <div className="lp-phase-mc-sub">$8,833/mo · 80% of base</div>
+                  </div>
+                  <div className="lp-phase-mc">
+                    <div className="lp-phase-mc-lbl" style={{ color: '#67e8f9' }}>No-Go · Ages 85–95</div>
+                    <div className="lp-phase-mc-val">$79,500/yr</div>
+                    <div className="lp-phase-mc-sub">$6,625/mo · 60% of base</div>
+                  </div>
+                  <div className="lp-phase-mc">
+                    <div className="lp-phase-mc-lbl">Portfolio at 95</div>
+                    <div className="lp-phase-mc-val">$250.0K</div>
+                    <div className="lp-phase-mc-sub">Target: $250.0K</div>
+                  </div>
+                  <div className="lp-phase-mc">
+                    <div className="lp-phase-mc-lbl">Social Security</div>
+                    <div className="lp-phase-mc-val">$2,850/mo</div>
+                    <div className="lp-phase-mc-sub">Claiming age 67</div>
+                  </div>
                 </div>
               </div>
-              <table className="lp-pt">
-                <thead>
-                  <tr>
-                    <th>Age</th><th>Phase</th><th>Spending</th><th>Portfolio</th><th>Tax</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td>65</td><td><span className="lp-pb">Go-Go</span></td><td className="lp-g">$114,200</td><td>$1,822,400</td><td>$18,340</td></tr>
-                  <tr><td>70</td><td><span className="lp-pb">Go-Go</span></td><td className="lp-g">$114,200</td><td>$1,634,100</td><td>$20,180</td></tr>
-                  <tr><td>75</td><td><span className="lp-pb slow">Slow-Go</span></td><td style={{ color: '#94a3b8', fontFamily: 'monospace' }}>$91,360</td><td>$1,490,200</td><td>$14,220</td></tr>
-                  <tr><td>80</td><td><span className="lp-pb slow">Slow-Go</span></td><td style={{ color: '#94a3b8', fontFamily: 'monospace' }}>$91,360</td><td>$1,280,500</td><td>$15,890</td></tr>
-                </tbody>
-              </table>
             </div>
           </div>
         </div>
